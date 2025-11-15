@@ -1190,13 +1190,33 @@
             // Сначала проверяем, есть ли сохраненный пользователь
             const savedUser = localStorage.getItem('hamster_combat_current_user');
             if (savedUser) {
-                // Пользователь уже авторизован ранее
+                console.log('Найден сохраненный пользователь:', savedUser);
                 user = JSON.parse(savedUser);
-                handleSuccessfulAuth();
-            } else {
-                // Иначе инициализируем Telegram Web App
-                initTelegramWebApp();
+                
+                // Проверяем, есть ли сохраненный прогресс
+                const savedProgress = localStorage.getItem(`hamster_combat_${user.id}`);
+                if (savedProgress) {
+                    console.log('Найден сохраненный прогресс');
+                    const parsedData = JSON.parse(savedProgress);
+                    gameData = parsedData.gameData;
+                } else {
+                    console.log('Прогресс не найден, создаем новый');
+                    initializeGameData();
+                }
+                
+                // Сразу показываем приложение
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+                updateUserInterface();
+                updateUI();
+                setInterval(autoclick, 1000);
+                showNotification(`С возвращением, ${user.first_name}!`, 'success');
+                return;
             }
+            
+            // Если сохраненного пользователя нет, инициализируем Telegram Web App
+            console.log('Сохраненный пользователь не найден, инициализируем Telegram Web App');
+            initTelegramWebApp();
         }
 
         // Функция для инициализации Telegram Web App
@@ -1222,13 +1242,16 @@
                 
                 // Получаем данные пользователя
                 const initData = tg.initData || tg.initDataUnsafe;
+                console.log('Telegram initData:', initData);
                 
                 if (initData && initData.user) {
                     // Пользователь уже авторизован в Telegram
                     user = initData.user;
+                    console.log('Пользователь авторизован через Telegram:', user);
                     handleSuccessfulAuth();
                 } else {
                     // Пользователь не авторизован, показываем кнопку авторизации
+                    console.log('Пользователь не авторизован, показываем экран авторизации');
                     showAuthScreen();
                 }
                 
@@ -1310,8 +1333,11 @@
 
         // Функция для обработки успешной авторизации
         function handleSuccessfulAuth() {
+            console.log('Успешная авторизация, пользователь:', user);
+            
             // Сохраняем пользователя в localStorage
             localStorage.setItem('hamster_combat_current_user', JSON.stringify(user));
+            console.log('Пользователь сохранен в localStorage');
             
             // Обновляем интерфейс пользователя
             updateUserInterface();
@@ -1322,9 +1348,11 @@
             
             // Загружаем прогресс или инициализируем новую игру
             if (!loadProgress()) {
+                console.log('Создаем новую игру');
                 initializeGameData();
                 showNotification(`Добро пожаловать, ${user.first_name}! Начинаем новую игру!`, 'success');
             } else {
+                console.log('Прогресс загружен');
                 showNotification(`С возвращением, ${user.first_name}! Прогресс загружен.`, 'success');
             }
             
@@ -1532,6 +1560,7 @@
                     timestamp: Date.now()
                 };
                 localStorage.setItem(`hamster_combat_${user.id}`, JSON.stringify(saveData));
+                console.log('Прогресс сохранен для пользователя:', user.id);
             }
         }
 
@@ -1543,10 +1572,13 @@
                     try {
                         const parsedData = JSON.parse(savedData);
                         gameData = parsedData.gameData;
+                        console.log('Прогресс загружен для пользователя:', user.id);
                         return true;
                     } catch (e) {
                         console.error('Ошибка загрузки прогресса:', e);
                     }
+                } else {
+                    console.log('Прогресс не найден для пользователя:', user.id);
                 }
             }
             return false;
@@ -2023,7 +2055,7 @@
 
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
-            // Инициализируем приложение
+            console.log('DOM загружен, инициализируем приложение');
             initApp();
             
             // Обработчик клика по лапке
