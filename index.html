@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hamster Combat</title>
+    <title>PawTapTap</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -841,7 +841,7 @@
                     <i class="fas fa-hamster" style="font-size: 24px; color: var(--text-secondary);"></i>
                 </div>
                 <div class="user-details">
-                    <h2 id="username">Хомяк-Боец</h2>
+                    <h2 id="username">Боец</h2>
                     <div class="level" id="user-level">Уровень 1: Начинающий</div>
                     <div class="level-progress">
                         <div class="level-progress-bar" id="level-progress-bar" style="width: 0%"></div>
@@ -1635,27 +1635,27 @@
             document.getElementById('invite-friends-btn').addEventListener('click', inviteFriends);
 
             // Демонстрация: кнопка для тестирования реферальной системы
-            const demoButton = document.createElement('button');
-            demoButton.textContent = 'Демо: Добавить реферального друга';
-            demoButton.style.width = '100%';
-            demoButton.style.padding = '10px';
-            demoButton.style.marginTop = '10px';
-            demoButton.style.backgroundColor = 'var(--warning)';
-            demoButton.style.border = 'none';
-            demoButton.style.borderRadius = '5px';
-            demoButton.style.color = 'white';
-            demoButton.style.cursor = 'pointer';
-            demoButton.addEventListener('click', function() {
-                const friendName = prompt('Введите имя друга:');
-                if (friendName) {
-                    addReferralFriend(friendName);
-                }
+         //   const demoButton = document.createElement('button');
+        //    demoButton.textContent = 'Демо: Добавить реферального друга';
+          //  demoButton.style.width = '100%';
+           // demoButton.style.padding = '10px';
+           // demoButton.style.marginTop = '10px';
+           // demoButton.style.backgroundColor = 'var(--warning)';
+            //demoButton.style.border = 'none';
+            //demoButton.style.borderRadius = '5px';
+           // demoButton.style.color = 'white';
+           // demoButton.style.cursor = 'pointer';
+           // demoButton.addEventListener('click', function() {
+           //     const friendName = prompt('Введите имя друга:');
+           //     if (friendName) {
+           //         addReferralFriend(friendName);
+             //   }
             });
             document.getElementById('friends-page').appendChild(demoButton);
             
             // Показываем приветственное сообщение
             setTimeout(() => {
-                showNotification('Добро пожаловать в Hamster Combat! Нажимай на лапку, чтобы зарабатывать монеты!', 'success');
+                showNotification('Добро пожаловать в PawTapTap! Нажимай на лапку, чтобы зарабатывать монеты!', 'success');
             }, 1000);
         });
     </script>
