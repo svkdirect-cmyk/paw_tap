@@ -2,10 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="format-detection" content="telephone=no">
-    <title>Paw Tap Tap</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hamster Combat</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -843,7 +841,7 @@
                     <i class="fas fa-hamster" style="font-size: 24px; color: var(--text-secondary);"></i>
                 </div>
                 <div class="user-details">
-                    <h2 id="username"></h2>
+                    <h2 id="username">Хомяк-Боец</h2>
                     <div class="level" id="user-level">Уровень 1: Начинающий</div>
                     <div class="level-progress">
                         <div class="level-progress-bar" id="level-progress-bar" style="width: 0%"></div>
@@ -861,10 +859,10 @@
                         <i class="fas fa-paw"></i>
                     </div>
                 </div>
-                <div class="click-info">Тапай на лапку, чтобы зарабатывать монеты!</div>
+                <div class="click-info">Нажимай на лапку, чтобы зарабатывать монеты!</div>
             </div>
 
-            <!--<h3>Прокачка</h3> -->
+            <h3>Прокачка</h3>
             <div class="upgrades" id="upgrades-container">
                 <!-- Улучшения будут добавлены через JS -->
             </div>
@@ -1078,7 +1076,7 @@
                 },
                 { 
                     id: 3, 
-                    name: "Лапка-ниндзя", 
+                    name: "Хомяк-ниндзя", 
                     image: "🥷",
                     imageType: "icon",
                     description: "Шанс 5% на 10x клик", 
@@ -1103,9 +1101,9 @@
                 }
             ],
             friends: [
-                { id: 1, name: "Боец", level: 5, coins: 1250000, avatar: "🐹", isReferral: true },
+                { id: 1, name: "Хомяк_Боец", level: 5, coins: 1250000, avatar: "🐹", isReferral: true },
                 { id: 2, name: "Бегун_3000", level: 3, coins: 450000, avatar: "🐹", isReferral: false },
-                { id: 3, name: "Силач", level: 7, coins: 3200000, avatar: "🐹", isReferral: true }
+                { id: 3, name: "Силач_Хомяк", level: 7, coins: 3200000, avatar: "🐹", isReferral: true }
             ],
             levels: [
                 { level: 1, name: "Начинающий", icon: "🐣", requirement: 0 },
@@ -1116,7 +1114,7 @@
                 { level: 6, name: "Мастер", icon: "🎯", requirement: 150000 },
                 { level: 7, name: "Легенда", icon: "🌟", requirement: 500000 },
                 { level: 8, name: "Император", icon: "👑", requirement: 1500000 },
-                { level: 9, name: "ЛАПИЩЕ", icon: "😇", requirement: 5000000 }
+                { level: 9, name: "БОГ ХОМЯКОВ", icon: "😇", requirement: 5000000 }
             ],
             walletConnected: false,
             walletAddress: null,
@@ -1471,7 +1469,7 @@
 
         // Функция для приглашения друзей через Telegram
         function inviteFriends() {
-            const link = `https://t.me/share/url?url=${encodeURIComponent(`https://t.me/hamster_combat_bot?start=${gameData.referral.code}`)}&text=${encodeURIComponent('Присоединяйся к PawTapTap! Нажимай на хомяка и зарабатывай монеты! 🐹💰')}`;
+            const link = `https://t.me/share/url?url=${encodeURIComponent(`https://t.me/hamster_combat_bot?start=${gameData.referral.code}`)}&text=${encodeURIComponent('Присоединяйся к Hamster Combat! Нажимай на хомяка и зарабатывай монеты! 🐹💰')}`;
             
             // В реальном приложении здесь будет вызов Telegram API
             // Для демонстрации просто открываем в новом окне
@@ -1530,7 +1528,7 @@
                 let clickValue = 1 * gameData.multiplier;
                 
                 // Проверяем бонус комбо-карты "Хомяк-ниндзя"
-                const ninjaCombo = gameData.combos.find(c => c.name.includes("Лапка-ниндзя") && c.owned);
+                const ninjaCombo = gameData.combos.find(c => c.name.includes("Хомяк-ниндзя") && c.owned);
                 if (ninjaCombo && Math.random() < 0.05) {
                     clickValue *= 10;
                     showNotification('Критический удар! 10x монет!', 'warning');
@@ -1637,27 +1635,27 @@
             document.getElementById('invite-friends-btn').addEventListener('click', inviteFriends);
 
             // Демонстрация: кнопка для тестирования реферальной системы
-           // const demoButton = document.createElement('button');
-          
-          //  demoButton.style.width = '100%';
-           // demoButton.style.padding = '10px';
-           // demoButton.style.marginTop = '10px';
-           // demoButton.style.backgroundColor = 'var(--warning)';
-           // demoButton.style.border = 'none';
-          //  demoButton.style.borderRadius = '5px';
-          //  demoButton.style.color = 'white';
-          //  demoButton.style.cursor = 'pointer';
-          //  demoButton.addEventListener('click', function() {
-          //      const friendName = prompt('Введите имя друга:');
-            //    if (friendName) {
-            //        addReferralFriend(friendName);
-            //    }
+            const demoButton = document.createElement('button');
+            demoButton.textContent = 'Демо: Добавить реферального друга';
+            demoButton.style.width = '100%';
+            demoButton.style.padding = '10px';
+            demoButton.style.marginTop = '10px';
+            demoButton.style.backgroundColor = 'var(--warning)';
+            demoButton.style.border = 'none';
+            demoButton.style.borderRadius = '5px';
+            demoButton.style.color = 'white';
+            demoButton.style.cursor = 'pointer';
+            demoButton.addEventListener('click', function() {
+                const friendName = prompt('Введите имя друга:');
+                if (friendName) {
+                    addReferralFriend(friendName);
+                }
             });
             document.getElementById('friends-page').appendChild(demoButton);
             
             // Показываем приветственное сообщение
             setTimeout(() => {
-                showNotification('Добро пожаловать в PawTapTap! Нажимай на лапку, чтобы зарабатывать монеты!', 'success');
+                showNotification('Добро пожаловать в Hamster Combat! Нажимай на лапку, чтобы зарабатывать монеты!', 'success');
             }, 1000);
         });
     </script>
