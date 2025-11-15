@@ -862,12 +862,60 @@
                 }
             });
             
-            // Остальные обработчики...
-            // (connect-wallet, upgrade-autoclicker, copy-ref-link, invite-friends-btn)
-        });
+           // Обработчик кошелька
+            document.getElementById('connect-wallet').addEventListener('click', function() {
+                if (gameData.walletConnected) {
+                    gameData.walletConnected = false;
+                    gameData.walletAddress = null;
+                    showNotification('Кошелек отвязан', 'success');
+                } else {
+                    gameData.walletConnected = true;
+                    gameData.walletAddress = 'EQD' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                    showNotification('Кошелек привязан!', 'success');
+                }
+                updateWallet();
+            });
+            
+            // Обработчик улучшения автокликера
+            document.getElementById('upgrade-autoclicker').addEventListener('click', function() {
+                if (gameData.coins >= gameData.autoclicker.cost) {
+                    gameData.coins -= gameData.autoclicker.cost;
+                    gameData.autoclicker.level++;
+                    gameData.autoclicker.power += 0.5;
+                    gameData.autoclicker.cost = Math.floor(gameData.autoclicker.cost * 1.8);
+                    updateUI();
+                    showNotification('Автокликер улучшен!', 'success');
+                }
+            });
+            
+            // Обработчики реферальной системы
+            document.getElementById('copy-ref-link').addEventListener('click', copyReferralLink);
+            document.getElementById('invite-friends-btn').addEventListener('click', inviteFriends);
 
-        // Остальные функции игры (updateUI, updateUpgrades, updateCombos, etc.) остаются без изменений
-        // ... (вставьте сюда остальные функции из предыдущего кода)
+            // Демонстрация: кнопка для тестирования реферальной системы
+            const demoButton = document.createElement('button');
+            demoButton.textContent = 'Демо: Добавить реферального друга';
+            demoButton.style.width = '100%';
+            demoButton.style.padding = '10px';
+            demoButton.style.marginTop = '10px';
+            demoButton.style.backgroundColor = 'var(--warning)';
+            demoButton.style.border = 'none';
+            demoButton.style.borderRadius = '5px';
+            demoButton.style.color = 'white';
+            demoButton.style.cursor = 'pointer';
+            demoButton.addEventListener('click', function() {
+                const friendName = prompt('Введите имя друга:');
+                if (friendName) {
+                    addReferralFriend(friendName);
+                }
+            });
+            document.getElementById('friends-page').appendChild(demoButton);
+            
+            // Показываем приветственное сообщение
+            setTimeout(() => {
+                showNotification('Добро пожаловать в Hamster Combat! Нажимай на лапку, чтобы зарабатывать монеты!', 'success');
+            }, 1000);
+        });
     </script>
 </body>
 </html>
