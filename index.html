@@ -109,10 +109,13 @@
             align-items: center;
             cursor: pointer;
             transition: transform 0.2s;
+            padding: 5px 10px;
+            border-radius: 10px;
         }
 
         .user-info:hover {
             transform: scale(1.02);
+            background-color: rgba(138, 92, 245, 0.1);
         }
 
         .avatar {
@@ -777,132 +780,6 @@
             background-color: var(--accent-hover);
         }
 
-        /* Админка */
-        .admin-section {
-            background-color: var(--bg-secondary);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid #333;
-        }
-
-        .admin-controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .admin-button {
-            padding: 10px 15px;
-            background-color: var(--accent-color);
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            flex: 1;
-            transition: background-color 0.3s;
-        }
-
-        .admin-button:hover {
-            background-color: var(--accent-hover);
-        }
-
-        .admin-form {
-            display: none;
-            background-color: var(--bg-tertiary);
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 15px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            background-color: var(--bg-secondary);
-            border: 1px solid #444;
-            border-radius: 5px;
-            color: var(--text-primary);
-        }
-
-        .form-group textarea {
-            height: 80px;
-            resize: vertical;
-        }
-
-        .image-options {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .image-option {
-            flex: 1;
-            text-align: center;
-            padding: 10px;
-            background-color: var(--bg-secondary);
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .image-option.active {
-            background-color: var(--accent-color);
-        }
-
-        .image-preview {
-            width: 60px;
-            height: 60px;
-            margin: 0 auto 5px;
-            border-radius: 5px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .image-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .form-actions button {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .save-btn {
-            background-color: var(--success);
-            color: white;
-        }
-
-        .cancel-btn {
-            background-color: var(--danger);
-            color: white;
-        }
-
         /* Адаптивность */
         @media (max-width: 400px) {
             .upgrades, .combos {
@@ -1068,6 +945,7 @@
             </div>
         </div>
 
+        <!-- Страница профиля (скрыта по умолчанию) -->
         <div id="profile-page" class="page">
             <div class="profile-section">
                 <h3>Профиль</h3>
@@ -1119,88 +997,6 @@
 
             <button class="logout-btn" id="logout-btn">Выйти из аккаунта</button>
         </div>
-
-        <!-- Админка -->
-        <div id="admin-page" class="page">
-            <div class="admin-section">
-                <h3>Админ-панель</h3>
-                <div class="admin-controls">
-                    <button class="admin-button" id="add-combo-btn">Добавить комбо-карту</button>
-                    <button class="admin-button" id="view-combos-btn">Просмотр карт</button>
-                </div>
-
-                <div class="admin-form" id="combo-form">
-                    <h4>Добавить/Редактировать комбо-карту</h4>
-                    <div class="form-group">
-                        <label for="combo-image-type">Тип изображения</label>
-                        <div class="image-options">
-                            <div class="image-option active" data-type="icon">
-                                <div class="image-preview">🐹</div>
-                                <div>Иконка</div>
-                            </div>
-                            <div class="image-option" data-type="image">
-                                <div class="image-preview"><i class="fas fa-image"></i></div>
-                                <div>Изображение</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group" id="icon-group">
-                        <label for="combo-icon">Иконка (эмодзи)</label>
-                        <input type="text" id="combo-icon" placeholder="🐹">
-                    </div>
-                    <div class="form-group" id="image-group" style="display: none;">
-                        <label for="combo-image">Изображение</label>
-                        <input type="file" id="combo-image" accept="image/*">
-                        <div class="image-preview" id="image-preview" style="margin-top: 10px;"></div>
-                    </div>
-                    <div class="form-group">
-                        <label for="combo-name">Название</label>
-                        <input type="text" id="combo-name" placeholder="Быстрые лапки">
-                    </div>
-                    <div class="form-group">
-                        <label for="combo-description">Описание</label>
-                        <textarea id="combo-description" placeholder="Увеличивает скорость клика на 10%"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="combo-price">Цена</label>
-                        <input type="number" id="combo-price" placeholder="5000">
-                    </div>
-                    <div class="form-group">
-                        <label for="combo-type">Тип карты</label>
-                        <select id="combo-type">
-                            <option value="permanent">Постоянная</option>
-                            <option value="temporary">Временная</option>
-                            <option value="multiplier">Усилитель множителя</option>
-                            <option value="reward">Разовая награда</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="combo-max-level">Максимальный уровень (0 = без уровня)</label>
-                        <input type="number" id="combo-max-level" min="0" value="0">
-                    </div>
-                    <div class="form-group" id="duration-group" style="display: none;">
-                        <label for="combo-duration">Время действия (секунды)</label>
-                        <input type="number" id="combo-duration" placeholder="3600">
-                    </div>
-                    <div class="form-group" id="multiplier-group" style="display: none;">
-                        <label for="combo-multiplier">Множитель</label>
-                        <input type="number" id="combo-multiplier" step="0.1" placeholder="1.5">
-                    </div>
-                    <div class="form-group" id="reward-group" style="display: none;">
-                        <label for="combo-reward">Размер награды</label>
-                        <input type="number" id="combo-reward" placeholder="10000">
-                    </div>
-                    <div class="form-actions">
-                        <button class="save-btn" id="save-combo">Сохранить</button>
-                        <button class="cancel-btn" id="cancel-combo">Отмена</button>
-                    </div>
-                </div>
-
-                <div class="admin-combos-list" id="admin-combos-list">
-                    <!-- Список комбо-карт для админа -->
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Нижние вкладки -->
@@ -1220,10 +1016,6 @@
         <div class="tab" data-tab="combos-page">
             <i class="fas fa-layer-group"></i>
             <span>Комбо</span>
-        </div>
-        <div class="tab" data-tab="profile-page">
-            <i class="fas fa-user"></i>
-            <span>Профиль</span>
         </div>
     </div>
 
@@ -1412,9 +1204,6 @@
             
             // Обновляем автокликер
             updateAutoclicker();
-            
-            // Обновляем админ-список
-            updateAdminCombosList();
             
             // Проверяем уровень игрока
             checkLevelUp();
@@ -1664,134 +1453,6 @@
             }
         }
 
-        // Функция для обновления списка комбо-карт в админке
-        function updateAdminCombosList() {
-            const container = document.getElementById('admin-combos-list');
-            container.innerHTML = '';
-            
-            if (gameData.combos.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 20px;">Нет комбо-карт</p>';
-                return;
-            }
-            
-            gameData.combos.forEach(combo => {
-                const comboElement = document.createElement('div');
-                comboElement.className = 'combo-card';
-                comboElement.innerHTML = `
-                    <div class="combo-image">${combo.image}</div>
-                    <div class="combo-header">
-                        <div class="combo-name">${combo.name}</div>
-                        <div class="combo-status">${formatNumber(combo.price)}</div>
-                    </div>
-                    <div class="combo-stats">
-                        ${combo.description}
-                    </div>
-                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">
-                        Тип: ${getComboTypeName(combo.type)}
-                    </div>
-                    <div class="form-actions">
-                        <button class="admin-button edit-combo" data-id="${combo.id}">Редактировать</button>
-                        <button class="cancel-btn delete-combo" data-id="${combo.id}">Удалить</button>
-                    </div>
-                `;
-                
-                container.appendChild(comboElement);
-            });
-            
-            // Добавляем обработчики для кнопок редактирования и удаления
-            document.querySelectorAll('.edit-combo').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const comboId = parseInt(this.getAttribute('data-id'));
-                    editCombo(comboId);
-                });
-            });
-            
-            document.querySelectorAll('.delete-combo').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const comboId = parseInt(this.getAttribute('data-id'));
-                    deleteCombo(comboId);
-                });
-            });
-        }
-
-        // Функция для получения названия типа карты
-        function getComboTypeName(type) {
-            const typeNames = {
-                'permanent': 'Постоянная',
-                'temporary': 'Временная',
-                'multiplier': 'Усилитель множителя',
-                'reward': 'Разовая награда'
-            };
-            return typeNames[type] || type;
-        }
-
-        // Функция для редактирования комбо-карты
-        function editCombo(id) {
-            const combo = gameData.combos.find(c => c.id === id);
-            if (!combo) return;
-            
-            // Заполняем форму данными карты
-            document.getElementById('combo-icon').value = combo.image;
-            document.getElementById('combo-name').value = combo.name;
-            document.getElementById('combo-description').value = combo.description;
-            document.getElementById('combo-price').value = combo.price;
-            document.getElementById('combo-type').value = combo.type;
-            document.getElementById('combo-max-level').value = combo.maxLevel;
-            
-            // Устанавливаем тип изображения
-            document.querySelectorAll('.image-option').forEach(opt => {
-                opt.classList.remove('active');
-                if (opt.getAttribute('data-type') === combo.imageType) {
-                    opt.classList.add('active');
-                }
-            });
-            toggleImageType(combo.imageType);
-            
-            // Показываем дополнительные поля в зависимости от типа
-            toggleComboFields(combo.type);
-            
-            if (combo.type === 'temporary') {
-                document.getElementById('combo-duration').value = combo.duration;
-            } else if (combo.type === 'multiplier') {
-                document.getElementById('combo-multiplier').value = combo.multiplier;
-            } else if (combo.type === 'reward') {
-                document.getElementById('combo-reward').value = combo.reward;
-            }
-            
-            // Показываем форму
-            document.getElementById('combo-form').style.display = 'block';
-            
-            // Сохраняем ID редактируемой карты
-            document.getElementById('combo-form').setAttribute('data-edit-id', id);
-        }
-
-        // Функция для удаления комбо-карты
-        function deleteCombo(id) {
-            if (confirm('Вы уверены, что хотите удалить эту комбо-карту?')) {
-                gameData.combos = gameData.combos.filter(c => c.id !== id);
-                updateUI();
-                showNotification('Комбо-карта удалена!', 'success');
-            }
-        }
-
-        // Функция для переключения типа изображения
-        function toggleImageType(type) {
-            if (type === 'icon') {
-                document.getElementById('icon-group').style.display = 'block';
-                document.getElementById('image-group').style.display = 'none';
-            } else {
-                document.getElementById('icon-group').style.display = 'none';
-                document.getElementById('image-group').style.display = 'block';
-            }
-        }
-
-        // Функция для переключения дополнительных полей формы
-        function toggleComboFields(type) {
-            document.getElementById('duration-group').style.display = type === 'temporary' ? 'block' : 'none';
-            document.getElementById('multiplier-group').style.display = type === 'multiplier' ? 'block' : 'none';
-            document.getElementById('reward-group').style.display = type === 'reward' ? 'block' : 'none';
-        }
-
         // Функция для копирования реферальной ссылки
         function copyReferralLink() {
             const link = document.getElementById('referral-link-text').textContent;
@@ -1913,7 +1574,7 @@
                 });
             });
             
-            // Обработчик кнопки профиля
+            // Обработчик кнопки профиля (нажатие на имя пользователя)
             document.getElementById('profile-button').addEventListener('click', function() {
                 // Скрываем все страницы
                 document.querySelectorAll('.page').forEach(page => {
@@ -1927,9 +1588,6 @@
                 document.querySelectorAll('.tab').forEach(tab => {
                     tab.classList.remove('active');
                 });
-                
-                // Активируем вкладку профиля
-                document.querySelector('.tab[data-tab="profile-page"]').classList.add('active');
             });
             
             // Обработчик кнопки выхода
@@ -1975,114 +1633,6 @@
             // Обработчики реферальной системы
             document.getElementById('copy-ref-link').addEventListener('click', copyReferralLink);
             document.getElementById('invite-friends-btn').addEventListener('click', inviteFriends);
-            
-            // Обработчики админки
-            document.getElementById('add-combo-btn').addEventListener('click', function() {
-                document.getElementById('combo-form').style.display = 'block';
-                document.getElementById('combo-form').removeAttribute('data-edit-id');
-                
-                // Сбрасываем форму
-                document.getElementById('combo-icon').value = '';
-                document.getElementById('combo-name').value = '';
-                document.getElementById('combo-description').value = '';
-                document.getElementById('combo-price').value = '';
-                document.getElementById('combo-type').value = 'permanent';
-                document.getElementById('combo-max-level').value = '0';
-                toggleComboFields('permanent');
-                
-                // Сбрасываем тип изображения
-                document.querySelectorAll('.image-option').forEach(opt => {
-                    opt.classList.remove('active');
-                    if (opt.getAttribute('data-type') === 'icon') {
-                        opt.classList.add('active');
-                    }
-                });
-                toggleImageType('icon');
-            });
-            
-            document.getElementById('view-combos-btn').addEventListener('click', function() {
-                updateAdminCombosList();
-            });
-            
-            // Обработчики типа изображения
-            document.querySelectorAll('.image-option').forEach(opt => {
-                opt.addEventListener('click', function() {
-                    document.querySelectorAll('.image-option').forEach(o => o.classList.remove('active'));
-                    this.classList.add('active');
-                    toggleImageType(this.getAttribute('data-type'));
-                });
-            });
-            
-            document.getElementById('combo-type').addEventListener('change', function() {
-                toggleComboFields(this.value);
-            });
-            
-            document.getElementById('save-combo').addEventListener('click', function() {
-                const editId = document.getElementById('combo-form').getAttribute('data-edit-id');
-                const imageType = document.querySelector('.image-option.active').getAttribute('data-type');
-                const name = document.getElementById('combo-name').value;
-                const description = document.getElementById('combo-description').value;
-                const price = parseInt(document.getElementById('combo-price').value);
-                const type = document.getElementById('combo-type').value;
-                const maxLevel = parseInt(document.getElementById('combo-max-level').value);
-                
-                if (!name || !description || !price) {
-                    showNotification('Заполните все обязательные поля!', 'warning');
-                    return;
-                }
-                
-                // Получаем изображение в зависимости от типа
-                let image = '';
-                if (imageType === 'icon') {
-                    image = document.getElementById('combo-icon').value || '🐹';
-                } else {
-                    // Для изображений - в демо используем иконку
-                    image = '🐹';
-                }
-                
-                const newCombo = {
-                    id: editId ? parseInt(editId) : Math.max(0, ...gameData.combos.map(c => c.id)) + 1,
-                    name,
-                    image,
-                    imageType,
-                    description,
-                    price,
-                    type,
-                    maxLevel,
-                    level: 0,
-                    owned: false
-                };
-                
-                // Добавляем дополнительные поля в зависимости от типа
-                if (type === 'temporary') {
-                    newCombo.duration = parseInt(document.getElementById('combo-duration').value) || 3600;
-                } else if (type === 'multiplier') {
-                    newCombo.multiplier = parseFloat(document.getElementById('combo-multiplier').value) || 1.5;
-                } else if (type === 'reward') {
-                    newCombo.reward = parseInt(document.getElementById('combo-reward').value) || 10000;
-                }
-                
-                if (editId) {
-                    // Обновляем существующую карту
-                    const index = gameData.combos.findIndex(c => c.id === parseInt(editId));
-                    if (index !== -1) {
-                        gameData.combos[index] = newCombo;
-                        showNotification('Комбо-карта обновлена!', 'success');
-                    }
-                } else {
-                    // Добавляем новую карту
-                    gameData.combos.push(newCombo);
-                    showNotification('Комбо-карта добавлена!', 'success');
-                }
-                
-                // Скрываем форму и обновляем интерфейс
-                document.getElementById('combo-form').style.display = 'none';
-                updateUI();
-            });
-            
-            document.getElementById('cancel-combo').addEventListener('click', function() {
-                document.getElementById('combo-form').style.display = 'none';
-            });
 
             // Демонстрация: кнопка для тестирования реферальной системы
             const demoButton = document.createElement('button');
