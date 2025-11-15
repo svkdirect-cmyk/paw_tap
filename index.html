@@ -1193,25 +1193,29 @@
                 console.log('Найден сохраненный пользователь:', savedUser);
                 user = JSON.parse(savedUser);
                 
-                // Проверяем, есть ли сохраненный прогресс
-                const savedProgress = localStorage.getItem(`hamster_combat_${user.id}`);
-                if (savedProgress) {
-                    console.log('Найден сохраненный прогресс');
-                    const parsedData = JSON.parse(savedProgress);
-                    gameData = parsedData.gameData;
+                // Загружаем прогресс
+                if (loadProgress()) {
+                    console.log('Прогресс загружен, монеты:', gameData.coins);
+                    // Сразу показываем приложение
+                    document.getElementById('auth-screen').style.display = 'none';
+                    document.getElementById('app').style.display = 'block';
+                    updateUserInterface();
+                    updateUI(); // ВАЖНО: вызываем обновление интерфейса
+                    setInterval(autoclick, 1000);
+                    showNotification(`С возвращением, ${user.first_name}! Баланс: ${formatNumber(gameData.coins)} монет`, 'success');
+                    return;
                 } else {
                     console.log('Прогресс не найден, создаем новый');
                     initializeGameData();
+                    // Сразу показываем приложение
+                    document.getElementById('auth-screen').style.display = 'none';
+                    document.getElementById('app').style.display = 'block';
+                    updateUserInterface();
+                    updateUI();
+                    setInterval(autoclick, 1000);
+                    showNotification(`Добро пожаловать, ${user.first_name}!`, 'success');
+                    return;
                 }
-                
-                // Сразу показываем приложение
-                document.getElementById('auth-screen').style.display = 'none';
-                document.getElementById('app').style.display = 'block';
-                updateUserInterface();
-                updateUI();
-                setInterval(autoclick, 1000);
-                showNotification(`С возвращением, ${user.first_name}!`, 'success');
-                return;
             }
             
             // Если сохраненного пользователя нет, инициализируем Telegram Web App
@@ -1352,8 +1356,8 @@
                 initializeGameData();
                 showNotification(`Добро пожаловать, ${user.first_name}! Начинаем новую игру!`, 'success');
             } else {
-                console.log('Прогресс загружен');
-                showNotification(`С возвращением, ${user.first_name}! Прогресс загружен.`, 'success');
+                console.log('Прогресс загружен, монеты:', gameData.coins);
+                showNotification(`С возвращением, ${user.first_name}! Баланс: ${formatNumber(gameData.coins)} монет`, 'success');
             }
             
             // Обновляем интерфейс игры
@@ -1560,7 +1564,7 @@
                     timestamp: Date.now()
                 };
                 localStorage.setItem(`hamster_combat_${user.id}`, JSON.stringify(saveData));
-                console.log('Прогресс сохранен для пользователя:', user.id);
+                console.log('Прогресс сохранен для пользователя:', user.id, 'Монеты:', gameData.coins);
             }
         }
 
@@ -1572,7 +1576,7 @@
                     try {
                         const parsedData = JSON.parse(savedData);
                         gameData = parsedData.gameData;
-                        console.log('Прогресс загружен для пользователя:', user.id);
+                        console.log('Прогресс загружен для пользователя:', user.id, 'Монеты:', gameData.coins);
                         return true;
                     } catch (e) {
                         console.error('Ошибка загрузки прогресса:', e);
@@ -1690,6 +1694,8 @@
         // Функция для обновления интерфейса
         function updateUI() {
             if (!gameData) return;
+            
+            console.log('Обновление UI, монеты:', gameData.coins);
             
             // Обновляем монеты (сокращенный формат)
             document.getElementById('coins').innerHTML = `<i class="fas fa-coins"></i> ${formatNumber(gameData.coins)}`;
