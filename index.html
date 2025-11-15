@@ -1,0 +1,2113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hamster Combat</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --bg-tertiary: #2d2d2d;
+            --accent-color: #8a5cf5;
+            --accent-hover: #9b75f7;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            padding-bottom: 70px;
+            background-image: radial-gradient(circle at 10% 20%, rgba(138, 92, 245, 0.1) 0%, transparent 20%),
+                              radial-gradient(circle at 90% 80%, rgba(138, 92, 245, 0.1) 0%, transparent 20%);
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        /* Вкладки */
+        .tabs {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--bg-secondary);
+            display: flex;
+            padding: 10px 0;
+            z-index: 100;
+            border-top: 1px solid #333;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-secondary);
+        }
+
+        .tab.active {
+            color: var(--accent-color);
+            border-top: 2px solid var(--accent-color);
+        }
+
+        .tab i {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .tab span {
+            font-size: 12px;
+            display: block;
+        }
+
+        /* Страницы */
+        .page {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Заголовок */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #333;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .user-info:hover {
+            transform: scale(1.02);
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            overflow: hidden;
+            border: 2px solid var(--accent-color);
+            position: relative;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-details h2 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .user-details .level {
+            font-size: 14px;
+            color: var(--accent-color);
+        }
+
+        .coins {
+            background-color: var(--bg-secondary);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            border: 1px solid #333;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .coins i {
+            color: gold;
+        }
+
+        /* Кнопка кликера с иконкой лапки */
+        .clicker-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .clicker-button {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--bg-tertiary), #3a3a3a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 4px solid var(--accent-color);
+            box-shadow: 
+                0 0 25px rgba(138, 92, 245, 0.4),
+                inset 0 0 15px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .clicker-button:hover {
+            transform: scale(1.05);
+            box-shadow: 
+                0 0 35px rgba(138, 92, 245, 0.6),
+                inset 0 0 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .clicker-button:active {
+            transform: scale(0.95);
+            animation: shake 0.2s;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0) scale(0.95); }
+            25% { transform: translateX(-5px) scale(0.95); }
+            50% { transform: translateX(5px) scale(0.95); }
+            75% { transform: translateX(-5px) scale(0.95); }
+            100% { transform: translateX(0) scale(0.95); }
+        }
+
+        .paw-icon {
+            font-size: 80px;
+            color: var(--accent-color);
+            filter: drop-shadow(0 0 10px rgba(138, 92, 245, 0.7));
+            transition: all 0.3s;
+        }
+
+        .clicker-button:active .paw-icon {
+            transform: scale(1.2);
+            color: #a78bfa;
+        }
+
+        .click-effect {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, rgba(138, 92, 245, 0.8) 0%, rgba(138, 92, 245, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: clickAnimation 0.6s forwards;
+        }
+
+        @keyframes clickAnimation {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+
+        .click-info {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 10px;
+        }
+
+        /* Карточки улучшений */
+        .upgrades {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .upgrade-card {
+            background-color: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid #333;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upgrade-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-5px);
+        }
+
+        .upgrade-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .upgrade-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .upgrade-level {
+            background-color: var(--bg-tertiary);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+
+        .upgrade-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .upgrade-button {
+            width: 100%;
+            padding: 8px;
+            background-color: var(--accent-color);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .upgrade-button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .upgrade-button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+
+        /* Карточки комбо */
+        .combos {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .combo-card {
+            background-color: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid #333;
+            transition: all 0.3s;
+            position: relative;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .combo-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-5px);
+        }
+
+        .combo-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            background-color: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 32px;
+            overflow: hidden;
+        }
+
+        .combo-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .combo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .combo-name {
+            font-weight: bold;
+            font-size: 16px;
+            flex: 1;
+            text-align: center;
+        }
+
+        .combo-level {
+            background-color: var(--bg-tertiary);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .combo-status {
+            background-color: var(--bg-tertiary);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+
+        .combo-stats {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .combo-timer {
+            font-size: 12px;
+            color: var(--warning);
+            margin-bottom: 5px;
+        }
+
+        .combo-button {
+            width: 100%;
+            padding: 8px;
+            background-color: var(--accent-color);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .combo-button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .combo-button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+
+        .combo-owned {
+            background-color: var(--success);
+        }
+
+        .combo-max {
+            background-color: var(--warning);
+        }
+
+        /* Списки */
+        .friends-list, .levels-list {
+            margin-top: 20px;
+        }
+
+        .friend-item, .level-item {
+            background-color: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            border: 1px solid #333;
+            transition: all 0.3s;
+        }
+
+        .friend-item:hover, .level-item:hover {
+            transform: translateX(5px);
+            border-color: var(--accent-color);
+        }
+
+        .friend-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--bg-tertiary);
+            margin-right: 15px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .friend-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .friend-info {
+            flex: 1;
+        }
+
+        .friend-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .friend-level {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .friend-coins {
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        /* Уровни */
+        .level-item {
+            justify-content: space-between;
+        }
+
+        .level-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .level-icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        .level-text {
+            flex: 1;
+        }
+
+        .level-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .level-requirement {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .level-status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .level-active {
+            background-color: var(--success);
+        }
+
+        .level-locked {
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        /* Настройки профиля */
+        .profile-section {
+            background-color: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+        }
+
+        .profile-section h3 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+        }
+
+        .profile-avatar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .avatar-upload {
+            margin-left: 20px;
+        }
+
+        .avatar-upload input {
+            display: none;
+        }
+
+        .avatar-upload label {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .avatar-upload label:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .profile-field {
+            margin-bottom: 15px;
+        }
+
+        .profile-field label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .profile-field input, .profile-field select, .profile-field textarea {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--bg-tertiary);
+            border: 1px solid #444;
+            border-radius: 5px;
+            color: var(--text-primary);
+        }
+
+        .profile-field textarea {
+            height: 80px;
+            resize: vertical;
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--danger);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        /* TON кошелек */
+        .wallet-section {
+            background-color: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+        }
+
+        .wallet-address {
+            background-color: var(--bg-tertiary);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 15px 0;
+            word-break: break-all;
+        }
+
+        .connect-wallet {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--accent-color);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .connect-wallet:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* Автокликер */
+        .autoclicker-info {
+            background-color: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            border: 1px solid #333;
+            text-align: center;
+        }
+
+        .autoclicker-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Приглашение друзей */
+        .invite-section {
+            background-color: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+            text-align: center;
+        }
+
+        .invite-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .invite-icon {
+            font-size: 24px;
+            margin-right: 10px;
+            color: var(--accent-color);
+        }
+
+        .invite-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+        }
+
+        .invite-stat {
+            text-align: center;
+        }
+
+        .invite-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .invite-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .invite-button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--success);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .invite-button:hover {
+            background-color: #45a049;
+        }
+
+        .referral-link {
+            background-color: var(--bg-tertiary);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-family: monospace;
+            word-break: break-all;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .copy-btn {
+            background-color: var(--accent-color);
+            border: none;
+            border-radius: 3px;
+            color: white;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .copy-btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* Админка */
+        .admin-section {
+            background-color: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+        }
+
+        .admin-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .admin-button {
+            padding: 10px 15px;
+            background-color: var(--accent-color);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            flex: 1;
+            transition: background-color 0.3s;
+        }
+
+        .admin-button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .admin-form {
+            display: none;
+            background-color: var(--bg-tertiary);
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--bg-secondary);
+            border: 1px solid #444;
+            border-radius: 5px;
+            color: var(--text-primary);
+        }
+
+        .form-group textarea {
+            height: 80px;
+            resize: vertical;
+        }
+
+        .image-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .image-option {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            background-color: var(--bg-secondary);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .image-option.active {
+            background-color: var(--accent-color);
+        }
+
+        .image-preview {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 5px;
+            border-radius: 5px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .form-actions button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .save-btn {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .cancel-btn {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 400px) {
+            .upgrades, .combos {
+                grid-template-columns: 1fr;
+            }
+            
+            .clicker-button {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .paw-icon {
+                font-size: 70px;
+            }
+        }
+
+        /* Уведомления */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--success);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            z-index: 1000;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        /* Прогресс-бар уровня */
+        .level-progress {
+            height: 5px;
+            background-color: var(--bg-tertiary);
+            border-radius: 5px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .level-progress-bar {
+            height: 100%;
+            background-color: var(--accent-color);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Шапка с информацией о пользователе -->
+        <div class="header">
+            <div class="user-info" id="profile-button">
+                <div class="avatar">
+                    <i class="fas fa-hamster" style="font-size: 24px; color: var(--text-secondary);"></i>
+                </div>
+                <div class="user-details">
+                    <h2 id="username">Хомяк-Боец</h2>
+                    <div class="level" id="user-level">Уровень 1: Начинающий</div>
+                    <div class="level-progress">
+                        <div class="level-progress-bar" id="level-progress-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="coins" id="coins"><i class="fas fa-coins"></i> 0</div>
+        </div>
+
+        <!-- Основной контент (меняется в зависимости от вкладки) -->
+        <div id="game-page" class="page active">
+            <div class="clicker-container">
+                <div class="clicker-button" id="clicker">
+                    <div class="paw-icon">
+                        <i class="fas fa-paw"></i>
+                    </div>
+                </div>
+                <div class="click-info">Нажимай на лапку, чтобы зарабатывать монеты!</div>
+            </div>
+
+            <h3>Прокачка</h3>
+            <div class="upgrades" id="upgrades-container">
+                <!-- Улучшения будут добавлены через JS -->
+            </div>
+
+            <div class="autoclicker-info">
+                <h3>Автокликер</h3>
+                <div class="autoclicker-stats">
+                    <div class="stat">
+                        <div class="stat-value" id="autoclicker-level">1</div>
+                        <div class="stat-label">Уровень</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="autoclicker-power">1/с</div>
+                        <div class="stat-label">Мощность</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="autoclicker-cost">100</div>
+                        <div class="stat-label">Стоимость</div>
+                    </div>
+                </div>
+                <button class="upgrade-button" id="upgrade-autoclicker" style="margin-top: 10px;">Улучшить автокликер</button>
+            </div>
+        </div>
+
+        <div id="friends-page" class="page">
+            <!-- Секция приглашения друзей -->
+            <div class="invite-section">
+                <div class="invite-header">
+                    <div class="invite-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3>Пригласи друзей</h3>
+                </div>
+                <p style="margin-bottom: 15px; color: var(--text-secondary);">
+                    Приглашай друзей и получай <span style="color: var(--success); font-weight: bold;">10,000 монет</span> за каждого!
+                </p>
+                
+                <div class="invite-stats">
+                    <div class="invite-stat">
+                        <div class="invite-value" id="invited-count">0</div>
+                        <div class="invite-label">Приглашено</div>
+                    </div>
+                    <div class="invite-stat">
+                        <div class="invite-value" id="earned-from-refs">0</div>
+                        <div class="invite-label">Заработано</div>
+                    </div>
+                </div>
+
+                <div class="referral-link">
+                    <span id="referral-link-text">https://t.me/hamster_combat_bot?start=ref123456</span>
+                    <button class="copy-btn" id="copy-ref-link">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+
+                <button class="invite-button" id="invite-friends-btn">
+                    <i class="fab fa-telegram"></i>
+                    Пригласить друзей
+                </button>
+            </div>
+
+            <h3>Друзья</h3>
+            <div class="friends-list" id="friends-list">
+                <!-- Список друзей будет добавлен через JS -->
+            </div>
+        </div>
+
+        <div id="levels-page" class="page">
+            <h3>Уровни</h3>
+            <div class="levels-list" id="levels-list">
+                <!-- Список уровней будет добавлен через JS -->
+            </div>
+        </div>
+
+        <div id="combos-page" class="page">
+            <h3>Комбо-карты</h3>
+            <p style="margin-bottom: 15px; color: var(--text-secondary);">Покупайте комбо-карты для получения бонусов</p>
+            <div class="combos" id="combos-container">
+                <!-- Комбо-карты будут добавлены через JS -->
+            </div>
+        </div>
+
+        <div id="profile-page" class="page">
+            <div class="profile-section">
+                <h3>Профиль</h3>
+                <div class="profile-avatar">
+                    <div class="avatar">
+                        <i class="fas fa-hamster" style="font-size: 24px; color: var(--text-secondary);"></i>
+                    </div>
+                    <div class="avatar-upload">
+                        <input type="file" id="avatar-input" accept="image/*">
+                        <label for="avatar-input">Изменить аватар</label>
+                    </div>
+                </div>
+                <div class="profile-field">
+                    <label for="profile-name">Имя пользователя</label>
+                    <input type="text" id="profile-name" value="Хомяк-Боец">
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <h3>Статистика</h3>
+                <div class="profile-field">
+                    <label>Всего кликов</label>
+                    <input type="text" id="total-clicks" value="0" readonly>
+                </div>
+                <div class="profile-field">
+                    <label>Монет заработано</label>
+                    <input type="text" id="total-coins" value="0" readonly>
+                </div>
+                <div class="profile-field">
+                    <label>Множитель</label>
+                    <input type="text" id="multiplier" value="1x" readonly>
+                </div>
+                <div class="profile-field">
+                    <label>Приглашено друзей</label>
+                    <input type="text" id="profile-invited-count" value="0" readonly>
+                </div>
+                <div class="profile-field">
+                    <label>Заработано с рефералов</label>
+                    <input type="text" id="profile-ref-earnings" value="0" readonly>
+                </div>
+            </div>
+
+            <div class="wallet-section">
+                <h3>TON Кошелек</h3>
+                <p>Привяжите TON кошелек для вывода средств</p>
+                <div class="wallet-address" id="wallet-address">Не привязан</div>
+                <button class="connect-wallet" id="connect-wallet">Привязать кошелек</button>
+            </div>
+
+            <button class="logout-btn" id="logout-btn">Выйти из аккаунта</button>
+        </div>
+
+        <!-- Админка -->
+        <div id="admin-page" class="page">
+            <div class="admin-section">
+                <h3>Админ-панель</h3>
+                <div class="admin-controls">
+                    <button class="admin-button" id="add-combo-btn">Добавить комбо-карту</button>
+                    <button class="admin-button" id="view-combos-btn">Просмотр карт</button>
+                </div>
+
+                <div class="admin-form" id="combo-form">
+                    <h4>Добавить/Редактировать комбо-карту</h4>
+                    <div class="form-group">
+                        <label for="combo-image-type">Тип изображения</label>
+                        <div class="image-options">
+                            <div class="image-option active" data-type="icon">
+                                <div class="image-preview">🐹</div>
+                                <div>Иконка</div>
+                            </div>
+                            <div class="image-option" data-type="image">
+                                <div class="image-preview"><i class="fas fa-image"></i></div>
+                                <div>Изображение</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" id="icon-group">
+                        <label for="combo-icon">Иконка (эмодзи)</label>
+                        <input type="text" id="combo-icon" placeholder="🐹">
+                    </div>
+                    <div class="form-group" id="image-group" style="display: none;">
+                        <label for="combo-image">Изображение</label>
+                        <input type="file" id="combo-image" accept="image/*">
+                        <div class="image-preview" id="image-preview" style="margin-top: 10px;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="combo-name">Название</label>
+                        <input type="text" id="combo-name" placeholder="Быстрые лапки">
+                    </div>
+                    <div class="form-group">
+                        <label for="combo-description">Описание</label>
+                        <textarea id="combo-description" placeholder="Увеличивает скорость клика на 10%"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="combo-price">Цена</label>
+                        <input type="number" id="combo-price" placeholder="5000">
+                    </div>
+                    <div class="form-group">
+                        <label for="combo-type">Тип карты</label>
+                        <select id="combo-type">
+                            <option value="permanent">Постоянная</option>
+                            <option value="temporary">Временная</option>
+                            <option value="multiplier">Усилитель множителя</option>
+                            <option value="reward">Разовая награда</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="combo-max-level">Максимальный уровень (0 = без уровня)</label>
+                        <input type="number" id="combo-max-level" min="0" value="0">
+                    </div>
+                    <div class="form-group" id="duration-group" style="display: none;">
+                        <label for="combo-duration">Время действия (секунды)</label>
+                        <input type="number" id="combo-duration" placeholder="3600">
+                    </div>
+                    <div class="form-group" id="multiplier-group" style="display: none;">
+                        <label for="combo-multiplier">Множитель</label>
+                        <input type="number" id="combo-multiplier" step="0.1" placeholder="1.5">
+                    </div>
+                    <div class="form-group" id="reward-group" style="display: none;">
+                        <label for="combo-reward">Размер награды</label>
+                        <input type="number" id="combo-reward" placeholder="10000">
+                    </div>
+                    <div class="form-actions">
+                        <button class="save-btn" id="save-combo">Сохранить</button>
+                        <button class="cancel-btn" id="cancel-combo">Отмена</button>
+                    </div>
+                </div>
+
+                <div class="admin-combos-list" id="admin-combos-list">
+                    <!-- Список комбо-карт для админа -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Нижние вкладки -->
+    <div class="tabs">
+        <div class="tab active" data-tab="game-page">
+            <i class="fas fa-paw"></i>
+            <span>Игра</span>
+        </div>
+        <div class="tab" data-tab="friends-page">
+            <i class="fas fa-users"></i>
+            <span>Друзья</span>
+        </div>
+        <div class="tab" data-tab="levels-page">
+            <i class="fas fa-trophy"></i>
+            <span>Уровни</span>
+        </div>
+        <div class="tab" data-tab="combos-page">
+            <i class="fas fa-layer-group"></i>
+            <span>Комбо</span>
+        </div>
+        <div class="tab" data-tab="profile-page">
+            <i class="fas fa-user"></i>
+            <span>Профиль</span>
+        </div>
+    </div>
+
+    <!-- Уведомление -->
+    <div class="notification" id="notification">
+        <span id="notification-text">Уведомление</span>
+    </div>
+
+    <script>
+        // Данные игры
+        const gameData = {
+            coins: 0,
+            clicks: 0,
+            level: 1,
+            multiplier: 1,
+            autoclicker: {
+                level: 1,
+                power: 1,
+                cost: 100
+            },
+            referral: {
+                code: "ref" + Math.floor(Math.random() * 1000000),
+                invitedFriends: 0,
+                earnedFromReferrals: 0
+            },
+            upgrades: [
+                { id: 1, name: "Усиленные лапы", level: 0, cost: 100, multiplier: 0.1 },
+                { id: 2, name: "Энергетик", level: 0, cost: 500, multiplier: 0.5 },
+                { id: 3, name: "Тренировка", level: 0, cost: 1000, multiplier: 1 },
+                { id: 4, name: "Протеин", level: 0, cost: 5000, multiplier: 5 },
+                { id: 5, name: "Стероиды", level: 0, cost: 15000, multiplier: 10 },
+                { id: 6, name: "Мутация", level: 0, cost: 50000, multiplier: 25 }
+            ],
+            combos: [
+                { 
+                    id: 1, 
+                    name: "Быстрые лапки", 
+                    image: "⚡",
+                    imageType: "icon",
+                    description: "Увеличивает скорость клика на 10%", 
+                    price: 5000, 
+                    type: "permanent",
+                    level: 0,
+                    maxLevel: 3,
+                    owned: false
+                },
+                { 
+                    id: 2, 
+                    name: "Золотая клетка", 
+                    image: "💰",
+                    imageType: "icon",
+                    description: "Удваивает доход с автокликера", 
+                    price: 15000, 
+                    type: "permanent",
+                    level: 0,
+                    maxLevel: 0,
+                    owned: false
+                },
+                { 
+                    id: 3, 
+                    name: "Хомяк-ниндзя", 
+                    image: "🥷",
+                    imageType: "icon",
+                    description: "Шанс 5% на 10x клик", 
+                    price: 25000, 
+                    type: "permanent",
+                    level: 0,
+                    maxLevel: 1,
+                    owned: false
+                },
+                { 
+                    id: 4, 
+                    name: "Энергетический напиток", 
+                    image: "🥤",
+                    imageType: "icon",
+                    description: "+50% к множителю на 1 час", 
+                    price: 10000, 
+                    type: "temporary",
+                    level: 0,
+                    maxLevel: 0,
+                    owned: false,
+                    duration: 3600
+                }
+            ],
+            friends: [
+                { id: 1, name: "Хомяк_Боец", level: 5, coins: 1250000, avatar: "🐹", isReferral: true },
+                { id: 2, name: "Бегун_3000", level: 3, coins: 450000, avatar: "🐹", isReferral: false },
+                { id: 3, name: "Силач_Хомяк", level: 7, coins: 3200000, avatar: "🐹", isReferral: true }
+            ],
+            levels: [
+                { level: 1, name: "Начинающий", icon: "🐣", requirement: 0 },
+                { level: 2, name: "Опытный бегун", icon: "🏃", requirement: 1000 },
+                { level: 3, name: "Силач", icon: "💪", requirement: 5000 },
+                { level: 4, name: "Воин", icon: "⚔️", requirement: 15000 },
+                { level: 5, name: "Чемпион", icon: "🏆", requirement: 50000 },
+                { level: 6, name: "Мастер", icon: "🎯", requirement: 150000 },
+                { level: 7, name: "Легенда", icon: "🌟", requirement: 500000 },
+                { level: 8, name: "Император", icon: "👑", requirement: 1500000 },
+                { level: 9, name: "БОГ ХОМЯКОВ", icon: "😇", requirement: 5000000 }
+            ],
+            walletConnected: false,
+            walletAddress: null,
+            activeCombos: [],
+            isAdmin: true
+        };
+
+        // Функция для форматирования чисел
+        function formatNumber(num) {
+            if (num >= 1000000000) {
+                return (num / 1000000000).toFixed(1) + 'B';
+            }
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            }
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+
+        // Функция для показа уведомлений
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notification-text');
+            
+            notificationText.textContent = message;
+            notification.style.backgroundColor = type === 'success' ? 'var(--success)' : 
+                                               type === 'warning' ? 'var(--warning)' : 'var(--danger)';
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Функция для обновления интерфейса
+        function updateUI() {
+            // Обновляем монеты
+            document.getElementById('coins').innerHTML = `<i class="fas fa-coins"></i> ${formatNumber(gameData.coins)}`;
+            document.getElementById('total-coins').value = formatNumber(gameData.coins);
+            
+            // Обновляем уровень
+            const currentLevel = gameData.levels.find(l => l.level === gameData.level);
+            const nextLevel = gameData.levels.find(l => l.level === gameData.level + 1);
+            
+            document.getElementById('user-level').textContent = `Уровень ${gameData.level}: ${currentLevel.name}`;
+            
+            // Обновляем прогресс-бар уровня
+            if (nextLevel) {
+                const progress = (gameData.coins / nextLevel.requirement) * 100;
+                document.getElementById('level-progress-bar').style.width = `${Math.min(progress, 100)}%`;
+            } else {
+                document.getElementById('level-progress-bar').style.width = '100%';
+            }
+            
+            // Обновляем клики
+            document.getElementById('total-clicks').value = formatNumber(gameData.clicks);
+            
+            // Обновляем множитель
+            document.getElementById('multiplier').value = gameData.multiplier.toFixed(1) + 'x';
+            
+            // Обновляем реферальную статистику
+            document.getElementById('invited-count').textContent = gameData.referral.invitedFriends;
+            document.getElementById('earned-from-refs').textContent = formatNumber(gameData.referral.earnedFromReferrals);
+            document.getElementById('profile-invited-count').value = gameData.referral.invitedFriends;
+            document.getElementById('profile-ref-earnings').value = formatNumber(gameData.referral.earnedFromReferrals);
+            
+            // Обновляем реферальную ссылку
+            document.getElementById('referral-link-text').textContent = `https://t.me/hamster_combat_bot?start=${gameData.referral.code}`;
+            
+            // Обновляем улучшения
+            updateUpgrades();
+            
+            // Обновляем комбо-карты
+            updateCombos();
+            
+            // Обновляем список друзей
+            updateFriendsList();
+            
+            // Обновляем список уровней
+            updateLevelsList();
+            
+            // Обновляем кошелек
+            updateWallet();
+            
+            // Обновляем автокликер
+            updateAutoclicker();
+            
+            // Обновляем админ-список
+            updateAdminCombosList();
+            
+            // Проверяем уровень игрока
+            checkLevelUp();
+        }
+
+        // Функция для обновления улучшений
+        function updateUpgrades() {
+            const container = document.getElementById('upgrades-container');
+            container.innerHTML = '';
+            
+            gameData.upgrades.forEach(upgrade => {
+                const upgradeElement = document.createElement('div');
+                upgradeElement.className = 'upgrade-card';
+                
+                const cost = Math.floor(upgrade.cost * Math.pow(1.5, upgrade.level));
+                const canAfford = gameData.coins >= cost;
+                
+                upgradeElement.innerHTML = `
+                    <div class="upgrade-header">
+                        <div class="upgrade-name">${upgrade.name}</div>
+                        <div class="upgrade-level">Ур. ${upgrade.level}</div>
+                    </div>
+                    <div class="upgrade-stats">
+                        <div>+${upgrade.multiplier} к множителю</div>
+                        <div>${formatNumber(cost)} монет</div>
+                    </div>
+                    <button class="upgrade-button" ${canAfford ? '' : 'disabled'}>
+                        ${canAfford ? 'Улучшить' : 'Недостаточно монет'}
+                    </button>
+                `;
+                
+                const button = upgradeElement.querySelector('.upgrade-button');
+                button.addEventListener('click', () => {
+                    if (canAfford) {
+                        gameData.coins -= cost;
+                        upgrade.level++;
+                        gameData.multiplier += upgrade.multiplier;
+                        updateUI();
+                        showNotification(`Улучшение "${upgrade.name}" куплено!`, 'success');
+                    }
+                });
+                
+                container.appendChild(upgradeElement);
+            });
+        }
+
+        // Функция для обновления комбо-карт
+        function updateCombos() {
+            const container = document.getElementById('combos-container');
+            container.innerHTML = '';
+            
+            gameData.combos.forEach(combo => {
+                const comboElement = document.createElement('div');
+                comboElement.className = 'combo-card';
+                
+                const canAfford = gameData.coins >= combo.price && !combo.owned;
+                const isMaxLevel = combo.maxLevel > 0 && combo.level >= combo.maxLevel;
+                const levelText = combo.maxLevel > 0 ? `Уровень ${combo.level}/${combo.maxLevel}` : '';
+                const buttonText = combo.owned ? 
+                    (isMaxLevel ? 'MAX' : `Улучшить ${formatNumber(combo.price)}`) : 
+                    (canAfford ? `Купить ${formatNumber(combo.price)}` : 'Недостаточно монет');
+                const buttonClass = combo.owned ? 
+                    (isMaxLevel ? 'combo-button combo-max' : 'combo-button combo-owned') : 
+                    'combo-button';
+                
+                let timerHTML = '';
+                if (combo.type === 'temporary' && combo.owned) {
+                    timerHTML = `<div class="combo-timer">⏰ 59:59</div>`;
+                }
+                
+                // Отображение изображения
+                let imageHTML = '';
+                if (combo.imageType === 'icon') {
+                    imageHTML = `<div class="combo-image">${combo.image}</div>`;
+                } else {
+                    imageHTML = `<div class="combo-image"><img src="${combo.image}" alt="${combo.name}"></div>`;
+                }
+                
+                comboElement.innerHTML = `
+                    ${imageHTML}
+                    <div class="combo-header">
+                        <div class="combo-name">${combo.name}</div>
+                        ${combo.maxLevel > 0 ? `<div class="combo-level">${levelText}</div>` : ''}
+                    </div>
+                    <div class="combo-stats">
+                        ${combo.description}
+                    </div>
+                    ${timerHTML}
+                    <button class="${buttonClass}" ${(combo.owned && isMaxLevel) || !canAfford ? 'disabled' : ''}>
+                        ${buttonText}
+                    </button>
+                `;
+                
+                const button = comboElement.querySelector('.combo-button');
+                if (!combo.owned || !isMaxLevel) {
+                    button.addEventListener('click', () => {
+                        if (canAfford) {
+                            gameData.coins -= combo.price;
+                            if (!combo.owned) {
+                                combo.owned = true;
+                                combo.level = 1;
+                                showNotification(`Комбо-карта "${combo.name}" куплена!`, 'success');
+                            } else {
+                                combo.level++;
+                                showNotification(`Комбо-карта "${combo.name}" улучшена до уровня ${combo.level}!`, 'success');
+                            }
+                            
+                            // Применяем бонусы комбо-карт
+                            applyComboBonus(combo);
+                            updateUI();
+                        }
+                    });
+                }
+                
+                container.appendChild(comboElement);
+            });
+        }
+
+        // Функция для применения бонусов комбо-карт
+        function applyComboBonus(combo) {
+            switch(combo.type) {
+                case 'permanent':
+                    // Постоянные улучшения
+                    if (combo.name.includes("Быстрые лапки")) {
+                        gameData.multiplier *= 1.1;
+                    } else if (combo.name.includes("Золотая клетка")) {
+                        gameData.autoclicker.power *= 2;
+                    }
+                    break;
+                case 'temporary':
+                    // Временные улучшения
+                    gameData.activeCombos.push({
+                        ...combo,
+                        endTime: Date.now() + (combo.duration * 1000)
+                    });
+                    gameData.multiplier += 0.5;
+                    break;
+                case 'multiplier':
+                    // Усилители множителя
+                    gameData.multiplier *= combo.multiplier;
+                    break;
+                case 'reward':
+                    // Разовые награды
+                    gameData.coins += combo.reward;
+                    break;
+            }
+        }
+
+        // Функция для обновления автокликера
+        function updateAutoclicker() {
+            document.getElementById('autoclicker-level').textContent = gameData.autoclicker.level;
+            document.getElementById('autoclicker-power').textContent = gameData.autoclicker.power.toFixed(1) + '/с';
+            document.getElementById('autoclicker-cost').textContent = formatNumber(gameData.autoclicker.cost);
+            
+            const button = document.getElementById('upgrade-autoclicker');
+            const canAfford = gameData.coins >= gameData.autoclicker.cost;
+            
+            button.disabled = !canAfford;
+            button.textContent = canAfford ? 'Улучшить автокликер' : 'Недостаточно монет';
+        }
+
+        // Функция для обновления списка друзей
+        function updateFriendsList() {
+            const container = document.getElementById('friends-list');
+            container.innerHTML = '';
+            
+            // Подсчитываем рефералов
+            const referralFriends = gameData.friends.filter(friend => friend.isReferral);
+            gameData.referral.invitedFriends = referralFriends.length;
+            
+            if (gameData.friends.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 20px;">У вас пока нет друзей. Пригласите их по реферальной ссылке!</p>';
+                return;
+            }
+            
+            gameData.friends.forEach(friend => {
+                const friendElement = document.createElement('div');
+                friendElement.className = 'friend-item';
+                
+                const referralBadge = friend.isReferral ? '<span style="color: var(--success); font-size: 10px; margin-left: 5px;">★</span>' : '';
+                
+                friendElement.innerHTML = `
+                    <div class="friend-avatar">
+                        ${friend.avatar}
+                    </div>
+                    <div class="friend-info">
+                        <div class="friend-name">${friend.name}${referralBadge}</div>
+                        <div class="friend-level">Уровень ${friend.level}</div>
+                    </div>
+                    <div class="friend-coins">${formatNumber(friend.coins)}</div>
+                `;
+                
+                container.appendChild(friendElement);
+            });
+        }
+
+        // Функция для обновления списка уровней
+        function updateLevelsList() {
+            const container = document.getElementById('levels-list');
+            container.innerHTML = '';
+            
+            gameData.levels.forEach(level => {
+                const levelElement = document.createElement('div');
+                levelElement.className = 'level-item';
+                
+                const isActive = gameData.level >= level.level;
+                const isCurrent = gameData.level === level.level;
+                const statusClass = isActive ? 'level-active' : 'level-locked';
+                const statusText = isCurrent ? 'Текущий' : (isActive ? 'Достигнут' : 'Заблокирован');
+                
+                levelElement.innerHTML = `
+                    <div class="level-info">
+                        <div class="level-icon">${level.icon}</div>
+                        <div class="level-text">
+                            <div class="level-name">${level.level}. ${level.name}</div>
+                            <div class="level-requirement">Требуется: ${formatNumber(level.requirement)} монет</div>
+                        </div>
+                    </div>
+                    <div class="level-status ${statusClass}">${statusText}</div>
+                `;
+                
+                container.appendChild(levelElement);
+            });
+        }
+
+        // Функция для проверки повышения уровня
+        function checkLevelUp() {
+            const nextLevel = gameData.levels.find(l => l.level === gameData.level + 1);
+            if (nextLevel && gameData.coins >= nextLevel.requirement) {
+                gameData.level++;
+                showNotification(`Поздравляем! Вы достигли уровня ${gameData.level}: ${nextLevel.name}!`, 'success');
+                updateUI();
+            }
+        }
+
+        // Функция для обновления кошелька
+        function updateWallet() {
+            const walletAddress = document.getElementById('wallet-address');
+            const connectButton = document.getElementById('connect-wallet');
+            
+            if (gameData.walletConnected) {
+                walletAddress.textContent = gameData.walletAddress;
+                connectButton.textContent = 'Отвязать кошелек';
+            } else {
+                walletAddress.textContent = 'Не привязан';
+                connectButton.textContent = 'Привязать кошелек';
+            }
+        }
+
+        // Функция для обновления списка комбо-карт в админке
+        function updateAdminCombosList() {
+            const container = document.getElementById('admin-combos-list');
+            container.innerHTML = '';
+            
+            if (gameData.combos.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 20px;">Нет комбо-карт</p>';
+                return;
+            }
+            
+            gameData.combos.forEach(combo => {
+                const comboElement = document.createElement('div');
+                comboElement.className = 'combo-card';
+                comboElement.innerHTML = `
+                    <div class="combo-image">${combo.image}</div>
+                    <div class="combo-header">
+                        <div class="combo-name">${combo.name}</div>
+                        <div class="combo-status">${formatNumber(combo.price)}</div>
+                    </div>
+                    <div class="combo-stats">
+                        ${combo.description}
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">
+                        Тип: ${getComboTypeName(combo.type)}
+                    </div>
+                    <div class="form-actions">
+                        <button class="admin-button edit-combo" data-id="${combo.id}">Редактировать</button>
+                        <button class="cancel-btn delete-combo" data-id="${combo.id}">Удалить</button>
+                    </div>
+                `;
+                
+                container.appendChild(comboElement);
+            });
+            
+            // Добавляем обработчики для кнопок редактирования и удаления
+            document.querySelectorAll('.edit-combo').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const comboId = parseInt(this.getAttribute('data-id'));
+                    editCombo(comboId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-combo').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const comboId = parseInt(this.getAttribute('data-id'));
+                    deleteCombo(comboId);
+                });
+            });
+        }
+
+        // Функция для получения названия типа карты
+        function getComboTypeName(type) {
+            const typeNames = {
+                'permanent': 'Постоянная',
+                'temporary': 'Временная',
+                'multiplier': 'Усилитель множителя',
+                'reward': 'Разовая награда'
+            };
+            return typeNames[type] || type;
+        }
+
+        // Функция для редактирования комбо-карты
+        function editCombo(id) {
+            const combo = gameData.combos.find(c => c.id === id);
+            if (!combo) return;
+            
+            // Заполняем форму данными карты
+            document.getElementById('combo-icon').value = combo.image;
+            document.getElementById('combo-name').value = combo.name;
+            document.getElementById('combo-description').value = combo.description;
+            document.getElementById('combo-price').value = combo.price;
+            document.getElementById('combo-type').value = combo.type;
+            document.getElementById('combo-max-level').value = combo.maxLevel;
+            
+            // Устанавливаем тип изображения
+            document.querySelectorAll('.image-option').forEach(opt => {
+                opt.classList.remove('active');
+                if (opt.getAttribute('data-type') === combo.imageType) {
+                    opt.classList.add('active');
+                }
+            });
+            toggleImageType(combo.imageType);
+            
+            // Показываем дополнительные поля в зависимости от типа
+            toggleComboFields(combo.type);
+            
+            if (combo.type === 'temporary') {
+                document.getElementById('combo-duration').value = combo.duration;
+            } else if (combo.type === 'multiplier') {
+                document.getElementById('combo-multiplier').value = combo.multiplier;
+            } else if (combo.type === 'reward') {
+                document.getElementById('combo-reward').value = combo.reward;
+            }
+            
+            // Показываем форму
+            document.getElementById('combo-form').style.display = 'block';
+            
+            // Сохраняем ID редактируемой карты
+            document.getElementById('combo-form').setAttribute('data-edit-id', id);
+        }
+
+        // Функция для удаления комбо-карты
+        function deleteCombo(id) {
+            if (confirm('Вы уверены, что хотите удалить эту комбо-карту?')) {
+                gameData.combos = gameData.combos.filter(c => c.id !== id);
+                updateUI();
+                showNotification('Комбо-карта удалена!', 'success');
+            }
+        }
+
+        // Функция для переключения типа изображения
+        function toggleImageType(type) {
+            if (type === 'icon') {
+                document.getElementById('icon-group').style.display = 'block';
+                document.getElementById('image-group').style.display = 'none';
+            } else {
+                document.getElementById('icon-group').style.display = 'none';
+                document.getElementById('image-group').style.display = 'block';
+            }
+        }
+
+        // Функция для переключения дополнительных полей формы
+        function toggleComboFields(type) {
+            document.getElementById('duration-group').style.display = type === 'temporary' ? 'block' : 'none';
+            document.getElementById('multiplier-group').style.display = type === 'multiplier' ? 'block' : 'none';
+            document.getElementById('reward-group').style.display = type === 'reward' ? 'block' : 'none';
+        }
+
+        // Функция для копирования реферальной ссылки
+        function copyReferralLink() {
+            const link = document.getElementById('referral-link-text').textContent;
+            navigator.clipboard.writeText(link).then(() => {
+                const btn = document.getElementById('copy-ref-link');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i>';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                }, 2000);
+                showNotification('Реферальная ссылка скопирована!', 'success');
+            });
+        }
+
+        // Функция для приглашения друзей через Telegram
+        function inviteFriends() {
+            const link = `https://t.me/share/url?url=${encodeURIComponent(`https://t.me/hamster_combat_bot?start=${gameData.referral.code}`)}&text=${encodeURIComponent('Присоединяйся к Hamster Combat! Нажимай на хомяка и зарабатывай монеты! 🐹💰')}`;
+            
+            // В реальном приложении здесь будет вызов Telegram API
+            // Для демонстрации просто открываем в новом окне
+            window.open(link, '_blank');
+            
+            // Показываем сообщение об успехе
+            showNotification('Ссылка для приглашения скопирована! Поделись ею с друзьями и получай 10,000 монет за каждого!', 'success');
+        }
+
+        // Функция для добавления реферального друга
+        function addReferralFriend(friendName) {
+            // Генерируем случайные данные для нового друга
+            const newFriend = {
+                id: Math.max(0, ...gameData.friends.map(f => f.id)) + 1,
+                name: friendName,
+                level: Math.floor(Math.random() * 5) + 1,
+                coins: Math.floor(Math.random() * 1000000),
+                avatar: "🐹",
+                isReferral: true
+            };
+            
+            gameData.friends.push(newFriend);
+            
+            // Начисляем награду
+            const reward = 10000;
+            gameData.coins += reward;
+            gameData.referral.earnedFromReferrals += reward;
+            
+            // Показываем уведомление
+            showNotification(`Поздравляем! Твой друг ${friendName} присоединился к игре! Ты получил ${formatNumber(reward)} монет!`, 'success');
+            
+            updateUI();
+        }
+
+        // Функция для автокликера
+        function autoclick() {
+            if (gameData.autoclicker.power > 0) {
+                gameData.coins += gameData.autoclicker.power * gameData.multiplier;
+                gameData.clicks += gameData.autoclicker.power;
+                updateUI();
+            }
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Устанавливаем начальные значения
+            updateUI();
+            
+            // Запускаем автокликер
+            setInterval(autoclick, 1000);
+            
+            // Обработчик клика по лапке
+            const clicker = document.getElementById('clicker');
+            clicker.addEventListener('click', function(e) {
+                // Добавляем монеты
+                let clickValue = 1 * gameData.multiplier;
+                
+                // Проверяем бонус комбо-карты "Хомяк-ниндзя"
+                const ninjaCombo = gameData.combos.find(c => c.name.includes("Хомяк-ниндзя") && c.owned);
+                if (ninjaCombo && Math.random() < 0.05) {
+                    clickValue *= 10;
+                    showNotification('Критический удар! 10x монет!', 'warning');
+                }
+                
+                gameData.coins += clickValue;
+                gameData.clicks += 1;
+                
+                // Создаем эффект клика
+                const clickEffect = document.createElement('div');
+                clickEffect.className = 'click-effect';
+                clickEffect.style.left = (e.offsetX - 20) + 'px';
+                clickEffect.style.top = (e.offsetY - 20) + 'px';
+                clicker.appendChild(clickEffect);
+                
+                // Удаляем эффект после анимации
+                setTimeout(() => {
+                    clickEffect.remove();
+                }, 600);
+                
+                // Обновляем интерфейс
+                updateUI();
+            });
+            
+            // Обработчики вкладок
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Убираем активный класс у всех вкладок
+                    tabs.forEach(t => t.classList.remove('active'));
+                    // Добавляем активный класс текущей вкладке
+                    this.classList.add('active');
+                    
+                    // Скрываем все страницы
+                    document.querySelectorAll('.page').forEach(page => {
+                        page.classList.remove('active');
+                    });
+                    
+                    // Показываем выбранную страницу
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Обработчик кнопки профиля
+            document.getElementById('profile-button').addEventListener('click', function() {
+                // Скрываем все страницы
+                document.querySelectorAll('.page').forEach(page => {
+                    page.classList.remove('active');
+                });
+                
+                // Показываем страницу профиля
+                document.getElementById('profile-page').classList.add('active');
+                
+                // Убираем активный класс у всех вкладок
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                
+                // Активируем вкладку профиля
+                document.querySelector('.tab[data-tab="profile-page"]').classList.add('active');
+            });
+            
+            // Обработчик кнопки выхода
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                if (confirm('Вы уверены, что хотите выйти?')) {
+                    showNotification('Вы вышли из аккаунта', 'success');
+                }
+            });
+            
+            // Обработчик изменения имени
+            document.getElementById('profile-name').addEventListener('change', function() {
+                const newName = this.value;
+                document.getElementById('username').textContent = newName;
+                showNotification('Имя пользователя изменено!', 'success');
+            });
+            
+            // Обработчик кошелька
+            document.getElementById('connect-wallet').addEventListener('click', function() {
+                if (gameData.walletConnected) {
+                    gameData.walletConnected = false;
+                    gameData.walletAddress = null;
+                    showNotification('Кошелек отвязан', 'success');
+                } else {
+                    gameData.walletConnected = true;
+                    gameData.walletAddress = 'EQD' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                    showNotification('Кошелек привязан!', 'success');
+                }
+                updateWallet();
+            });
+            
+            // Обработчик улучшения автокликера
+            document.getElementById('upgrade-autoclicker').addEventListener('click', function() {
+                if (gameData.coins >= gameData.autoclicker.cost) {
+                    gameData.coins -= gameData.autoclicker.cost;
+                    gameData.autoclicker.level++;
+                    gameData.autoclicker.power += 0.5;
+                    gameData.autoclicker.cost = Math.floor(gameData.autoclicker.cost * 1.8);
+                    updateUI();
+                    showNotification('Автокликер улучшен!', 'success');
+                }
+            });
+            
+            // Обработчики реферальной системы
+            document.getElementById('copy-ref-link').addEventListener('click', copyReferralLink);
+            document.getElementById('invite-friends-btn').addEventListener('click', inviteFriends);
+            
+            // Обработчики админки
+            document.getElementById('add-combo-btn').addEventListener('click', function() {
+                document.getElementById('combo-form').style.display = 'block';
+                document.getElementById('combo-form').removeAttribute('data-edit-id');
+                
+                // Сбрасываем форму
+                document.getElementById('combo-icon').value = '';
+                document.getElementById('combo-name').value = '';
+                document.getElementById('combo-description').value = '';
+                document.getElementById('combo-price').value = '';
+                document.getElementById('combo-type').value = 'permanent';
+                document.getElementById('combo-max-level').value = '0';
+                toggleComboFields('permanent');
+                
+                // Сбрасываем тип изображения
+                document.querySelectorAll('.image-option').forEach(opt => {
+                    opt.classList.remove('active');
+                    if (opt.getAttribute('data-type') === 'icon') {
+                        opt.classList.add('active');
+                    }
+                });
+                toggleImageType('icon');
+            });
+            
+            document.getElementById('view-combos-btn').addEventListener('click', function() {
+                updateAdminCombosList();
+            });
+            
+            // Обработчики типа изображения
+            document.querySelectorAll('.image-option').forEach(opt => {
+                opt.addEventListener('click', function() {
+                    document.querySelectorAll('.image-option').forEach(o => o.classList.remove('active'));
+                    this.classList.add('active');
+                    toggleImageType(this.getAttribute('data-type'));
+                });
+            });
+            
+            document.getElementById('combo-type').addEventListener('change', function() {
+                toggleComboFields(this.value);
+            });
+            
+            document.getElementById('save-combo').addEventListener('click', function() {
+                const editId = document.getElementById('combo-form').getAttribute('data-edit-id');
+                const imageType = document.querySelector('.image-option.active').getAttribute('data-type');
+                const name = document.getElementById('combo-name').value;
+                const description = document.getElementById('combo-description').value;
+                const price = parseInt(document.getElementById('combo-price').value);
+                const type = document.getElementById('combo-type').value;
+                const maxLevel = parseInt(document.getElementById('combo-max-level').value);
+                
+                if (!name || !description || !price) {
+                    showNotification('Заполните все обязательные поля!', 'warning');
+                    return;
+                }
+                
+                // Получаем изображение в зависимости от типа
+                let image = '';
+                if (imageType === 'icon') {
+                    image = document.getElementById('combo-icon').value || '🐹';
+                } else {
+                    // Для изображений - в демо используем иконку
+                    image = '🐹';
+                }
+                
+                const newCombo = {
+                    id: editId ? parseInt(editId) : Math.max(0, ...gameData.combos.map(c => c.id)) + 1,
+                    name,
+                    image,
+                    imageType,
+                    description,
+                    price,
+                    type,
+                    maxLevel,
+                    level: 0,
+                    owned: false
+                };
+                
+                // Добавляем дополнительные поля в зависимости от типа
+                if (type === 'temporary') {
+                    newCombo.duration = parseInt(document.getElementById('combo-duration').value) || 3600;
+                } else if (type === 'multiplier') {
+                    newCombo.multiplier = parseFloat(document.getElementById('combo-multiplier').value) || 1.5;
+                } else if (type === 'reward') {
+                    newCombo.reward = parseInt(document.getElementById('combo-reward').value) || 10000;
+                }
+                
+                if (editId) {
+                    // Обновляем существующую карту
+                    const index = gameData.combos.findIndex(c => c.id === parseInt(editId));
+                    if (index !== -1) {
+                        gameData.combos[index] = newCombo;
+                        showNotification('Комбо-карта обновлена!', 'success');
+                    }
+                } else {
+                    // Добавляем новую карту
+                    gameData.combos.push(newCombo);
+                    showNotification('Комбо-карта добавлена!', 'success');
+                }
+                
+                // Скрываем форму и обновляем интерфейс
+                document.getElementById('combo-form').style.display = 'none';
+                updateUI();
+            });
+            
+            document.getElementById('cancel-combo').addEventListener('click', function() {
+                document.getElementById('combo-form').style.display = 'none';
+            });
+
+            // Демонстрация: кнопка для тестирования реферальной системы
+            const demoButton = document.createElement('button');
+            demoButton.textContent = 'Демо: Добавить реферального друга';
+            demoButton.style.width = '100%';
+            demoButton.style.padding = '10px';
+            demoButton.style.marginTop = '10px';
+            demoButton.style.backgroundColor = 'var(--warning)';
+            demoButton.style.border = 'none';
+            demoButton.style.borderRadius = '5px';
+            demoButton.style.color = 'white';
+            demoButton.style.cursor = 'pointer';
+            demoButton.addEventListener('click', function() {
+                const friendName = prompt('Введите имя друга:');
+                if (friendName) {
+                    addReferralFriend(friendName);
+                }
+            });
+            document.getElementById('friends-page').appendChild(demoButton);
+            
+            // Показываем приветственное сообщение
+            setTimeout(() => {
+                showNotification('Добро пожаловать в Hamster Combat! Нажимай на лапку, чтобы зарабатывать монеты!', 'success');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
