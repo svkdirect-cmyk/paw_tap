@@ -1635,21 +1635,21 @@
             document.getElementById('invite-friends-btn').addEventListener('click', inviteFriends);
 
             // Демонстрация: кнопка для тестирования реферальной системы
-         //   const demoButton = document.createElement('button');
-        //    demoButton.textContent = 'Демо: Добавить реферального друга';
-          //  demoButton.style.width = '100%';
-           // demoButton.style.padding = '10px';
-           // demoButton.style.marginTop = '10px';
-           // demoButton.style.backgroundColor = 'var(--warning)';
-            //demoButton.style.border = 'none';
-            //demoButton.style.borderRadius = '5px';
-           // demoButton.style.color = 'white';
-           // demoButton.style.cursor = 'pointer';
-           // demoButton.addEventListener('click', function() {
-           //     const friendName = prompt('Введите имя друга:');
-           //     if (friendName) {
-           //         addReferralFriend(friendName);
-             //   }
+          const demoButton = document.createElement('button');
+          demoButton.textContent = 'Демо: Добавить реферального друга';
+           demoButton.style.width = '100%';
+            demoButton.style.padding = '10px';
+            demoButton.style.marginTop = '10px';
+            demoButton.style.backgroundColor = 'var(--warning)';
+            demoButton.style.border = 'none';
+            demoButton.style.borderRadius = '5px';
+            demoButton.style.color = 'white';
+            demoButton.style.cursor = 'pointer';
+            demoButton.addEventListener('click', function() {
+               const friendName = prompt('Введите имя друга:');
+              if (friendName) {
+                  addReferralFriend(friendName);
+               }
             });
             document.getElementById('friends-page').appendChild(demoButton);
             
