@@ -1185,20 +1185,6 @@
         let user = null;
         let saveTimeout = null;
 
-        // Функция для инициализации приложения
-        function initApp() {
-            // Сначала проверяем, есть ли сохраненный пользователь
-            const savedUser = localStorage.getItem('hamster_combat_current_user');
-            if (savedUser) {
-                // Пользователь уже авторизован ранее
-                user = JSON.parse(savedUser);
-                handleSuccessfulAuth();
-            } else {
-                // Иначе инициализируем Telegram Web App
-                initTelegramWebApp();
-            }
-        }
-
         // Функция для инициализации Telegram Web App
         function initTelegramWebApp() {
             try {
@@ -1436,21 +1422,18 @@
             }
         }
 
-        // Функция для форматирования чисел (ОБНОВЛЕННАЯ ФУНКЦИЯ)
+        // Функция для форматирования чисел
         function formatNumber(num) {
-            // Сначала округляем до одной цифры после точки
-            const rounded = Math.round(num * 10) / 10;
-            
-            if (rounded >= 1000000000) {
-                return (rounded / 1000000000).toFixed(1) + 'B';
+            if (num >= 1000000000) {
+                return (num / 1000000000).toFixed(1) + 'B';
             }
-            if (rounded >= 1000000) {
-                return (rounded / 1000000).toFixed(1) + 'M';
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
             }
-            if (rounded >= 1000) {
-                return (rounded / 1000).toFixed(1) + 'K';
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
             }
-            return rounded.toString();
+            return num.toString();
         }
 
         // Функция для показа уведомлений
@@ -1659,7 +1642,7 @@
         function updateUI() {
             if (!gameData) return;
             
-            // Обновляем монеты (сокращенный формат)
+            // Обновляем монеты
             document.getElementById('coins').innerHTML = `<i class="fas fa-coins"></i> ${formatNumber(gameData.coins)}`;
             document.getElementById('total-coins').value = formatNumber(gameData.coins);
             
@@ -2023,8 +2006,8 @@
 
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
-            // Инициализируем приложение
-            initApp();
+            // Инициализируем Telegram Web App
+            initTelegramWebApp();
             
             // Обработчик клика по лапке
             document.getElementById('clicker').addEventListener('click', function(e) {
