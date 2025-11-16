@@ -13,31 +13,36 @@
     <div id="app">
         <!-- Экран игры -->
         <div id="game-tab" class="tab-content active">
-            <!-- Обновлённая шапка -->
+            <!-- Исправленная шапка -->
             <div class="header">
-                <div class="user-section clickable" id="profile-opener">
-                    <div class="avatar-container">
-                        <img id="user-avatar" src="" alt="Avatar" class="avatar">
-                        <div class="level-badge">1</div>
-                    </div>
-                    <div class="user-info">
-                        <div id="user-name" class="username">Player</div>
-                        <div class="level-progress-mini">
-                            <div class="progress-bar-mini">
-                                <div class="progress-fill-mini" id="level-progress-mini"></div>
-                            </div>
-                            <span class="level-text">Ур. 1</span>
+                <div class="header-top">
+                    <div class="user-section clickable" id="profile-opener">
+                        <div class="avatar-container">
+                            <img id="user-avatar" src="" alt="Avatar" class="avatar">
+                            <div class="level-badge">1</div>
+                        </div>
+                        <div class="user-info">
+                            <div id="user-name" class="username">Player</div>
+                            <div class="level-text">Уровень <span>1</span></div>
                         </div>
                     </div>
-                </div>
-                
-                <div class="stats-section">
+                    
                     <div class="coin-balance">
                         <div class="coin-icon">🪙</div>
                         <div class="coin-amount">
                             <span id="score">0</span>
                             <div class="coin-label">монет</div>
                         </div>
+                    </div>
+                </div>
+                
+                <!-- Прогресс бар под шапкой -->
+                <div class="header-progress">
+                    <div class="progress-bar-header">
+                        <div class="progress-fill-header" id="level-progress-header"></div>
+                    </div>
+                    <div class="progress-text-header">
+                        До уровня <span>2</span>: <span id="progress-remaining">100</span> очков
                     </div>
                 </div>
             </div>
@@ -51,10 +56,7 @@
                         </div>
                         <div class="paw-glow"></div>
                     </div>
-                    <div class="click-stats">
-                        <div class="click-power">+<span id="click-power">1</span> за клик</div>
-                        <div class="auto-clicks">+<span id="auto-clicks">0</span>/сек</div>
-                    </div>
+                    <!-- Убраны надписи под кнопкой -->
                 </div>
                 
                 <!-- Эффекты частиц -->
@@ -354,7 +356,7 @@
                 <span>Уровни</span>
             </div>
             <div class="tab-item" data-tab="combo-tab">
-                <i class="fas fa-cards"></i>
+                <i class="fas fa-layer-group"></i>
                 <span>Комбо</span>
             </div>
         </div>
