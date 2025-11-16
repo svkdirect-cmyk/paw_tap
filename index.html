@@ -13,27 +13,31 @@
     <div id="app">
         <!-- Экран игры -->
         <div id="game-tab" class="tab-content active">
-            <!-- Шапка -->
+            <!-- Обновлённая шапка -->
             <div class="header">
-                <div class="user-section">
+                <div class="user-section clickable" id="profile-opener">
                     <div class="avatar-container">
                         <img id="user-avatar" src="" alt="Avatar" class="avatar">
                         <div class="level-badge">1</div>
                     </div>
                     <div class="user-info">
-                        <div id="user-name" class="username clickable">Player</div>
-                        <div class="user-id">ID: 0000</div>
+                        <div id="user-name" class="username">Player</div>
+                        <div class="level-progress-mini">
+                            <div class="progress-bar-mini">
+                                <div class="progress-fill-mini" id="level-progress-mini"></div>
+                            </div>
+                            <span class="level-text">Ур. 1</span>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="stats-section">
-                    <div class="stat-card">
-                        <div class="stat-label">БАЛЛЫ</div>
-                        <div id="score" class="stat-value">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">УРОВЕНЬ</div>
-                        <div id="level" class="stat-value">1</div>
+                    <div class="coin-balance">
+                        <div class="coin-icon">🪙</div>
+                        <div class="coin-amount">
+                            <span id="score">0</span>
+                            <div class="coin-label">монет</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -42,12 +46,10 @@
             <div class="game-area">
                 <div class="click-container">
                     <div id="paw-button" class="paw-button">
-                        <div class="paw-pad">
-                            <div class="paw-toe toe-1"></div>
-                            <div class="paw-toe toe-2"></div>
-                            <div class="paw-toe toe-3"></div>
-                            <div class="paw-toe toe-4"></div>
+                        <div class="paw-icon">
+                            <i class="fas fa-paw"></i>
                         </div>
+                        <div class="paw-glow"></div>
                     </div>
                     <div class="click-stats">
                         <div class="click-power">+<span id="click-power">1</span> за клик</div>
@@ -89,17 +91,6 @@
                         </div>
                         <button class="upgrade-btn" data-cost="25">25</button>
                     </div>
-                </div>
-            </div>
-
-            <!-- Прогресс бар -->
-            <div class="progress-section">
-                <div class="progress-info">
-                    <span>До следующего уровня</span>
-                    <span id="progress-text">0/100</span>
-                </div>
-                <div class="progress-bar">
-                    <div id="level-progress" class="progress-fill"></div>
                 </div>
             </div>
         </div>
