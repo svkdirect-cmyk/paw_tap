@@ -99,11 +99,6 @@ class DarkPawsClicker {
                     this.buyUpgrade(upgradeType);
                 }
             });
-            
-            // Отключаем выделение текста при касании
-            btn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-            });
         });
 
         // Кнопка приглашения друзей
@@ -151,13 +146,6 @@ class DarkPawsClicker {
                 this.shareProfile();
             });
         }
-
-        // Отключаем выделение текста для всех кликабельных элементов
-        document.querySelectorAll('.clickable, .tab-item, .btn-primary, .btn-secondary').forEach(el => {
-            el.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-            });
-        });
     }
 
     initTelegramAuth() {
@@ -181,7 +169,7 @@ class DarkPawsClicker {
         if (this.user) {
             const avatar = document.getElementById('user-avatar');
             const username = document.getElementById('user-name');
-            const levelText = document.querySelector('.level-text span');
+            const levelText = document.querySelector('.level-text');
             
             if (avatar) {
                 if (this.user.photo_url) {
@@ -194,7 +182,7 @@ class DarkPawsClicker {
                 username.textContent = this.user.first_name || 'Player';
             }
             if (levelText) {
-                levelText.textContent = this.gameState.level;
+                levelText.textContent = `Уровень ${this.gameState.level}`;
             }
         }
     }
@@ -766,10 +754,14 @@ class DarkPawsClicker {
     showLevelUp() {
         // Можно добавить анимацию уровня
         const levelBadge = document.querySelector('.level-badge');
+        const levelText = document.querySelector('.level-text');
         if (levelBadge) {
             levelBadge.textContent = this.gameState.level;
             levelBadge.classList.add('pulse');
             setTimeout(() => levelBadge.classList.remove('pulse'), 1000);
+        }
+        if (levelText) {
+            levelText.textContent = `Уровень ${this.gameState.level}`;
         }
     }
 
@@ -843,15 +835,12 @@ class DarkPawsClicker {
     updateUI() {
         // Обновляем счет и уровень
         const scoreElement = document.getElementById('score');
-        const levelElement = document.querySelector('.level-text span');
         const levelBadge = document.querySelector('.level-badge');
-        const nextLevelElement = document.querySelector('.progress-text-header span:first-child');
-        const progressRemaining = document.getElementById('progress-remaining');
+        const levelText = document.querySelector('.level-text');
         
         if (scoreElement) scoreElement.textContent = Math.floor(this.gameState.score).toLocaleString();
-        if (levelElement) levelElement.textContent = this.gameState.level;
         if (levelBadge) levelBadge.textContent = this.gameState.level;
-        if (nextLevelElement) nextLevelElement.textContent = this.gameState.level + 1;
+        if (levelText) levelText.textContent = `Уровень ${this.gameState.level}`;
         
         // Обновляем прогресс бар в шапке
         this.updateHeaderProgressBar();
@@ -868,15 +857,9 @@ class DarkPawsClicker {
         const percentage = (progress / totalNeeded) * 100;
         
         const progressFillHeader = document.getElementById('level-progress-header');
-        const progressRemaining = document.getElementById('progress-remaining');
         
         if (progressFillHeader) {
             progressFillHeader.style.width = `${Math.min(percentage, 100)}%`;
-        }
-        
-        if (progressRemaining) {
-            const remaining = Math.max(0, totalNeeded - progress);
-            progressRemaining.textContent = remaining.toLocaleString();
         }
     }
 
@@ -996,10 +979,3 @@ document.addEventListener('keydown', (e) => {
         }
     }
 });
-
-// Предотвращение масштабирования на мобильных устройствах
-document.addEventListener('touchmove', function(e) {
-    if (e.scale !== 1) {
-        e.preventDefault();
-    }
-}, { passive: false });
