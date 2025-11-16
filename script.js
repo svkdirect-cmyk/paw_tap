@@ -31,6 +31,7 @@ class DarkPawsClicker {
         this.particles = [];
         this.currentTab = 'game-tab';
         this.startTime = Date.now();
+        this.lastTouch = null;
         this.init();
     }
 
@@ -79,6 +80,11 @@ class DarkPawsClicker {
             pawButton.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 pawButton.classList.add('click-animation');
+                // Сохраняем позицию касания для создания частиц
+                this.lastTouch = {
+                    clientX: e.touches[0].clientX,
+                    clientY: e.touches[0].clientY
+                };
             });
             
             pawButton.addEventListener('touchend', (e) => {
@@ -86,6 +92,16 @@ class DarkPawsClicker {
                 setTimeout(() => {
                     pawButton.classList.remove('click-animation');
                 }, 150);
+                
+                // Обрабатываем клик с позицией касания
+                if (this.lastTouch) {
+                    const touchEvent = {
+                        clientX: this.lastTouch.clientX,
+                        clientY: this.lastTouch.clientY
+                    };
+                    this.handleClick(touchEvent);
+                    this.lastTouch = null;
+                }
             });
         }
 
@@ -614,9 +630,22 @@ class DarkPawsClicker {
         const container = document.getElementById('particles-container');
         if (!container) return;
         
+        // Получаем координаты клика
+        let clientX, clientY;
+        
+        if (event.touches && event.touches[0]) {
+            // Для touch событий
+            clientX = event.touches[0].clientX;
+            clientY = event.touches[0].clientY;
+        } else {
+            // Для mouse событий
+            clientX = event.clientX;
+            clientY = event.clientY;
+        }
+        
         const rect = container.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
         
         // Создаем 8-12 частиц
         const particleCount = 8 + Math.floor(Math.random() * 5);
@@ -631,22 +660,17 @@ class DarkPawsClicker {
             const tx = Math.cos(angle) * distance;
             const ty = Math.sin(angle) * distance;
             
-            particle.style.setProperty('--tx', `${tx}px`);
-            particle.style.setProperty('--ty', `${ty}px`);
-            particle.style.left = `${x}px`;
-            particle.style.top = `${y}px`;
-            
-            // Случайный размер
-            const size = 2 + Math.random() * 4;
-            particle.style.width = `${size}px`;
-            particle.style.height = `${size}px`;
-            
-            // Случайная прозрачность
-            const opacity = 0.3 + Math.random() * 0.7;
-            particle.style.opacity = opacity;
-            
-            // Анимация
-            particle.style.animation = `particle-float ${0.8 + Math.random() * 0.4}s ease-out forwards`;
+            // Устанавливаем CSS переменные для анимации
+            particle.style.cssText = `
+                --tx: ${tx}px;
+                --ty: ${ty}px;
+                left: ${x}px;
+                top: ${y}px;
+                width: ${2 + Math.random() * 4}px;
+                height: ${2 + Math.random() * 4}px;
+                opacity: ${0.3 + Math.random() * 0.7};
+                animation: particle-float ${0.8 + Math.random() * 0.4}s ease-out forwards;
+            `;
             
             container.appendChild(particle);
             
@@ -706,18 +730,16 @@ class DarkPawsClicker {
         const tx = Math.cos(angle) * distance;
         const ty = Math.sin(angle) * distance;
         
-        particle.style.setProperty('--tx', `${tx}px`);
-        particle.style.setProperty('--ty', `${ty}px`);
-        particle.style.left = `${x}px`;
-        particle.style.top = `${y}px`;
-        
-        // Маленький размер и низкая opacity
-        const size = 1 + Math.random() * 2;
-        particle.style.width = `${size}px`;
-        particle.style.height = `${size}px`;
-        particle.style.opacity = 0.1 + Math.random() * 0.2;
-        
-        particle.style.animation = `particle-float ${2 + Math.random() * 2}s ease-out forwards`;
+        particle.style.cssText = `
+            --tx: ${tx}px;
+            --ty: ${ty}px;
+            left: ${x}px;
+            top: ${y}px;
+            width: ${1 + Math.random() * 2}px;
+            height: ${1 + Math.random() * 2}px;
+            opacity: ${0.1 + Math.random() * 0.2};
+            animation: particle-float ${2 + Math.random() * 2}s ease-out forwards;
+        `;
         
         container.appendChild(particle);
         
