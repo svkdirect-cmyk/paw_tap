@@ -36,17 +36,35 @@ body {
 }
 
 /* Шапка */
+/* Обновлённая шапка */
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 30px;
+    padding: 15px 0;
 }
 
 .user-section {
     display: flex;
     align-items: center;
     gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 8px 12px;
+    border-radius: 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    min-width: 180px;
+}
+
+.user-section:hover {
+    background: var(--bg-tertiary);
+    transform: translateY(-2px);
+}
+
+.user-section:active {
+    transform: translateY(0);
 }
 
 .avatar-container {
@@ -57,7 +75,7 @@ body {
     width: 50px;
     height: 50px;
     border-radius: 12px;
-    background: var(--bg-secondary);
+    background: var(--bg-tertiary);
     border: 2px solid var(--border-color);
 }
 
@@ -73,67 +91,96 @@ body {
     border-radius: 8px;
     min-width: 20px;
     text-align: center;
+    border: 2px solid var(--bg-primary);
 }
 
 .user-info {
     display: flex;
     flex-direction: column;
+    gap: 6px;
+    flex: 1;
 }
 
 .username {
     font-weight: 600;
-    font-size: 16px;
+    font-size: 14px;
+    color: var(--text-primary);
 }
 
-.user-id {
-    font-size: 11px;
+.level-progress-mini {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.progress-bar-mini {
+    flex: 1;
+    height: 4px;
+    background: var(--bg-tertiary);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-fill-mini {
+    height: 100%;
+    background: linear-gradient(90deg, var(--text-accent), #ff6b9d);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+.level-text {
+    font-size: 10px;
     color: var(--text-secondary);
+    font-weight: 600;
+    min-width: 35px;
 }
 
+/* Баланс монет */
 .stats-section {
     display: flex;
     gap: 10px;
 }
 
-.stat-card {
+.coin-balance {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     background: var(--bg-secondary);
-    padding: 10px 15px;
-    border-radius: 12px;
+    padding: 12px 16px;
+    border-radius: 16px;
     border: 1px solid var(--border-color);
-    text-align: center;
-    min-width: 80px;
+    min-width: 120px;
 }
 
-.stat-label {
-    font-size: 10px;
-    color: var(--text-secondary);
-    font-weight: 500;
-    margin-bottom: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+.coin-icon {
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #ffd700, #ff6b00);
+    border-radius: 50%;
+    border: 2px solid rgba(255, 215, 0, 0.3);
 }
 
-.stat-value {
+.coin-amount {
+    display: flex;
+    flex-direction: column;
+}
+
+.coin-amount span {
     font-size: 18px;
     font-weight: 700;
     color: var(--text-primary);
+    line-height: 1;
 }
 
-/* Игровая зона */
-.game-area {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 40px 0;
-    min-height: 200px;
-}
-
-.click-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
+.coin-amount .coin-label {
+    font-size: 10px;
+    color: var(--text-secondary);
+    margin-top: 2px;
 }
 
 /* Кнопка-лапка */
