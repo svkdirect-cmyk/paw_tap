@@ -1209,6 +1209,18 @@
                 // Получаем данные пользователя
                 const initData = tg.initData || tg.initDataUnsafe;
                 
+                // Проверяем сохраненного пользователя в localStorage
+                const savedUser = localStorage.getItem('hamster_combat_current_user');
+                if (savedUser) {
+                    try {
+                        user = JSON.parse(savedUser);
+                        handleSuccessfulAuth();
+                        return;
+                    } catch (e) {
+                        console.error('Ошибка загрузки пользователя:', e);
+                    }
+                }
+                
                 if (initData && initData.user) {
                     // Пользователь уже авторизован в Telegram
                     user = initData.user;
@@ -1226,8 +1238,19 @@
                 
             } catch (error) {
                 console.error('Ошибка инициализации Telegram Web App:', error);
-                // Если Telegram Web App не доступен, показываем обычную авторизацию
-                showAuthScreen();
+                // Если Telegram Web App не доступен, проверяем сохраненного пользователя
+                const savedUser = localStorage.getItem('hamster_combat_current_user');
+                if (savedUser) {
+                    try {
+                        user = JSON.parse(savedUser);
+                        handleSuccessfulAuth();
+                    } catch (e) {
+                        console.error('Ошибка загрузки пользователя:', e);
+                        showAuthScreen();
+                    }
+                } else {
+                    showAuthScreen();
+                }
             }
         }
 
@@ -1422,7 +1445,7 @@
             }
         }
 
-        // Функция для форматирования чисел
+        // Функция для форматирования чисел (исправленная версия)
         function formatNumber(num) {
             if (num >= 1000000000) {
                 return (num / 1000000000).toFixed(1) + 'B';
@@ -1432,6 +1455,10 @@
             }
             if (num >= 1000) {
                 return (num / 1000).toFixed(1) + 'K';
+            }
+            // Для чисел меньше 1000 отображаем с одной цифрой после точки если есть
+            if (num % 1 !== 0) {
+                return num.toFixed(1);
             }
             return num.toString();
         }
@@ -2006,8 +2033,36 @@
 
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
-            // Инициализируем Telegram Web App
-            initTelegramWebApp();
+            // Сначала проверяем, есть ли сохраненный пользователь
+            const savedUser = localStorage.getItem('hamster_combat_current_user');
+            if (savedUser) {
+                try {
+                    user = JSON.parse(savedUser);
+                    // Если пользователь найден, сразу показываем приложение
+                    document.getElementById('auth-screen').style.display = 'none';
+                    document.getElementById('app').style.display = 'block';
+                    
+                    // Загружаем прогресс
+                    if (!loadProgress()) {
+                        initializeGameData();
+                    }
+                    
+                    // Обновляем интерфейс
+                    updateUserInterface();
+                    updateUI();
+                    
+                    // Запускаем автокликер
+                    setInterval(autoclick, 1000);
+                    
+                    console.log('Пользователь автоматически авторизован');
+                } catch (e) {
+                    console.error('Ошибка загрузки пользователя:', e);
+                    initTelegramWebApp();
+                }
+            } else {
+                // Если сохраненного пользователя нет, инициализируем Telegram Web App
+                initTelegramWebApp();
+            }
             
             // Обработчик клика по лапке
             document.getElementById('clicker').addEventListener('click', function(e) {
