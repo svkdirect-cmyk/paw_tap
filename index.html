@@ -98,22 +98,31 @@
                 <h2>Друзья</h2>
                 <div class="tab-stats">
                     <div class="friends-count">Друзей: <span>0</span></div>
+                    <div class="friends-bonus">Бонус: <span>0%</span></div>
                 </div>
             </div>
 
             <div class="friends-content">
-                <div class="empty-state">
-                    <div class="empty-icon">👥</div>
-                    <h3>Пригласите друзей</h3>
-                    <p>Приглашайте друзей и получайте бонусы за их прогресс</p>
+                <div class="friends-actions">
                     <button class="btn-primary" id="invite-friends">
-                        <i class="fas fa-share-alt"></i>
-                        Пригласить друзей
+                        <i class="fas fa-user-plus"></i>
+                        Пригласить друга
+                    </button>
+                    <button class="btn-secondary" id="refresh-friends">
+                        <i class="fas fa-sync-alt"></i>
+                        Обновить
                     </button>
                 </div>
 
-                <div class="friends-list" style="display: none;">
-                    <div class="coming-soon">Список друзей будет доступен после подключения</div>
+                <div class="friends-list-section">
+                    <h4>Мои друзья</h4>
+                    <div class="friends-list" id="friends-list-container">
+                        <div class="empty-state">
+                            <div class="empty-icon">👥</div>
+                            <h3>Друзей пока нет</h3>
+                            <p>Пригласите друзей и получайте бонусы за их прогресс</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="friends-bonuses">
@@ -143,6 +152,13 @@
                             </div>
                             <div class="bonus-status">Не активно</div>
                         </div>
+                    </div>
+                </div>
+
+                <div class="leaderboard-section">
+                    <h4>Топ игроков</h4>
+                    <div class="leaderboard" id="leaderboard-container">
+                        <div class="loading">Загрузка...</div>
                     </div>
                 </div>
             </div>
