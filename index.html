@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Paws Clicker</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Экран игры -->
+        <div id="game-tab" class="tab-content active">
+            <!-- Шапка -->
+            <div class="header">
+                <div class="user-section">
+                    <div class="avatar-container">
+                        <img id="user-avatar" src="" alt="Avatar" class="avatar">
+                        <div class="level-badge">1</div>
+                    </div>
+                    <div class="user-info">
+                        <div id="user-name" class="username clickable">Player</div>
+                        <div class="user-id">ID: 0000</div>
+                    </div>
+                </div>
+                
+                <div class="stats-section">
+                    <div class="stat-card">
+                        <div class="stat-label">БАЛЛЫ</div>
+                        <div id="score" class="stat-value">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">УРОВЕНЬ</div>
+                        <div id="level" class="stat-value">1</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Игровая зона -->
+            <div class="game-area">
+                <div class="click-container">
+                    <div id="paw-button" class="paw-button">
+                        <div class="paw-pad">
+                            <div class="paw-toe toe-1"></div>
+                            <div class="paw-toe toe-2"></div>
+                            <div class="paw-toe toe-3"></div>
+                            <div class="paw-toe toe-4"></div>
+                        </div>
+                    </div>
+                    <div class="click-stats">
+                        <div class="click-power">+<span id="click-power">1</span> за клик</div>
+                        <div class="auto-clicks">+<span id="auto-clicks">0</span>/сек</div>
+                    </div>
+                </div>
+                
+                <!-- Эффекты частиц -->
+                <div id="particles-container" class="particles-container"></div>
+            </div>
+
+            <!-- Улучшения -->
+            <div class="upgrades-section">
+                <h3 class="section-title">УЛУЧШЕНИЯ</h3>
+                <div class="upgrades-grid">
+                    <div class="upgrade-card" data-upgrade="click-power">
+                        <div class="upgrade-icon">💪</div>
+                        <div class="upgrade-info">
+                            <div class="upgrade-name">Сила лапы</div>
+                            <div class="upgrade-level">Уровень <span>1</span></div>
+                        </div>
+                        <button class="upgrade-btn" data-cost="10">10</button>
+                    </div>
+                    
+                    <div class="upgrade-card" data-upgrade="auto-click">
+                        <div class="upgrade-icon">⚡</div>
+                        <div class="upgrade-info">
+                            <div class="upgrade-name">Авто-клик</div>
+                            <div class="upgrade-level">Уровень <span>0</span></div>
+                        </div>
+                        <button class="upgrade-btn" data-cost="50">50</button>
+                    </div>
+                    
+                    <div class="upgrade-card" data-upgrade="critical-chance">
+                        <div class="upgrade-icon">🎯</div>
+                        <div class="upgrade-info">
+                            <div class="upgrade-name">Точность</div>
+                            <div class="upgrade-level">Уровень <span>1</span></div>
+                        </div>
+                        <button class="upgrade-btn" data-cost="25">25</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Прогресс бар -->
+            <div class="progress-section">
+                <div class="progress-info">
+                    <span>До следующего уровня</span>
+                    <span id="progress-text">0/100</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="level-progress" class="progress-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка друзей -->
+        <div id="friends-tab" class="tab-content">
+            <div class="tab-header">
+                <h2>Друзья</h2>
+                <div class="tab-stats">
+                    <div class="friends-count">Друзей: <span>0</span></div>
+                </div>
+            </div>
+
+            <div class="friends-content">
+                <div class="empty-state">
+                    <div class="empty-icon">👥</div>
+                    <h3>Пригласите друзей</h3>
+                    <p>Приглашайте друзей и получайте бонусы за их прогресс</p>
+                    <button class="btn-primary" id="invite-friends">
+                        <i class="fas fa-share-alt"></i>
+                        Пригласить друзей
+                    </button>
+                </div>
+
+                <div class="friends-list" style="display: none;">
+                    <div class="coming-soon">Список друзей будет доступен после подключения</div>
+                </div>
+
+                <div class="friends-bonuses">
+                    <h4>Бонусы за друзей</h4>
+                    <div class="bonus-grid">
+                        <div class="bonus-card">
+                            <div class="bonus-icon">🔥</div>
+                            <div class="bonus-info">
+                                <div class="bonus-name">+1 друг</div>
+                                <div class="bonus-desc">+5% к силе клика</div>
+                            </div>
+                            <div class="bonus-status">Не активно</div>
+                        </div>
+                        <div class="bonus-card">
+                            <div class="bonus-icon">🚀</div>
+                            <div class="bonus-info">
+                                <div class="bonus-name">+3 друга</div>
+                                <div class="bonus-desc">+10% к авто-клику</div>
+                            </div>
+                            <div class="bonus-status">Не активно</div>
+                        </div>
+                        <div class="bonus-card">
+                            <div class="bonus-icon">💎</div>
+                            <div class="bonus-info">
+                                <div class="bonus-name">+5 друзей</div>
+                                <div class="bonus-desc">+15% к шансу крита</div>
+                            </div>
+                            <div class="bonus-status">Не активно</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка уровней -->
+        <div id="levels-tab" class="tab-content">
+            <div class="tab-header">
+                <h2>Уровни</h2>
+                <div class="tab-stats">
+                    <div class="current-level">Текущий: <span>1</span></div>
+                </div>
+            </div>
+
+            <div class="levels-content">
+                <div class="levels-progress">
+                    <div class="level-indicator">
+                        <div class="level-circle active">
+                            <span>1</span>
+                        </div>
+                        <div class="level-line"></div>
+                        <div class="level-circle">
+                            <span>2</span>
+                        </div>
+                        <div class="level-line"></div>
+                        <div class="level-circle">
+                            <span>3</span>
+                        </div>
+                        <div class="level-line"></div>
+                        <div class="level-circle">
+                            <span>4</span>
+                        </div>
+                        <div class="level-line"></div>
+                        <div class="level-circle">
+                            <span>5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="levels-grid">
+                    <div class="level-card active">
+                        <div class="level-header">
+                            <div class="level-number">Уровень 1</div>
+                            <div class="level-status completed">Пройден</div>
+                        </div>
+                        <div class="level-reward">
+                            <div class="reward-icon">🎁</div>
+                            <div class="reward-info">
+                                <div class="reward-name">Начальный набор</div>
+                                <div class="reward-desc">+10 к силе клика</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="level-card">
+                        <div class="level-header">
+                            <div class="level-number">Уровень 2</div>
+                            <div class="level-status">1000 очков</div>
+                        </div>
+                        <div class="level-reward">
+                            <div class="reward-icon">⚡</div>
+                            <div class="reward-info">
+                                <div class="reward-name">Авто-кликер</div>
+                                <div class="reward-desc">+1 авто-клик/сек</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="level-card locked">
+                        <div class="level-header">
+                            <div class="level-number">Уровень 3</div>
+                            <div class="level-status">5000 очков</div>
+                        </div>
+                        <div class="level-reward">
+                            <div class="reward-icon">🎯</div>
+                            <div class="reward-info">
+                                <div class="reward-name">Критический удар</div>
+                                <div class="reward-desc">+10% шанс крита</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="level-card locked">
+                        <div class="level-header">
+                            <div class="level-number">Уровень 4</div>
+                            <div class="level-status">15000 очков</div>
+                        </div>
+                        <div class="level-reward">
+                            <div class="reward-icon">💎</div>
+                            <div class="reward-info">
+                                <div class="reward-name">Премиум буст</div>
+                                <div class="reward-desc">x2 все бонусы</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка комбо -->
+        <div id="combo-tab" class="tab-content">
+            <div class="tab-header">
+                <h2>Комбо карты</h2>
+                <div class="tab-stats">
+                    <div class="combo-count">Карт: <span>0/12</span></div>
+                </div>
+            </div>
+
+            <div class="combo-content">
+                <div class="combo-deck">
+                    <div class="deck-info">
+                        <div class="deck-power">
+                            <div class="power-value">0</div>
+                            <div class="power-label">Сила колоды</div>
+                        </div>
+                        <div class="deck-stats">
+                            <div class="deck-stat">
+                                <div class="stat-value">0%</div>
+                                <div class="stat-label">Бонус клика</div>
+                            </div>
+                            <div class="deck-stat">
+                                <div class="stat-value">0%</div>
+                                <div class="stat-label">Бонус авто</div>
+                            </div>
+                            <div class="deck-stat">
+                                <div class="stat-value">0%</div>
+                                <div class="stat-label">Бонус крита</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="combo-collection">
+                    <h4>Коллекция карт</h4>
+                    <div class="cards-grid">
+                        <div class="combo-card locked">
+                            <div class="card-frame">
+                                <div class="card-rarity common">Обычная</div>
+                                <div class="card-icon">🐾</div>
+                                <div class="card-name">Лапа новичка</div>
+                                <div class="card-stats">
+                                    <div class="card-stat">+5% к клику</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="combo-card locked">
+                            <div class="card-frame">
+                                <div class="card-rarity rare">Редкая</div>
+                                <div class="card-icon">⚡</div>
+                                <div class="card-name">Энергия</div>
+                                <div class="card-stats">
+                                    <div class="card-stat">+3 авто-клика</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="combo-card locked">
+                            <div class="card-frame">
+                                <div class="card-rarity epic">Эпическая</div>
+                                <div class="card-icon">🎯</div>
+                                <div class="card-name">Точность</div>
+                                <div class="card-stats">
+                                    <div class="card-stat">+15% шанс крита</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="combo-card locked">
+                            <div class="card-frame">
+                                <div class="card-rarity legendary">Легендарная</div>
+                                <div class="card-icon">💎</div>
+                                <div class="card-name">Алмазная лапа</div>
+                                <div class="card-stats">
+                                    <div class="card-stat">x2 все бонусы</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="combo-info">
+                    <h4>Как работают комбо карты?</h4>
+                    <ul class="combo-rules">
+                        <li>Собирайте карты для усиления характеристик</li>
+                        <li>Комбинируйте карты для получения бонусов</li>
+                        <li>Редкость карт: Обычная, Редкая, Эпическая, Легендарная</li>
+                        <li>Карты открываются при достижении уровней</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Нижняя панель вкладок -->
+        <div class="bottom-tabs">
+            <div class="tab-item active" data-tab="game-tab">
+                <i class="fas fa-paw"></i>
+                <span>Игра</span>
+            </div>
+            <div class="tab-item" data-tab="friends-tab">
+                <i class="fas fa-users"></i>
+                <span>Друзья</span>
+            </div>
+            <div class="tab-item" data-tab="levels-tab">
+                <i class="fas fa-chart-line"></i>
+                <span>Уровни</span>
+            </div>
+            <div class="tab-item" data-tab="combo-tab">
+                <i class="fas fa-cards"></i>
+                <span>Комбо</span>
+            </div>
+        </div>
+
+        <!-- Модальное окно профиля -->
+        <div id="profile-modal" class="modal">
+            <div class="modal-content profile-modal">
+                <div class="modal-header">
+                    <h2>Профиль игрока</h2>
+                    <button class="modal-close" id="close-profile">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="profile-content">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <img id="profile-avatar" src="" alt="Avatar" class="avatar-large">
+                            <div class="profile-level">
+                                <span id="profile-level">1</span>
+                            </div>
+                        </div>
+                        <div class="profile-info">
+                            <h3 id="profile-name">Player</h3>
+                            <div class="profile-id">ID: <span id="profile-id">0000</span></div>
+                            <div class="profile-rank">
+                                <i class="fas fa-trophy"></i>
+                                Ранг: <span id="profile-rank">Новичок</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-stats">
+                        <div class="stat-row">
+                            <div class="stat-item">
+                                <div class="stat-icon">🎯</div>
+                                <div class="stat-data">
+                                    <div class="stat-number" id="profile-total-clicks">0</div>
+                                    <div class="stat-label">Всего кликов</div>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-icon">⏱️</div>
+                                <div class="stat-data">
+                                    <div class="stat-number" id="profile-play-time">0ч</div>
+                                    <div class="stat-label">Время игры</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-row">
+                            <div class="stat-item">
+                                <div class="stat-icon">⚡</div>
+                                <div class="stat-data">
+                                    <div class="stat-number" id="profile-total-score">0</div>
+                                    <div class="stat-label">Всего очков</div>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-icon">📅</div>
+                                <div class="stat-data">
+                                    <div class="stat-number" id="profile-join-date">Сегодня</div>
+                                    <div class="stat-label">Дата регистрации</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-achievements">
+                        <h4>Достижения</h4>
+                        <div class="achievements-grid">
+                            <div class="achievement unlocked">
+                                <div class="achievement-icon">🎮</div>
+                                <div class="achievement-info">
+                                    <div class="achievement-name">Первые шаги</div>
+                                    <div class="achievement-desc">Сделать 100 кликов</div>
+                                </div>
+                            </div>
+                            <div class="achievement locked">
+                                <div class="achievement-icon">💪</div>
+                                <div class="achievement-info">
+                                    <div class="achievement-name">Усердный работник</div>
+                                    <div class="achievement-desc">Сделать 1000 кликов</div>
+                                </div>
+                            </div>
+                            <div class="achievement locked">
+                                <div class="achievement-icon">🚀</div>
+                                <div class="achievement-info">
+                                    <div class="achievement-name">Клик-мастер</div>
+                                    <div class="achievement-desc">Сделать 10000 кликов</div>
+                                </div>
+                            </div>
+                            <div class="achievement locked">
+                                <div class="achievement-icon">🏆</div>
+                                <div class="achievement-info">
+                                    <div class="achievement-name">Легенда кликов</div>
+                                    <div class="achievement-desc">Сделать 50000 кликов</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-upgrades">
+                        <h4>Мои улучшения</h4>
+                        <div class="upgrades-list">
+                            <div class="profile-upgrade">
+                                <div class="upgrade-name">Сила лапы</div>
+                                <div class="upgrade-level">Уровень <span id="profile-click-power">1</span></div>
+                            </div>
+                            <div class="profile-upgrade">
+                                <div class="upgrade-name">Авто-клик</div>
+                                <div class="upgrade-level">Уровень <span id="profile-auto-click">0</span></div>
+                            </div>
+                            <div class="profile-upgrade">
+                                <div class="upgrade-name">Точность</div>
+                                <div class="upgrade-level">Уровень <span id="profile-critical">1</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-secondary" id="share-profile">
+                        <i class="fas fa-share"></i>
+                        Поделиться профилем
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
