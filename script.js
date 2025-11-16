@@ -106,10 +106,10 @@ class DarkPawsClicker {
             });
         }
 
-        // Клик по имени пользователя для открытия профиля
-        const userName = document.getElementById('user-name');
-        if (userName) {
-            userName.addEventListener('click', () => {
+        // Клик по всей секции профиля для открытия
+        const profileOpener = document.getElementById('profile-opener');
+        if (profileOpener) {
+            profileOpener.addEventListener('click', () => {
                 this.openProfile();
             });
         }
@@ -823,10 +823,12 @@ class DarkPawsClicker {
     updateUI() {
         // Обновляем счет и уровень
         const scoreElement = document.getElementById('score');
-        const levelElement = document.getElementById('level');
+        const levelElement = document.querySelector('.level-text');
+        const levelBadge = document.querySelector('.level-badge');
         
-        if (scoreElement) scoreElement.textContent = Math.floor(this.gameState.score);
-        if (levelElement) levelElement.textContent = this.gameState.level;
+        if (scoreElement) scoreElement.textContent = Math.floor(this.gameState.score).toLocaleString();
+        if (levelElement) levelElement.textContent = `Ур. ${this.gameState.level}`;
+        if (levelBadge) levelBadge.textContent = this.gameState.level;
         
         // Обновляем силу клика и авто-клик
         const clickPowerElement = document.getElementById('click-power');
@@ -838,8 +840,22 @@ class DarkPawsClicker {
         // Обновляем кнопки улучшений
         this.updateUpgradeButtons();
         
-        // Обновляем прогресс бар
-        this.updateProgressBar();
+        // Обновляем прогресс бар в шапке
+        this.updateMiniProgressBar();
+    }
+
+    updateMiniProgressBar() {
+        const currentLevelScore = this.getRequiredScoreForLevel(this.gameState.level);
+        const nextLevelScore = this.getRequiredScoreForLevel(this.gameState.level + 1);
+        const progress = this.gameState.score - currentLevelScore;
+        const totalNeeded = nextLevelScore - currentLevelScore;
+        const percentage = (progress / totalNeeded) * 100;
+        
+        const progressFillMini = document.getElementById('level-progress-mini');
+        
+        if (progressFillMini) {
+            progressFillMini.style.width = `${Math.min(percentage, 100)}%`;
+        }
     }
 
     updateUpgradeButtons() {
@@ -889,25 +905,6 @@ class DarkPawsClicker {
                 button.classList.remove('affordable');
             }
         });
-    }
-
-    updateProgressBar() {
-        const currentLevelScore = this.getRequiredScoreForLevel(this.gameState.level);
-        const nextLevelScore = this.getRequiredScoreForLevel(this.gameState.level + 1);
-        const progress = this.gameState.score - currentLevelScore;
-        const totalNeeded = nextLevelScore - currentLevelScore;
-        const percentage = (progress / totalNeeded) * 100;
-        
-        const progressFill = document.getElementById('level-progress');
-        const progressText = document.getElementById('progress-text');
-        
-        if (progressFill) {
-            progressFill.style.width = `${Math.min(percentage, 100)}%`;
-        }
-        
-        if (progressText) {
-            progressText.textContent = `${Math.floor(progress)}/${totalNeeded}`;
-        }
     }
 
     inviteFriends() {
