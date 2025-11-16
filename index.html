@@ -1184,6 +1184,57 @@
         let tg = null;
         let user = null;
         let saveTimeout = null;
+        let autoclickerInterval = null;
+
+        // Функция для инициализации приложения
+        function initApp() {
+            console.log('Инициализация приложения...');
+            
+            // Сначала проверяем, есть ли сохраненный пользователь
+            const savedUser = localStorage.getItem('hamster_combat_current_user');
+            if (savedUser) {
+                try {
+                    console.log('Найден сохраненный пользователь');
+                    user = JSON.parse(savedUser);
+                    
+                    // Загружаем прогресс
+                    if (loadProgress()) {
+                        console.log('Прогресс загружен:', {
+                            монеты: gameData.coins,
+                            уровень: gameData.level,
+                            улучшения: gameData.upgrades.map(u => `${u.name}: ур.${u.level}`),
+                            комбо: gameData.combos.filter(c => c.owned).length
+                        });
+                        
+                        // Сразу показываем приложение
+                        showApp();
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Ошибка при загрузке пользователя:', error);
+                }
+            }
+            
+            // Если сохраненного пользователя нет или ошибка, инициализируем Telegram Web App
+            console.log('Сохраненный пользователь не найден, инициализируем Telegram Web App');
+            initTelegramWebApp();
+        }
+
+        // Функция для показа приложения
+        function showApp() {
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            updateUserInterface();
+            updateUI();
+            
+            // Запускаем автокликер
+            if (autoclickerInterval) {
+                clearInterval(autoclickerInterval);
+            }
+            autoclickerInterval = setInterval(autoclick, 1000);
+            
+            showNotification(`С возвращением, ${user.first_name}! Баланс: ${formatNumber(gameData.coins)} монет`, 'success');
+        }
 
         // Функция для инициализации Telegram Web App
         function initTelegramWebApp() {
@@ -1212,17 +1263,17 @@
                 if (initData && initData.user) {
                     // Пользователь уже авторизован в Telegram
                     user = initData.user;
+                    console.log('Пользователь авторизован через Telegram:', user);
                     handleSuccessfulAuth();
                 } else {
                     // Пользователь не авторизован, показываем кнопку авторизации
+                    console.log('Пользователь не авторизован, показываем экран авторизации');
                     showAuthScreen();
                 }
                 
                 // Настраиваем внешний вид приложения
                 tg.setHeaderColor('#8a5cf5');
                 tg.setBackgroundColor('#121212');
-                
-                console.log('Telegram Web App инициализирован');
                 
             } catch (error) {
                 console.error('Ошибка инициализации Telegram Web App:', error);
@@ -1249,100 +1300,41 @@
             authButtonText.innerHTML = '<div class="loading"></div>';
             authButton.disabled = true;
             
-            if (tg && tg.showPopup) {
-                // Используем встроенную авторизацию Telegram
-                tg.showPopup({
-                    title: 'Авторизация',
-                    message: 'Для игры в Hamster Combat требуется авторизация через Telegram',
-                    buttons: [
-                        {id: 'auth', type: 'default', text: 'Авторизоваться'}
-                    ]
-                }, (buttonId) => {
-                    if (buttonId === 'auth') {
-                        // Запрашиваем контактные данные
-                        tg.requestContact((response) => {
-                            if (response && response.contact) {
-                                user = {
-                                    id: response.contact.user_id,
-                                    first_name: response.contact.first_name,
-                                    last_name: response.contact.last_name || '',
-                                    username: response.contact.username || '',
-                                    phone: response.contact.phone_number
-                                };
-                                handleSuccessfulAuth();
-                            } else {
-                                handleAuthError('Не удалось получить контактные данные');
-                            }
-                        });
-                    } else {
-                        handleAuthError('Авторизация отменена');
-                    }
-                });
-            } else {
-                // Альтернативный метод авторизации
-                setTimeout(() => {
-                    // Имитация успешной авторизации для демонстрации
-                    user = {
-                        id: Math.floor(Math.random() * 1000000),
-                        first_name: 'Telegram',
-                        last_name: 'User',
-                        username: 'telegram_user_' + Date.now(),
-                        phone: '+79001234567'
-                    };
-                    handleSuccessfulAuth();
-                }, 1500);
-            }
+            // Альтернативный метод авторизации (для демонстрации)
+            setTimeout(() => {
+                user = {
+                    id: Math.floor(Math.random() * 1000000),
+                    first_name: 'Telegram',
+                    last_name: 'User',
+                    username: 'telegram_user_' + Date.now(),
+                    phone: '+79001234567'
+                };
+                handleSuccessfulAuth();
+            }, 1500);
         }
 
         // Функция для обработки успешной авторизации
         function handleSuccessfulAuth() {
+            console.log('Успешная авторизация, пользователь:', user);
+            
             // Сохраняем пользователя в localStorage
             localStorage.setItem('hamster_combat_current_user', JSON.stringify(user));
             
             // Обновляем интерфейс пользователя
             updateUserInterface();
             
-            // Скрываем экран авторизации и показываем приложение
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
-            
             // Загружаем прогресс или инициализируем новую игру
             if (!loadProgress()) {
+                console.log('Создаем новую игру');
                 initializeGameData();
                 showNotification(`Добро пожаловать, ${user.first_name}! Начинаем новую игру!`, 'success');
             } else {
-                showNotification(`С возвращением, ${user.first_name}! Прогресс загружен.`, 'success');
+                console.log('Прогресс загружен');
+                showNotification(`С возвращением, ${user.first_name}! Баланс: ${formatNumber(gameData.coins)} монет`, 'success');
             }
             
-            // Обновляем интерфейс игры
-            updateUI();
-            
-            // Запускаем автокликер
-            setInterval(autoclick, 1000);
-        }
-
-        // Функция для обработки ошибок авторизации
-        function handleAuthError(message) {
-            const authButton = document.getElementById('telegram-auth');
-            const authButtonText = document.getElementById('auth-button-text');
-            
-            // Восстанавливаем кнопку
-            authButtonText.textContent = 'Войти через Telegram';
-            authButton.disabled = false;
-            
-            showNotification(message, 'danger');
-            
-            // Альтернативный метод авторизации
-            setTimeout(() => {
-                showNotification('Используется демо-режим', 'warning');
-                user = {
-                    id: Math.floor(Math.random() * 1000000),
-                    first_name: 'Демо',
-                    last_name: 'Пользователь',
-                    username: 'demo_user'
-                };
-                handleSuccessfulAuth();
-            }, 2000);
+            // Показываем приложение
+            showApp();
         }
 
         // Функция для обновления интерфейса пользователя
@@ -1353,15 +1345,6 @@
             const displayName = user.first_name + (user.last_name ? ' ' + user.last_name : '');
             document.getElementById('username').textContent = displayName;
             document.getElementById('profile-name').value = displayName;
-            
-            // Обновляем аватар (если есть)
-            if (user.photo_url) {
-                const avatar = document.getElementById('user-avatar');
-                const profileAvatar = document.getElementById('profile-avatar');
-                
-                avatar.innerHTML = `<img src="${user.photo_url}" alt="${displayName}">`;
-                profileAvatar.innerHTML = `<img src="${user.photo_url}" alt="${displayName}">`;
-            }
             
             // Обновляем реферальную ссылку с ID пользователя
             if (gameData) {
@@ -1374,6 +1357,11 @@
             if (confirm('Вы уверены, что хотите выйти? Весь прогресс будет сохранен.')) {
                 // Сохраняем прогресс перед выходом
                 saveProgress();
+                
+                // Останавливаем автокликер
+                if (autoclickerInterval) {
+                    clearInterval(autoclickerInterval);
+                }
                 
                 // Сбрасываем состояние
                 user = null;
@@ -1394,7 +1382,7 @@
             }
         }
 
-        // Функция для показа страницы (с обработкой кнопки "Назад")
+        // Функция для показа страницы
         function showPage(pageId) {
             // Скрываем все страницы
             document.querySelectorAll('.page').forEach(page => {
@@ -1411,29 +1399,23 @@
                     tab.classList.add('active');
                 }
             });
-            
-            // Управляем кнопкой "Назад" в Telegram
-            if (tg && tg.BackButton) {
-                if (pageId === 'profile-page') {
-                    tg.BackButton.show();
-                } else {
-                    tg.BackButton.hide();
-                }
-            }
         }
 
         // Функция для форматирования чисел
         function formatNumber(num) {
-            if (num >= 1000000000) {
-                return (num / 1000000000).toFixed(1) + 'B';
+            // Сначала округляем до одной цифры после точки
+            const rounded = Math.round(num * 10) / 10;
+            
+            if (rounded >= 1000000000) {
+                return (rounded / 1000000000).toFixed(1) + 'B';
             }
-            if (num >= 1000000) {
-                return (num / 1000000).toFixed(1) + 'M';
+            if (rounded >= 1000000) {
+                return (rounded / 1000000).toFixed(1) + 'M';
             }
-            if (num >= 1000) {
-                return (num / 1000).toFixed(1) + 'K';
+            if (rounded >= 1000) {
+                return (rounded / 1000).toFixed(1) + 'K';
             }
-            return num.toString();
+            return rounded.toString();
         }
 
         // Функция для показа уведомлений
@@ -1472,23 +1454,6 @@
                 }, 2000);
             }
             
-            // Создаем частицы звезд
-            for (let i = 0; i < 8; i++) {
-                const starParticle = document.createElement('div');
-                starParticle.className = 'star-particle';
-                starParticle.textContent = '✦';
-                starParticle.style.left = x + 'px';
-                starParticle.style.top = y + 'px';
-                starParticle.style.setProperty('--tx', (Math.random() * 120 - 60) + 'px');
-                starParticle.style.setProperty('--ty', (Math.random() * -80 - 20) + 'px');
-                
-                container.appendChild(starParticle);
-                
-                setTimeout(() => {
-                    starParticle.remove();
-                }, 1200);
-            }
-            
             // Создаем текст с количеством монет
             if (clickValue > 1) {
                 const coinText = document.createElement('div');
@@ -1515,6 +1480,11 @@
                     timestamp: Date.now()
                 };
                 localStorage.setItem(`hamster_combat_${user.id}`, JSON.stringify(saveData));
+                console.log('Прогресс сохранен:', {
+                    монеты: gameData.coins,
+                    уровень: gameData.level,
+                    улучшения: gameData.upgrades.map(u => `${u.name}: ур.${u.level}`)
+                });
             }
         }
 
@@ -1526,6 +1496,12 @@
                     try {
                         const parsedData = JSON.parse(savedData);
                         gameData = parsedData.gameData;
+                        
+                        // Восстанавливаем структуру данных если нужно
+                        if (!gameData.upgrades) gameData.upgrades = getDefaultUpgrades();
+                        if (!gameData.combos) gameData.combos = getDefaultCombos();
+                        if (!gameData.levels) gameData.levels = getDefaultLevels();
+                        
                         return true;
                     } catch (e) {
                         console.error('Ошибка загрузки прогресса:', e);
@@ -1543,10 +1519,61 @@
             saveTimeout = setTimeout(saveProgress, 1000);
         }
 
+        // Функции для получения стандартных данных
+        function getDefaultUpgrades() {
+            return [
+                { id: 1, name: "Усиленные лапы", level: 0, cost: 100, multiplier: 0.1 },
+                { id: 2, name: "Энергетик", level: 0, cost: 500, multiplier: 0.5 },
+                { id: 3, name: "Тренировка", level: 0, cost: 1000, multiplier: 1 },
+                { id: 4, name: "Протеин", level: 0, cost: 5000, multiplier: 5 },
+                { id: 5, name: "Стероиды", level: 0, cost: 15000, multiplier: 10 },
+                { id: 6, name: "Мутация", level: 0, cost: 50000, multiplier: 25 }
+            ];
+        }
+
+        function getDefaultCombos() {
+            return [
+                { 
+                    id: 1, 
+                    name: "Быстрые лапки", 
+                    image: "⚡",
+                    imageType: "icon",
+                    description: "Увеличивает скорость клика на 10%", 
+                    price: 5000, 
+                    type: "permanent",
+                    level: 0,
+                    maxLevel: 3,
+                    owned: false
+                },
+                { 
+                    id: 2, 
+                    name: "Золотая клетка", 
+                    image: "💰",
+                    imageType: "icon",
+                    description: "Удваивает доход с автокликера", 
+                    price: 15000, 
+                    type: "permanent",
+                    level: 0,
+                    maxLevel: 0,
+                    owned: false
+                }
+            ];
+        }
+
+        function getDefaultLevels() {
+            return [
+                { level: 1, name: "Начинающий", icon: "🐣", requirement: 0 },
+                { level: 2, name: "Опытный бегун", icon: "🏃", requirement: 1000 },
+                { level: 3, name: "Силач", icon: "💪", requirement: 5000 },
+                { level: 4, name: "Воин", icon: "⚔️", requirement: 15000 },
+                { level: 5, name: "Чемпион", icon: "🏆", requirement: 50000 }
+            ];
+        }
+
         // Функция для инициализации данных игры
         function initializeGameData() {
             gameData = {
-                coins: 0,
+                coins: 100, // Начальный баланс для тестирования
                 clicks: 0,
                 level: 1,
                 multiplier: 1,
@@ -1560,77 +1587,10 @@
                     invitedFriends: 0,
                     earnedFromReferrals: 0
                 },
-                upgrades: [
-                    { id: 1, name: "Усиленные лапы", level: 0, cost: 100, multiplier: 0.1 },
-                    { id: 2, name: "Энергетик", level: 0, cost: 500, multiplier: 0.5 },
-                    { id: 3, name: "Тренировка", level: 0, cost: 1000, multiplier: 1 },
-                    { id: 4, name: "Протеин", level: 0, cost: 5000, multiplier: 5 },
-                    { id: 5, name: "Стероиды", level: 0, cost: 15000, multiplier: 10 },
-                    { id: 6, name: "Мутация", level: 0, cost: 50000, multiplier: 25 }
-                ],
-                combos: [
-                    { 
-                        id: 1, 
-                        name: "Быстрые лапки", 
-                        image: "⚡",
-                        imageType: "icon",
-                        description: "Увеличивает скорость клика на 10%", 
-                        price: 5000, 
-                        type: "permanent",
-                        level: 0,
-                        maxLevel: 3,
-                        owned: false
-                    },
-                    { 
-                        id: 2, 
-                        name: "Золотая клетка", 
-                        image: "💰",
-                        imageType: "icon",
-                        description: "Удваивает доход с автокликера", 
-                        price: 15000, 
-                        type: "permanent",
-                        level: 0,
-                        maxLevel: 0,
-                        owned: false
-                    },
-                    { 
-                        id: 3, 
-                        name: "Хомяк-ниндзя", 
-                        image: "🥷",
-                        imageType: "icon",
-                        description: "Шанс 5% на 10x клик", 
-                        price: 25000, 
-                        type: "permanent",
-                        level: 0,
-                        maxLevel: 1,
-                        owned: false
-                    },
-                    { 
-                        id: 4, 
-                        name: "Энергетический напиток", 
-                        image: "🥤",
-                        imageType: "icon",
-                        description: "+50% к множителю на 1 час", 
-                        price: 10000, 
-                        type: "temporary",
-                        level: 0,
-                        maxLevel: 0,
-                        owned: false,
-                        duration: 3600
-                    }
-                ],
+                upgrades: getDefaultUpgrades(),
+                combos: getDefaultCombos(),
+                levels: getDefaultLevels(),
                 friends: [],
-                levels: [
-                    { level: 1, name: "Начинающий", icon: "🐣", requirement: 0 },
-                    { level: 2, name: "Опытный бегун", icon: "🏃", requirement: 1000 },
-                    { level: 3, name: "Силач", icon: "💪", requirement: 5000 },
-                    { level: 4, name: "Воин", icon: "⚔️", requirement: 15000 },
-                    { level: 5, name: "Чемпион", icon: "🏆", requirement: 50000 },
-                    { level: 6, name: "Мастер", icon: "🎯", requirement: 150000 },
-                    { level: 7, name: "Легенда", icon: "🌟", requirement: 500000 },
-                    { level: 8, name: "Император", icon: "👑", requirement: 1500000 },
-                    { level: 9, name: "БОГ ХОМЯКОВ", icon: "😇", requirement: 5000000 }
-                ],
                 walletConnected: false,
                 walletAddress: null,
                 activeCombos: [],
@@ -1642,7 +1602,7 @@
         function updateUI() {
             if (!gameData) return;
             
-            // Обновляем монеты
+            // Обновляем монеты (сокращенный формат)
             document.getElementById('coins').innerHTML = `<i class="fas fa-coins"></i> ${formatNumber(gameData.coins)}`;
             document.getElementById('total-coins').value = formatNumber(gameData.coins);
             
@@ -1650,7 +1610,9 @@
             const currentLevel = gameData.levels.find(l => l.level === gameData.level);
             const nextLevel = gameData.levels.find(l => l.level === gameData.level + 1);
             
-            document.getElementById('user-level').textContent = `Уровень ${gameData.level}: ${currentLevel.name}`;
+            if (currentLevel) {
+                document.getElementById('user-level').textContent = `Уровень ${gameData.level}: ${currentLevel.name}`;
+            }
             
             // Обновляем прогресс-бар уровня
             if (nextLevel) {
@@ -1669,8 +1631,6 @@
             // Обновляем реферальную статистику
             document.getElementById('invited-count').textContent = gameData.referral.invitedFriends;
             document.getElementById('earned-from-refs').textContent = formatNumber(gameData.referral.earnedFromReferrals);
-            document.getElementById('profile-invited-count').value = gameData.referral.invitedFriends;
-            document.getElementById('profile-ref-earnings').value = formatNumber(gameData.referral.earnedFromReferrals);
             
             // Обновляем реферальную ссылку
             document.getElementById('referral-link-text').textContent = `https://t.me/hamster_combat_bot?start=${gameData.referral.code}`;
@@ -1680,15 +1640,6 @@
             
             // Обновляем комбо-карты
             updateCombos();
-            
-            // Обновляем список друзей
-            updateFriendsList();
-            
-            // Обновляем список уровней
-            updateLevelsList();
-            
-            // Обновляем кошелек
-            updateWallet();
             
             // Обновляем автокликер
             updateAutoclicker();
@@ -1703,6 +1654,8 @@
         // Функция для обновления улучшений
         function updateUpgrades() {
             const container = document.getElementById('upgrades-container');
+            if (!container) return;
+            
             container.innerHTML = '';
             
             gameData.upgrades.forEach(upgrade => {
@@ -1744,6 +1697,8 @@
         // Функция для обновления комбо-карт
         function updateCombos() {
             const container = document.getElementById('combos-container');
+            if (!container) return;
+            
             container.innerHTML = '';
             
             gameData.combos.forEach(combo => {
@@ -1760,21 +1715,8 @@
                     (isMaxLevel ? 'combo-button combo-max' : 'combo-button combo-owned') : 
                     'combo-button';
                 
-                let timerHTML = '';
-                if (combo.type === 'temporary' && combo.owned) {
-                    timerHTML = `<div class="combo-timer">⏰ 59:59</div>`;
-                }
-                
-                // Отображение изображения
-                let imageHTML = '';
-                if (combo.imageType === 'icon') {
-                    imageHTML = `<div class="combo-image">${combo.image}</div>`;
-                } else {
-                    imageHTML = `<div class="combo-image"><img src="${combo.image}" alt="${combo.name}"></div>`;
-                }
-                
                 comboElement.innerHTML = `
-                    ${imageHTML}
+                    <div class="combo-image">${combo.image}</div>
                     <div class="combo-header">
                         <div class="combo-name">${combo.name}</div>
                         ${combo.maxLevel > 0 ? `<div class="combo-level">${levelText}</div>` : ''}
@@ -1782,7 +1724,6 @@
                     <div class="combo-stats">
                         ${combo.description}
                     </div>
-                    ${timerHTML}
                     <button class="${buttonClass}" ${(combo.owned && isMaxLevel) || !canAfford ? 'disabled' : ''}>
                         ${buttonText}
                     </button>
@@ -1801,9 +1742,6 @@
                                 combo.level++;
                                 showNotification(`Комбо-карта "${combo.name}" улучшена до уровня ${combo.level}!`, 'success');
                             }
-                            
-                            // Применяем бонусы комбо-карт
-                            applyComboBonus(combo);
                             updateUI();
                         }
                     });
@@ -1811,36 +1749,6 @@
                 
                 container.appendChild(comboElement);
             });
-        }
-
-        // Функция для применения бонусов комбо-карт
-        function applyComboBonus(combo) {
-            switch(combo.type) {
-                case 'permanent':
-                    // Постоянные улучшения
-                    if (combo.name.includes("Быстрые лапки")) {
-                        gameData.multiplier *= 1.1;
-                    } else if (combo.name.includes("Золотая клетка")) {
-                        gameData.autoclicker.power *= 2;
-                    }
-                    break;
-                case 'temporary':
-                    // Временные улучшения
-                    gameData.activeCombos.push({
-                        ...combo,
-                        endTime: Date.now() + (combo.duration * 1000)
-                    });
-                    gameData.multiplier += 0.5;
-                    break;
-                case 'multiplier':
-                    // Усилители множителя
-                    gameData.multiplier *= combo.multiplier;
-                    break;
-                case 'reward':
-                    // Разовые награды
-                    gameData.coins += combo.reward;
-                    break;
-            }
         }
 
         // Функция для обновления автокликера
@@ -1856,70 +1764,6 @@
             button.textContent = canAfford ? 'Улучшить автокликер' : 'Недостаточно монет';
         }
 
-        // Функция для обновления списка друзей
-        function updateFriendsList() {
-            const container = document.getElementById('friends-list');
-            container.innerHTML = '';
-            
-            // Подсчитываем рефералов
-            const referralFriends = gameData.friends.filter(friend => friend.isReferral);
-            gameData.referral.invitedFriends = referralFriends.length;
-            
-            if (gameData.friends.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 20px;">У вас пока нет друзей. Пригласите их по реферальной ссылке!</p>';
-                return;
-            }
-            
-            gameData.friends.forEach(friend => {
-                const friendElement = document.createElement('div');
-                friendElement.className = 'friend-item';
-                
-                const referralBadge = friend.isReferral ? '<span style="color: var(--success); font-size: 10px; margin-left: 5px;">★</span>' : '';
-                
-                friendElement.innerHTML = `
-                    <div class="friend-avatar">
-                        ${friend.avatar}
-                    </div>
-                    <div class="friend-info">
-                        <div class="friend-name">${friend.name}${referralBadge}</div>
-                        <div class="friend-level">Уровень ${friend.level}</div>
-                    </div>
-                    <div class="friend-coins">${formatNumber(friend.coins)}</div>
-                `;
-                
-                container.appendChild(friendElement);
-            });
-        }
-
-        // Функция для обновления списка уровней
-        function updateLevelsList() {
-            const container = document.getElementById('levels-list');
-            container.innerHTML = '';
-            
-            gameData.levels.forEach(level => {
-                const levelElement = document.createElement('div');
-                levelElement.className = 'level-item';
-                
-                const isActive = gameData.level >= level.level;
-                const isCurrent = gameData.level === level.level;
-                const statusClass = isActive ? 'level-active' : 'level-locked';
-                const statusText = isCurrent ? 'Текущий' : (isActive ? 'Достигнут' : 'Заблокирован');
-                
-                levelElement.innerHTML = `
-                    <div class="level-info">
-                        <div class="level-icon">${level.icon}</div>
-                        <div class="level-text">
-                            <div class="level-name">${level.level}. ${level.name}</div>
-                            <div class="level-requirement">Требуется: ${formatNumber(level.requirement)} монет</div>
-                        </div>
-                    </div>
-                    <div class="level-status ${statusClass}">${statusText}</div>
-                `;
-                
-                container.appendChild(levelElement);
-            });
-        }
-
         // Функция для проверки повышения уровня
         function checkLevelUp() {
             const nextLevel = gameData.levels.find(l => l.level === gameData.level + 1);
@@ -1928,71 +1772,6 @@
                 showNotification(`Поздравляем! Вы достигли уровня ${gameData.level}: ${nextLevel.name}!`, 'success');
                 updateUI();
             }
-        }
-
-        // Функция для обновления кошелька
-        function updateWallet() {
-            const walletAddress = document.getElementById('wallet-address');
-            const connectButton = document.getElementById('connect-wallet');
-            
-            if (gameData.walletConnected) {
-                walletAddress.textContent = gameData.walletAddress;
-                connectButton.textContent = 'Отвязать кошелек';
-            } else {
-                walletAddress.textContent = 'Не привязан';
-                connectButton.textContent = 'Привязать кошелек';
-            }
-        }
-
-        // Функция для копирования реферальной ссылки
-        function copyReferralLink() {
-            const link = document.getElementById('referral-link-text').textContent;
-            navigator.clipboard.writeText(link).then(() => {
-                const btn = document.getElementById('copy-ref-link');
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i>';
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                }, 2000);
-                showNotification('Реферальная ссылка скопирована!', 'success');
-            });
-        }
-
-        // Функция для приглашения друзей через Telegram
-        function inviteFriends() {
-            const link = `https://t.me/share/url?url=${encodeURIComponent(`https://t.me/hamster_combat_bot?start=${gameData.referral.code}`)}&text=${encodeURIComponent('Присоединяйся к Hamster Combat! Нажимай на хомяка и зарабатывай монеты! 🐹💰')}`;
-            
-            // В реальном приложении здесь будет вызов Telegram API
-            // Для демонстрации просто открываем в новом окне
-            window.open(link, '_blank');
-            
-            // Показываем сообщение об успехе
-            showNotification('Ссылка для приглашения скопирована! Поделись ею с друзьями и получай 10,000 монет за каждого!', 'success');
-        }
-
-        // Функция для добавления реферального друга
-        function addReferralFriend(friendName) {
-            // Генерируем случайные данные для нового друга
-            const newFriend = {
-                id: Math.max(0, ...gameData.friends.map(f => f.id)) + 1,
-                name: friendName,
-                level: Math.floor(Math.random() * 5) + 1,
-                coins: Math.floor(Math.random() * 1000000),
-                avatar: "🐹",
-                isReferral: true
-            };
-            
-            gameData.friends.push(newFriend);
-            
-            // Начисляем награду
-            const reward = 10000;
-            gameData.coins += reward;
-            gameData.referral.earnedFromReferrals += reward;
-            
-            // Показываем уведомление
-            showNotification(`Поздравляем! Твой друг ${friendName} присоединился к игре! Ты получил ${formatNumber(reward)} монет!`, 'success');
-            
-            updateUI();
         }
 
         // Функция для автокликера
@@ -2006,8 +1785,8 @@
 
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
-            // Инициализируем Telegram Web App
-            initTelegramWebApp();
+            console.log('Загрузка приложения...');
+            initApp();
             
             // Обработчик клика по лапке
             document.getElementById('clicker').addEventListener('click', function(e) {
@@ -2015,14 +1794,6 @@
                 
                 // Добавляем монеты
                 let clickValue = 1 * gameData.multiplier;
-                
-                // Проверяем бонус комбо-карты "Хомяк-ниндзя"
-                const ninjaCombo = gameData.combos.find(c => c.name.includes("Хомяк-ниндзя") && c.owned);
-                if (ninjaCombo && Math.random() < 0.05) {
-                    clickValue *= 10;
-                    showNotification('Критический удар! 10x монет!', 'warning');
-                }
-                
                 gameData.coins += clickValue;
                 gameData.clicks += 1;
                 
@@ -2049,46 +1820,20 @@
             });
             
             // Обработчики вкладок
-            const tabs = document.querySelectorAll('.tab');
-            tabs.forEach(tab => {
+            document.querySelectorAll('.tab').forEach(tab => {
                 tab.addEventListener('click', function() {
                     const tabId = this.getAttribute('data-tab');
                     showPage(tabId);
                 });
             });
             
-            // Обработчик кнопки профиля (нажатие на имя пользователя)
+            // Обработчик кнопки профиля
             document.getElementById('profile-button').addEventListener('click', function() {
                 showPage('profile-page');
             });
             
             // Обработчик кнопки выхода
             document.getElementById('logout-btn').addEventListener('click', logout);
-            
-            // Обработчик изменения имени
-            document.getElementById('profile-name').addEventListener('change', function() {
-                if (user) {
-                    const newName = this.value;
-                    document.getElementById('username').textContent = newName;
-                    user.first_name = newName;
-                    localStorage.setItem('hamster_combat_current_user', JSON.stringify(user));
-                    showNotification('Имя пользователя изменено!', 'success');
-                }
-            });
-            
-            // Обработчик кошелька
-            document.getElementById('connect-wallet').addEventListener('click', function() {
-                if (gameData.walletConnected) {
-                    gameData.walletConnected = false;
-                    gameData.walletAddress = null;
-                    showNotification('Кошелек отвязан', 'success');
-                } else {
-                    gameData.walletConnected = true;
-                    gameData.walletAddress = 'EQD' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-                    showNotification('Кошелек привязан!', 'success');
-                }
-                updateWallet();
-            });
             
             // Обработчик улучшения автокликера
             document.getElementById('upgrade-autoclicker').addEventListener('click', function() {
@@ -2102,28 +1847,19 @@
                 }
             });
             
-            // Обработчики реферальной системы
-            document.getElementById('copy-ref-link').addEventListener('click', copyReferralLink);
-            document.getElementById('invite-friends-btn').addEventListener('click', inviteFriends);
-
-            // Демонстрация: кнопка для тестирования реферальной системы
-            const demoButton = document.createElement('button');
-            demoButton.textContent = 'Демо: Добавить реферального друга';
-            demoButton.style.width = '100%';
-            demoButton.style.padding = '10px';
-            demoButton.style.marginTop = '10px';
-            demoButton.style.backgroundColor = 'var(--warning)';
-            demoButton.style.border = 'none';
-            demoButton.style.borderRadius = '5px';
-            demoButton.style.color = 'white';
-            demoButton.style.cursor = 'pointer';
-            demoButton.addEventListener('click', function() {
-                const friendName = prompt('Введите имя друга:');
-                if (friendName) {
-                    addReferralFriend(friendName);
-                }
+            // Обработчик копирования реферальной ссылки
+            document.getElementById('copy-ref-link').addEventListener('click', function() {
+                const link = document.getElementById('referral-link-text').textContent;
+                navigator.clipboard.writeText(link).then(() => {
+                    const btn = document.getElementById('copy-ref-link');
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                    }, 2000);
+                    showNotification('Реферальная ссылка скопирована!', 'success');
+                });
             });
-            document.getElementById('friends-page').appendChild(demoButton);
         });
     </script>
 </body>
