@@ -25,17 +25,6 @@ body {
     line-height: 1.6;
 }
 
-.screen {
-    display: none;
-    min-height: 100vh;
-    padding: 20px;
-}
-
-.screen.active {
-    display: block;
-}
-
-/* Шапка */
 /* Обновлённая шапка */
 .header {
     display: flex;
@@ -123,10 +112,21 @@ body {
 
 .progress-fill-mini {
     height: 100%;
-    background: linear-gradient(90deg, var(--text-accent), #ff6b9d);
+    background: linear-gradient(90deg, #8b5cf6, #ec4899, #8b5cf6);
     border-radius: 2px;
     transition: width 0.3s ease;
     width: 0%;
+    background-size: 200% 100%;
+    animation: progress-shine 2s ease-in-out infinite;
+}
+
+@keyframes progress-shine {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
 }
 
 .level-text {
@@ -183,7 +183,7 @@ body {
     margin-top: 2px;
 }
 
-/* Кнопка-лапка */
+/* Обновлённая кнопка-лапка */
 .paw-button {
     width: 160px;
     height: 160px;
@@ -294,7 +294,49 @@ body {
     animation: paw-shake 0.15s ease-in-out, paw-vibrate 0.1s ease-in-out;
 }
 
-/* Улучшенные эффекты частиц */
+/* Игровая зона */
+.game-area {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 40px 0;
+    min-height: 200px;
+}
+
+.click-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Статистика кликов */
+.click-stats {
+    display: flex;
+    gap: 20px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.click-power, .auto-clicks {
+    background: var(--bg-secondary);
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+/* Эффекты частиц */
+.particles-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
 .particle {
     position: absolute;
     width: 6px;
@@ -305,142 +347,107 @@ body {
     box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
 }
 
-/* Адаптивность для новых элементов */
-@media (max-width: 768px) {
-    .header {
-        flex-direction: column;
-        gap: 15px;
-        align-items: stretch;
-    }
-    
-    .user-section {
-        min-width: auto;
-        justify-content: flex-start;
-    }
-    
-    .coin-balance {
-        min-width: auto;
-        justify-content: center;
-    }
-    
-    .paw-button {
-        width: 140px;
-        height: 140px;
-    }
-    
-    .paw-icon {
-        font-size: 50px;
-    }
-    
-    .user-info {
-        min-width: 0;
-    }
-    
-    .level-progress-mini {
-        flex-direction: column;
-        gap: 4px;
-        align-items: flex-start;
-    }
-    
-    .progress-bar-mini {
-        width: 100%;
-    }
-}
-
-@media (max-width: 480px) {
-    .paw-button {
-        width: 120px;
-        height: 120px;
-    }
-    
-    .paw-icon {
-        font-size: 40px;
-    }
-    
-    .user-section {
-        padding: 6px 10px;
-    }
-    
-    .avatar {
-        width: 40px;
-        height: 40px;
-    }
-    
-    .coin-balance {
-        padding: 10px 12px;
-    }
-    
-    .coin-icon {
-        width: 32px;
-        height: 32px;
-        font-size: 18px;
-    }
-    
-    .coin-amount span {
-        font-size: 16px;
-    }
-}
-
-/* Анимация появления элементов */
-@keyframes slideInFromLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-30px);
-    }
-    to {
+@keyframes particle-float {
+    0% {
         opacity: 1;
-        transform: translateX(0);
+        transform: translate(0, 0) scale(1);
     }
-}
-
-@keyframes slideInFromRight {
-    from {
+    100% {
         opacity: 0;
-        transform: translateX(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
+        transform: translate(var(--tx), var(--ty)) scale(0);
     }
 }
 
-.user-section {
-    animation: slideInFromLeft 0.6s ease-out;
+/* Улучшения */
+.upgrades-section {
+    margin: 30px 0;
 }
 
-.coin-balance {
-    animation: slideInFromRight 0.6s ease-out;
+.section-title {
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    font-weight: 600;
 }
 
-/* Улучшенные hover эффекты */
-.clickable {
-    cursor: pointer;
+.upgrades-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.upgrade-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg-secondary);
+    padding: 12px 15px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
     transition: all 0.3s ease;
 }
 
-.clickable:hover {
-    transform: translateY(-2px);
+.upgrade-card:hover {
+    border-color: var(--text-secondary);
 }
 
-.clickable:active {
-    transform: translateY(0);
+.upgrade-icon {
+    font-size: 20px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
 }
 
-/* Улучшенная анимация для прогресс баров */
-.progress-fill-mini {
-    background: linear-gradient(90deg, #8b5cf6, #ec4899, #8b5cf6);
-    background-size: 200% 100%;
-    animation: progress-shine 2s ease-in-out infinite;
+.upgrade-info {
+    flex: 1;
 }
 
-@keyframes progress-shine {
-    0% {
-        background-position: -200% 0;
-    }
-    100% {
-        background-position: 200% 0;
-    }
+.upgrade-name {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 2px;
 }
+
+.upgrade-level {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.upgrade-btn {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 60px;
+}
+
+.upgrade-btn:hover:not(:disabled) {
+    background: var(--text-secondary);
+    color: var(--bg-primary);
+}
+
+.upgrade-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.upgrade-btn.affordable {
+    background: var(--success-color);
+    color: var(--bg-primary);
+    border-color: var(--success-color);
+}
+
 /* Стили для вкладок */
 .tab-content {
     display: none;
@@ -1267,35 +1274,49 @@ body {
     border-color: var(--text-secondary);
 }
 
-/* Стиль для кликабельного имени */
+/* Анимация появления элементов */
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.user-section {
+    animation: slideInFromLeft 0.6s ease-out;
+}
+
+.coin-balance {
+    animation: slideInFromRight 0.6s ease-out;
+}
+
+/* Улучшенные hover эффекты */
 .clickable {
     cursor: pointer;
     transition: all 0.3s ease;
-    position: relative;
 }
 
 .clickable:hover {
-    color: var(--text-accent);
+    transform: translateY(-2px);
 }
 
 .clickable:active {
-    transform: scale(0.95);
-}
-
-/* Специальные эффекты */
-.critical-hit {
-    color: var(--text-accent) !important;
-    font-weight: 700;
-}
-
-.pulse {
-    animation: pulse 0.3s ease-in-out;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
+    transform: translateY(0);
 }
 
 .coming-soon {
@@ -1310,27 +1331,40 @@ body {
     .header {
         flex-direction: column;
         gap: 15px;
-        align-items: flex-start;
+        align-items: stretch;
     }
     
-    .stats-section {
-        width: 100%;
-        justify-content: space-between;
-    }
-    
-    .stat-card {
-        flex: 1;
+    .user-section {
         min-width: auto;
+        justify-content: flex-start;
+    }
+    
+    .coin-balance {
+        min-width: auto;
+        justify-content: center;
     }
     
     .paw-button {
-        width: 100px;
-        height: 100px;
+        width: 140px;
+        height: 140px;
     }
     
-    .paw-pad {
-        width: 50px;
-        height: 50px;
+    .paw-icon {
+        font-size: 50px;
+    }
+    
+    .user-info {
+        min-width: 0;
+    }
+    
+    .level-progress-mini {
+        flex-direction: column;
+        gap: 4px;
+        align-items: flex-start;
+    }
+    
+    .progress-bar-mini {
+        width: 100%;
     }
 
     .tab-content {
@@ -1403,6 +1437,40 @@ body {
     }
 }
 
+@media (max-width: 480px) {
+    .paw-button {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .paw-icon {
+        font-size: 40px;
+    }
+    
+    .user-section {
+        padding: 6px 10px;
+    }
+    
+    .avatar {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .coin-balance {
+        padding: 10px 12px;
+    }
+    
+    .coin-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 18px;
+    }
+    
+    .coin-amount span {
+        font-size: 16px;
+    }
+}
+
 /* Анимация появления профиля */
 @keyframes profileAppear {
     from {
@@ -1417,4 +1485,20 @@ body {
 
 .profile-modal {
     animation: profileAppear 0.3s ease-out;
+}
+
+/* Специальные эффекты */
+.critical-hit {
+    color: var(--text-accent) !important;
+    font-weight: 700;
+}
+
+.pulse {
+    animation: pulse 0.3s ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
 }
