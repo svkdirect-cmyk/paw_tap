@@ -2,6 +2,11 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 :root {
@@ -23,15 +28,20 @@ body {
     color: var(--text-primary);
     overflow-x: hidden;
     line-height: 1.6;
+    -webkit-touch-callout: none;
+    -webkit-text-size-adjust: none;
 }
 
-/* Обновлённая шапка */
+/* Исправленная шапка */
 .header {
+    margin-bottom: 20px;
+}
+
+.header-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    padding: 15px 0;
+    margin-bottom: 12px;
 }
 
 .user-section {
@@ -40,11 +50,12 @@ body {
     gap: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
-    padding: 8px 12px;
+    padding: 10px 15px;
     border-radius: 16px;
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
     min-width: 180px;
+    flex-shrink: 0;
 }
 
 .user-section:hover {
@@ -86,7 +97,7 @@ body {
 .user-info {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
     flex: 1;
 }
 
@@ -96,52 +107,13 @@ body {
     color: var(--text-primary);
 }
 
-.level-progress-mini {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.progress-bar-mini {
-    flex: 1;
-    height: 4px;
-    background: var(--bg-tertiary);
-    border-radius: 2px;
-    overflow: hidden;
-}
-
-.progress-fill-mini {
-    height: 100%;
-    background: linear-gradient(90deg, #8b5cf6, #ec4899, #8b5cf6);
-    border-radius: 2px;
-    transition: width 0.3s ease;
-    width: 0%;
-    background-size: 200% 100%;
-    animation: progress-shine 2s ease-in-out infinite;
-}
-
-@keyframes progress-shine {
-    0% {
-        background-position: -200% 0;
-    }
-    100% {
-        background-position: 200% 0;
-    }
-}
-
 .level-text {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--text-secondary);
-    font-weight: 600;
-    min-width: 35px;
+    font-weight: 500;
 }
 
-/* Баланс монет */
-.stats-section {
-    display: flex;
-    gap: 10px;
-}
-
+/* Баланс монет - исправленное расположение */
 .coin-balance {
     display: flex;
     align-items: center;
@@ -151,6 +123,7 @@ body {
     border-radius: 16px;
     border: 1px solid var(--border-color);
     min-width: 120px;
+    flex-shrink: 0;
 }
 
 .coin-icon {
@@ -183,10 +156,57 @@ body {
     margin-top: 2px;
 }
 
-/* Обновлённая кнопка-лапка */
+/* Прогресс бар под шапкой */
+.header-progress {
+    background: var(--bg-secondary);
+    padding: 12px 15px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.progress-bar-header {
+    width: 100%;
+    height: 6px;
+    background: var(--bg-tertiary);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.progress-fill-header {
+    height: 100%;
+    background: linear-gradient(90deg, #8b5cf6, #ec4899, #8b5cf6);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+    width: 0%;
+    background-size: 200% 100%;
+    animation: progress-shine 2s ease-in-out infinite;
+}
+
+.progress-text-header {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.progress-text-header span {
+    color: var(--text-accent);
+    font-weight: 600;
+}
+
+@keyframes progress-shine {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* Увеличенная кнопка-лапка */
 .paw-button {
-    width: 160px;
-    height: 160px;
+    width: 180px;
+    height: 180px;
     background: var(--bg-secondary);
     border: 3px solid transparent;
     border-radius: 50%;
@@ -198,21 +218,22 @@ body {
     position: relative;
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* Фиолетовая рассеянная обводка */
 .paw-button::before {
     content: '';
     position: absolute;
-    top: -6px;
-    left: -6px;
-    right: -6px;
-    bottom: -6px;
+    top: -8px;
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
     background: linear-gradient(45deg, #8b5cf6, #ec4899, #8b5cf6);
     border-radius: 50%;
     z-index: -1;
     opacity: 0.7;
-    filter: blur(15px);
+    filter: blur(20px);
     animation: glow-pulse 2s ease-in-out infinite alternate;
 }
 
@@ -245,18 +266,18 @@ body {
 }
 
 .paw-button:active {
-    transform: scale(0.90);
+    transform: scale(0.85);
 }
 
 .paw-icon {
-    font-size: 60px;
+    font-size: 70px;
     color: var(--text-primary);
     transition: all 0.3s ease;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .paw-button:active .paw-icon {
-    transform: scale(0.95);
+    transform: scale(0.9);
     color: var(--text-accent);
 }
 
@@ -278,16 +299,16 @@ body {
 
 /* Анимации для кнопки */
 @keyframes paw-shake {
-    0%, 100% { transform: translateX(0) scale(0.90); }
-    25% { transform: translateX(-3px) scale(0.90); }
-    75% { transform: translateX(3px) scale(0.90); }
+    0%, 100% { transform: translateX(0) scale(0.85); }
+    25% { transform: translateX(-3px) scale(0.85); }
+    75% { transform: translateX(3px) scale(0.85); }
 }
 
 @keyframes paw-vibrate {
-    0%, 100% { transform: translate(0, 0) scale(0.90); }
-    25% { transform: translate(-2px, 2px) scale(0.90); }
-    50% { transform: translate(2px, -2px) scale(0.90); }
-    75% { transform: translate(-2px, -2px) scale(0.90); }
+    0%, 100% { transform: translate(0, 0) scale(0.85); }
+    25% { transform: translate(-2px, 2px) scale(0.85); }
+    50% { transform: translate(2px, -2px) scale(0.85); }
+    75% { transform: translate(-2px, -2px) scale(0.85); }
 }
 
 .paw-button.click-animation {
@@ -300,7 +321,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 40px 0;
+    margin: 30px 0;
     min-height: 200px;
 }
 
@@ -308,23 +329,10 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
 }
 
-/* Статистика кликов */
-.click-stats {
-    display: flex;
-    gap: 20px;
-    font-size: 12px;
-    color: var(--text-secondary);
-}
-
-.click-power, .auto-clicks {
-    background: var(--bg-secondary);
-    padding: 6px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-}
+/* Убраны надписи под кнопкой */
 
 /* Эффекты частиц */
 .particles-container {
@@ -360,7 +368,7 @@ body {
 
 /* Улучшения */
 .upgrades-section {
-    margin: 30px 0;
+    margin: 25px 0;
 }
 
 .section-title {
@@ -430,6 +438,8 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     min-width: 60px;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
 }
 
 .upgrade-btn:hover:not(:disabled) {
@@ -513,6 +523,7 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     opacity: 0.6;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .tab-item.active {
@@ -581,6 +592,7 @@ body {
     align-items: center;
     gap: 8px;
     margin: 0 auto;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .btn-primary:hover {
@@ -1014,6 +1026,7 @@ body {
     padding: 8px;
     border-radius: 8px;
     transition: all 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .modal-close:hover {
@@ -1267,6 +1280,7 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .btn-secondary:hover {
@@ -1309,6 +1323,7 @@ body {
 .clickable {
     cursor: pointer;
     transition: all 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .clickable:hover {
@@ -1328,9 +1343,9 @@ body {
 
 /* Адаптивность */
 @media (max-width: 768px) {
-    .header {
+    .header-top {
         flex-direction: column;
-        gap: 15px;
+        gap: 12px;
         align-items: stretch;
     }
     
@@ -1345,28 +1360,14 @@ body {
     }
     
     .paw-button {
-        width: 140px;
-        height: 140px;
+        width: 160px;
+        height: 160px;
     }
     
     .paw-icon {
-        font-size: 50px;
+        font-size: 60px;
     }
     
-    .user-info {
-        min-width: 0;
-    }
-    
-    .level-progress-mini {
-        flex-direction: column;
-        gap: 4px;
-        align-items: flex-start;
-    }
-    
-    .progress-bar-mini {
-        width: 100%;
-    }
-
     .tab-content {
         padding: 15px;
         padding-bottom: 70px;
@@ -1439,16 +1440,16 @@ body {
 
 @media (max-width: 480px) {
     .paw-button {
-        width: 120px;
-        height: 120px;
+        width: 140px;
+        height: 140px;
     }
     
     .paw-icon {
-        font-size: 40px;
+        font-size: 50px;
     }
     
     .user-section {
-        padding: 6px 10px;
+        padding: 8px 12px;
     }
     
     .avatar {
@@ -1501,4 +1502,14 @@ body {
     0% { transform: scale(1); }
     50% { transform: scale(1.1); }
     100% { transform: scale(1); }
+}
+
+/* Отключение выделения текста */
+button, .clickable, .tab-item, .paw-button {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
 }
