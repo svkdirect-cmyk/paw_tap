@@ -76,11 +76,13 @@ class DarkPawsClicker {
                 }, 150);
             });
             
-            pawButton.addEventListener('touchstart', () => {
+            pawButton.addEventListener('touchstart', (e) => {
+                e.preventDefault();
                 pawButton.classList.add('click-animation');
             });
             
-            pawButton.addEventListener('touchend', () => {
+            pawButton.addEventListener('touchend', (e) => {
+                e.preventDefault();
                 setTimeout(() => {
                     pawButton.classList.remove('click-animation');
                 }, 150);
@@ -90,18 +92,25 @@ class DarkPawsClicker {
         // Кнопки улучшений
         document.querySelectorAll('.upgrade-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
+                e.preventDefault();
                 const upgradeCard = e.target.closest('.upgrade-card');
                 if (upgradeCard) {
                     const upgradeType = upgradeCard.dataset.upgrade;
                     this.buyUpgrade(upgradeType);
                 }
             });
+            
+            // Отключаем выделение текста при касании
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+            });
         });
 
         // Кнопка приглашения друзей
         const inviteBtn = document.getElementById('invite-friends');
         if (inviteBtn) {
-            inviteBtn.addEventListener('click', () => {
+            inviteBtn.addEventListener('click', (e) => {
+                e.preventDefault();
                 this.inviteFriends();
             });
         }
@@ -109,7 +118,8 @@ class DarkPawsClicker {
         // Клик по всей секции профиля для открытия
         const profileOpener = document.getElementById('profile-opener');
         if (profileOpener) {
-            profileOpener.addEventListener('click', () => {
+            profileOpener.addEventListener('click', (e) => {
+                e.preventDefault();
                 this.openProfile();
             });
         }
@@ -117,7 +127,8 @@ class DarkPawsClicker {
         // Закрытие модального окна профиля
         const closeProfile = document.getElementById('close-profile');
         if (closeProfile) {
-            closeProfile.addEventListener('click', () => {
+            closeProfile.addEventListener('click', (e) => {
+                e.preventDefault();
                 this.closeProfile();
             });
         }
@@ -135,10 +146,18 @@ class DarkPawsClicker {
         // Кнопка поделиться профилем
         const shareProfile = document.getElementById('share-profile');
         if (shareProfile) {
-            shareProfile.addEventListener('click', () => {
+            shareProfile.addEventListener('click', (e) => {
+                e.preventDefault();
                 this.shareProfile();
             });
         }
+
+        // Отключаем выделение текста для всех кликабельных элементов
+        document.querySelectorAll('.clickable, .tab-item, .btn-primary, .btn-secondary').forEach(el => {
+            el.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+            });
+        });
     }
 
     initTelegramAuth() {
@@ -162,7 +181,7 @@ class DarkPawsClicker {
         if (this.user) {
             const avatar = document.getElementById('user-avatar');
             const username = document.getElementById('user-name');
-            const userid = document.querySelector('.user-id');
+            const levelText = document.querySelector('.level-text span');
             
             if (avatar) {
                 if (this.user.photo_url) {
@@ -174,8 +193,8 @@ class DarkPawsClicker {
             if (username) {
                 username.textContent = this.user.first_name || 'Player';
             }
-            if (userid) {
-                userid.textContent = `ID: ${this.user.id}`;
+            if (levelText) {
+                levelText.textContent = this.gameState.level;
             }
         }
     }
@@ -184,7 +203,8 @@ class DarkPawsClicker {
         const tabItems = document.querySelectorAll('.tab-item');
         
         tabItems.forEach(tab => {
-            tab.addEventListener('click', () => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
                 const tabId = tab.dataset.tab;
                 this.switchTab(tabId);
             });
@@ -823,38 +843,40 @@ class DarkPawsClicker {
     updateUI() {
         // Обновляем счет и уровень
         const scoreElement = document.getElementById('score');
-        const levelElement = document.querySelector('.level-text');
+        const levelElement = document.querySelector('.level-text span');
         const levelBadge = document.querySelector('.level-badge');
+        const nextLevelElement = document.querySelector('.progress-text-header span:first-child');
+        const progressRemaining = document.getElementById('progress-remaining');
         
         if (scoreElement) scoreElement.textContent = Math.floor(this.gameState.score).toLocaleString();
-        if (levelElement) levelElement.textContent = `Ур. ${this.gameState.level}`;
+        if (levelElement) levelElement.textContent = this.gameState.level;
         if (levelBadge) levelBadge.textContent = this.gameState.level;
+        if (nextLevelElement) nextLevelElement.textContent = this.gameState.level + 1;
         
-        // Обновляем силу клика и авто-клик
-        const clickPowerElement = document.getElementById('click-power');
-        const autoClicksElement = document.getElementById('auto-clicks');
-        
-        if (clickPowerElement) clickPowerElement.textContent = this.gameState.upgrades.clickPower;
-        if (autoClicksElement) autoClicksElement.textContent = this.gameState.upgrades.autoClick;
+        // Обновляем прогресс бар в шапке
+        this.updateHeaderProgressBar();
         
         // Обновляем кнопки улучшений
         this.updateUpgradeButtons();
-        
-        // Обновляем прогресс бар в шапке
-        this.updateMiniProgressBar();
     }
 
-    updateMiniProgressBar() {
+    updateHeaderProgressBar() {
         const currentLevelScore = this.getRequiredScoreForLevel(this.gameState.level);
         const nextLevelScore = this.getRequiredScoreForLevel(this.gameState.level + 1);
         const progress = this.gameState.score - currentLevelScore;
         const totalNeeded = nextLevelScore - currentLevelScore;
         const percentage = (progress / totalNeeded) * 100;
         
-        const progressFillMini = document.getElementById('level-progress-mini');
+        const progressFillHeader = document.getElementById('level-progress-header');
+        const progressRemaining = document.getElementById('progress-remaining');
         
-        if (progressFillMini) {
-            progressFillMini.style.width = `${Math.min(percentage, 100)}%`;
+        if (progressFillHeader) {
+            progressFillHeader.style.width = `${Math.min(percentage, 100)}%`;
+        }
+        
+        if (progressRemaining) {
+            const remaining = Math.max(0, totalNeeded - progress);
+            progressRemaining.textContent = remaining.toLocaleString();
         }
     }
 
@@ -974,3 +996,10 @@ document.addEventListener('keydown', (e) => {
         }
     }
 });
+
+// Предотвращение масштабирования на мобильных устройствах
+document.addEventListener('touchmove', function(e) {
+    if (e.scale !== 1) {
+        e.preventDefault();
+    }
+}, { passive: false });
