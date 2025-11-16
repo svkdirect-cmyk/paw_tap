@@ -529,12 +529,80 @@ body {
     gap: 25px;
 }
 
-.empty-state {
-    text-align: center;
-    padding: 40px 20px;
+.friends-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.friends-actions .btn-primary,
+.friends-actions .btn-secondary {
+    flex: 1;
+    justify-content: center;
+}
+
+.friends-list-section h4 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+}
+
+.friends-list {
     background: var(--bg-secondary);
     border-radius: 16px;
     border: 1px solid var(--border-color);
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.friend-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.friend-item:last-child {
+    border-bottom: none;
+}
+
+.friend-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--bg-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.friend-info {
+    flex: 1;
+}
+
+.friend-name {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.friend-stats {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.friend-score {
+    font-weight: 600;
+    color: var(--text-accent);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
 }
 
 .empty-icon {
@@ -567,13 +635,32 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin: 0 auto;
     -webkit-tap-highlight-color: transparent;
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.btn-secondary {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.btn-secondary:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--text-secondary);
 }
 
 .friends-bonuses h4 {
@@ -635,6 +722,73 @@ body {
 .bonus-status.active {
     background: var(--success-color);
     color: var(--bg-primary);
+}
+
+.leaderboard-section h4 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+}
+
+.leaderboard {
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    padding: 20px;
+}
+
+.leaderboard-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.leaderboard-item:last-child {
+    border-bottom: none;
+}
+
+.leaderboard-rank {
+    font-weight: 700;
+    color: var(--text-accent);
+    min-width: 30px;
+}
+
+.leaderboard-user {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.leaderboard-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--bg-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.leaderboard-name {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.leaderboard-score {
+    font-weight: 700;
+    color: var(--text-accent);
+}
+
+.loading {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+    font-style: italic;
 }
 
 /* Стили для вкладки уровней */
@@ -1244,26 +1398,6 @@ body {
     justify-content: center;
 }
 
-.btn-secondary {
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    padding: 12px 24px;
-    border-radius: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.btn-secondary:hover {
-    background: var(--bg-tertiary);
-    border-color: var(--text-secondary);
-}
-
 .coming-soon {
     text-align: center;
     padding: 40px 20px;
@@ -1329,6 +1463,10 @@ body {
     .tab-stats {
         width: 100%;
         justify-content: space-between;
+    }
+    
+    .friends-actions {
+        flex-direction: column;
     }
     
     .cards-grid {
