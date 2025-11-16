@@ -34,14 +34,18 @@ body {
 
 /* Исправленная шапка */
 .header {
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
     margin-bottom: 20px;
+    overflow: hidden;
 }
 
-.header-top {
+.header-main {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    padding: 15px;
 }
 
 .user-section {
@@ -50,21 +54,11 @@ body {
     gap: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
-    padding: 10px 15px;
-    border-radius: 16px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    min-width: 180px;
-    flex-shrink: 0;
-}
-
-.user-section:hover {
-    background: var(--bg-tertiary);
-    transform: translateY(-2px);
+    flex: 1;
 }
 
 .user-section:active {
-    transform: translateY(0);
+    transform: scale(0.98);
 }
 
 .avatar-container {
@@ -98,32 +92,29 @@ body {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    flex: 1;
 }
 
 .username {
     font-weight: 600;
-    font-size: 14px;
+    font-size: 16px;
     color: var(--text-primary);
 }
 
 .level-text {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--text-secondary);
     font-weight: 500;
 }
 
-/* Баланс монет - исправленное расположение */
+/* Баланс монет */
 .coin-balance {
     display: flex;
     align-items: center;
     gap: 10px;
-    background: var(--bg-secondary);
-    padding: 12px 16px;
-    border-radius: 16px;
+    background: var(--bg-tertiary);
+    padding: 10px 15px;
+    border-radius: 12px;
     border: 1px solid var(--border-color);
-    min-width: 120px;
-    flex-shrink: 0;
 }
 
 .coin-icon {
@@ -150,18 +141,9 @@ body {
     line-height: 1;
 }
 
-.coin-amount .coin-label {
-    font-size: 10px;
-    color: var(--text-secondary);
-    margin-top: 2px;
-}
-
 /* Прогресс бар под шапкой */
 .header-progress {
-    background: var(--bg-secondary);
-    padding: 12px 15px;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
+    padding: 0 15px 15px 15px;
 }
 
 .progress-bar-header {
@@ -170,7 +152,6 @@ body {
     background: var(--bg-tertiary);
     border-radius: 3px;
     overflow: hidden;
-    margin-bottom: 6px;
 }
 
 .progress-fill-header {
@@ -181,17 +162,6 @@ body {
     width: 0%;
     background-size: 200% 100%;
     animation: progress-shine 2s ease-in-out infinite;
-}
-
-.progress-text-header {
-    font-size: 11px;
-    color: var(--text-secondary);
-    text-align: center;
-}
-
-.progress-text-header span {
-    color: var(--text-accent);
-    font-weight: 600;
 }
 
 @keyframes progress-shine {
@@ -205,8 +175,8 @@ body {
 
 /* Увеличенная кнопка-лапка */
 .paw-button {
-    width: 180px;
-    height: 180px;
+    width: 220px;
+    height: 220px;
     background: var(--bg-secondary);
     border: 3px solid transparent;
     border-radius: 50%;
@@ -225,15 +195,15 @@ body {
 .paw-button::before {
     content: '';
     position: absolute;
-    top: -8px;
-    left: -8px;
-    right: -8px;
-    bottom: -8px;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
     background: linear-gradient(45deg, #8b5cf6, #ec4899, #8b5cf6);
     border-radius: 50%;
     z-index: -1;
     opacity: 0.7;
-    filter: blur(20px);
+    filter: blur(25px);
     animation: glow-pulse 2s ease-in-out infinite alternate;
 }
 
@@ -270,7 +240,7 @@ body {
 }
 
 .paw-icon {
-    font-size: 70px;
+    font-size: 80px;
     color: var(--text-primary);
     transition: all 0.3s ease;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
@@ -321,7 +291,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 30px 0;
+    margin: 40px 0;
     min-height: 200px;
 }
 
@@ -331,8 +301,6 @@ body {
     align-items: center;
     gap: 15px;
 }
-
-/* Убраны надписи под кнопкой */
 
 /* Эффекты частиц */
 .particles-container {
@@ -1288,52 +1256,6 @@ body {
     border-color: var(--text-secondary);
 }
 
-/* Анимация появления элементов */
-@keyframes slideInFromLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes slideInFromRight {
-    from {
-        opacity: 0;
-        transform: translateX(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-.user-section {
-    animation: slideInFromLeft 0.6s ease-out;
-}
-
-.coin-balance {
-    animation: slideInFromRight 0.6s ease-out;
-}
-
-/* Улучшенные hover эффекты */
-.clickable {
-    cursor: pointer;
-    transition: all 0.3s ease;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.clickable:hover {
-    transform: translateY(-2px);
-}
-
-.clickable:active {
-    transform: translateY(0);
-}
-
 .coming-soon {
     text-align: center;
     padding: 40px 20px;
@@ -1343,29 +1265,17 @@ body {
 
 /* Адаптивность */
 @media (max-width: 768px) {
-    .header-top {
-        flex-direction: column;
-        gap: 12px;
-        align-items: stretch;
-    }
-    
-    .user-section {
-        min-width: auto;
-        justify-content: flex-start;
-    }
-    
-    .coin-balance {
-        min-width: auto;
-        justify-content: center;
+    .header-main {
+        padding: 12px;
     }
     
     .paw-button {
-        width: 160px;
-        height: 160px;
+        width: 200px;
+        height: 200px;
     }
     
     .paw-icon {
-        font-size: 60px;
+        font-size: 70px;
     }
     
     .tab-content {
@@ -1440,16 +1350,12 @@ body {
 
 @media (max-width: 480px) {
     .paw-button {
-        width: 140px;
-        height: 140px;
+        width: 180px;
+        height: 180px;
     }
     
     .paw-icon {
-        font-size: 50px;
-    }
-    
-    .user-section {
-        padding: 8px 12px;
+        font-size: 60px;
     }
     
     .avatar {
@@ -1458,7 +1364,7 @@ body {
     }
     
     .coin-balance {
-        padding: 10px 12px;
+        padding: 8px 12px;
     }
     
     .coin-icon {
@@ -1469,6 +1375,14 @@ body {
     
     .coin-amount span {
         font-size: 16px;
+    }
+    
+    .username {
+        font-size: 14px;
+    }
+    
+    .level-text {
+        font-size: 11px;
     }
 }
 
