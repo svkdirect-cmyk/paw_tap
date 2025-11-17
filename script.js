@@ -195,12 +195,35 @@ class DarkPawsClicker {
     updateUserInfo() {
         if (this.user) {
             const avatar = document.getElementById('user-avatar');
+            const profileAvatar = document.getElementById('profile-avatar');
             const username = document.getElementById('user-name');
             const levelText = document.querySelector('.level-text');
             
             if (avatar) {
-                avatar.textContent = this.user.first_name ? this.user.first_name.charAt(0).toUpperCase() : 'P';
+                // Используем фото профиля Telegram если доступно
+                if (this.user.photo_url) {
+                    avatar.style.backgroundImage = `url(${this.user.photo_url})`;
+                    avatar.style.backgroundSize = 'cover';
+                    avatar.style.backgroundPosition = 'center';
+                    avatar.textContent = '';
+                } else {
+                    avatar.textContent = this.user.first_name ? this.user.first_name.charAt(0).toUpperCase() : 'P';
+                    avatar.style.backgroundImage = 'none';
+                }
             }
+            
+            if (profileAvatar) {
+                if (this.user.photo_url) {
+                    profileAvatar.style.backgroundImage = `url(${this.user.photo_url})`;
+                    profileAvatar.style.backgroundSize = 'cover';
+                    profileAvatar.style.backgroundPosition = 'center';
+                    profileAvatar.textContent = '';
+                } else {
+                    profileAvatar.textContent = this.user.first_name ? this.user.first_name.charAt(0).toUpperCase() : 'P';
+                    profileAvatar.style.backgroundImage = 'none';
+                }
+            }
+            
             if (username) {
                 username.textContent = this.user.first_name || 'Player';
             }
@@ -647,13 +670,7 @@ class DarkPawsClicker {
     }
 
     updateProfileModal() {
-        // Обновляем аватар
-        const profileAvatar = document.getElementById('profile-avatar');
-        if (profileAvatar) {
-            profileAvatar.textContent = this.user.first_name ? this.user.first_name.charAt(0).toUpperCase() : 'P';
-        }
-
-        // Обновляем основную информацию
+        // Обновляем аватар (уже обновляется в updateUserInfo)
         const profileName = document.getElementById('profile-name');
         const profileLevel = document.getElementById('profile-level');
         const profileId = document.getElementById('profile-id');
@@ -1009,8 +1026,13 @@ class DarkPawsClicker {
         const cost = costs[upgradeType];
         
         if (this.gameState.score >= cost) {
+            // Сохраняем текущий уровень перед покупкой
+            const oldLevel = this.gameState.level;
+            
+            // Вычитаем стоимость
             this.gameState.score -= cost;
             
+            // Применяем улучшение
             switch(upgradeType) {
                 case 'click-power':
                     this.gameState.upgrades.clickPower++;
@@ -1023,12 +1045,36 @@ class DarkPawsClicker {
                     break;
             }
             
+            // Проверяем, не понизился ли уровень из-за траты очков
+            this.checkLevelAfterPurchase(oldLevel);
+            
             this.updateUI();
             this.saveGameState();
             
             this.showUpgradeNotification(upgradeType);
         } else {
             this.showInsufficientFundsNotification(cost);
+        }
+    }
+
+    checkLevelAfterPurchase(oldLevel) {
+        const maxLevel = this.getMaxLevel();
+        let newLevel = 1;
+        
+        // Находим максимальный уровень, который можем достичь с текущими очками
+        for (let level = maxLevel; level >= 1; level--) {
+            if (this.gameState.score >= this.getRequiredScoreForLevel(level)) {
+                newLevel = level;
+                break;
+            }
+        }
+        
+        // Устанавливаем новый уровень
+        this.gameState.level = newLevel;
+        
+        // Если уровень понизился, показываем сообщение
+        if (newLevel < oldLevel) {
+            console.log(`Уровень понизился с ${oldLevel} до ${newLevel} после покупки улучшения`);
         }
     }
 
@@ -1090,6 +1136,9 @@ class DarkPawsClicker {
         
         // Обновляем кнопки улучшений
         this.updateUpgradeButtons();
+        
+        // Обновляем информацию пользователя (включая аватар)
+        this.updateUserInfo();
     }
 
     updateHeaderProgressBar() {
