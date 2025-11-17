@@ -714,7 +714,7 @@ class DarkPawsClicker {
             playTime.textContent = `${hours}ч`;
         }
         if (totalScore) {
-            totalScore.textContent = this.gameState.stats.totalScore.toLocaleString();
+            totalScore.textContent = this.gameState.totalEarnedScore.toLocaleString(); // Используем общие заработанные очки
         }
         if (joinDate) {
             const joinDateObj = new Date(this.gameState.stats.joinDate);
