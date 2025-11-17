@@ -36,11 +36,12 @@ body {
     -webkit-text-size-adjust: none;
 }
 
-/* Исправленная шапка */
+/* Шапка */
 .header {
     background: var(--bg-secondary);
     border-radius: 16px;
     border: 1px solid var(--border-color);
+    margin: 10px;
     margin-bottom: 20px;
     overflow: hidden;
 }
@@ -75,6 +76,7 @@ body {
     border-radius: 12px;
     background: var(--bg-tertiary);
     border: 2px solid var(--border-color);
+    object-fit: cover;
 }
 
 .level-badge {
@@ -179,8 +181,8 @@ body {
 
 /* Улучшенная кнопка-лапка с фиолетовым градиентом */
 .paw-button {
-    width: 220px;
-    height: 220px;
+    width: 200px;
+    height: 200px;
     background: linear-gradient(135deg, var(--purple-dark), var(--purple-medium), var(--purple-dark));
     border: 3px solid transparent;
     border-radius: 50%;
@@ -196,6 +198,7 @@ body {
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
     -webkit-tap-highlight-color: transparent;
     animation: paw-glow 3s ease-in-out infinite;
+    margin: 20px auto;
 }
 
 /* Анимация переливающегося градиента */
@@ -265,7 +268,7 @@ body {
 }
 
 .paw-icon {
-    font-size: 80px;
+    font-size: 70px;
     color: white;
     transition: all 0.3s ease;
     text-shadow: 
@@ -319,7 +322,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 40px 0;
+    margin: 20px 0;
     min-height: 200px;
 }
 
@@ -366,7 +369,7 @@ body {
 
 /* Улучшения */
 .upgrades-section {
-    margin: 25px 0;
+    margin: 25px 10px;
 }
 
 .section-title {
@@ -376,6 +379,7 @@ body {
     letter-spacing: 1px;
     margin-bottom: 15px;
     font-weight: 600;
+    text-align: center;
 }
 
 .upgrades-grid {
@@ -466,7 +470,7 @@ body {
 .tab-content {
     display: none;
     min-height: calc(100vh - 80px);
-    padding: 20px;
+    padding: 10px;
     padding-bottom: 80px;
     overflow-y: auto;
 }
@@ -480,7 +484,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
+    padding: 0 10px;
 }
 
 .tab-header h2 {
@@ -554,7 +559,8 @@ body {
 .friends-content {
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 20px;
+    padding: 0 10px;
 }
 
 .friends-actions {
@@ -655,7 +661,7 @@ body {
     background: var(--text-accent);
     color: var(--bg-primary);
     border: none;
-    padding: 12px 24px;
+    padding: 12px 20px;
     border-radius: 12px;
     font-weight: 600;
     cursor: pointer;
@@ -664,6 +670,7 @@ body {
     align-items: center;
     gap: 8px;
     -webkit-tap-highlight-color: transparent;
+    font-size: 14px;
 }
 
 .btn-primary:hover {
@@ -675,7 +682,7 @@ body {
     background: var(--bg-secondary);
     color: var(--text-primary);
     border: 1px solid var(--border-color);
-    padding: 12px 24px;
+    padding: 12px 20px;
     border-radius: 12px;
     font-weight: 600;
     cursor: pointer;
@@ -684,6 +691,7 @@ body {
     align-items: center;
     gap: 8px;
     -webkit-tap-highlight-color: transparent;
+    font-size: 14px;
 }
 
 .btn-secondary:hover {
@@ -823,7 +831,8 @@ body {
 .levels-content {
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 20px;
+    padding: 0 10px;
 }
 
 .levels-progress {
@@ -949,7 +958,8 @@ body {
 .combo-content {
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 20px;
+    padding: 0 10px;
 }
 
 .combo-deck {
@@ -1159,7 +1169,7 @@ body {
     background: var(--bg-primary);
     border-radius: 20px;
     border: 1px solid var(--border-color);
-    max-width: 90%;
+    max-width: 95%;
     max-height: 90%;
     overflow: hidden;
     animation: modalSlideIn 0.3s ease-out;
@@ -1237,6 +1247,7 @@ body {
     border-radius: 20px;
     background: var(--bg-secondary);
     border: 3px solid var(--border-color);
+    object-fit: cover;
 }
 
 .profile-level {
@@ -1864,136 +1875,6 @@ body {
     justify-content: center;
 }
 
-/* Управление игроками */
-.players-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.players-list {
-    max-height: 200px;
-    overflow-y: auto;
-    background: var(--bg-secondary);
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    padding: 10px;
-}
-
-.player-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.player-item:last-child {
-    border-bottom: none;
-}
-
-.player-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.player-name {
-    font-weight: 600;
-    font-size: 14px;
-}
-
-.player-stats {
-    font-size: 11px;
-    color: var(--text-secondary);
-}
-
-/* Серверные настройки */
-.server-settings {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.server-setting {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.server-setting label {
-    font-weight: 600;
-    font-size: 14px;
-}
-
-.server-setting input {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 10px 12px;
-    color: var(--text-primary);
-    font-size: 14px;
-    width: 100%;
-}
-
-.server-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.debug-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
-.debug-info textarea {
-    width: 100%;
-    height: 120px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 12px;
-    color: var(--text-primary);
-    font-size: 12px;
-    font-family: 'Courier New', monospace;
-    resize: vertical;
-}
-
-/* Формы редактирования */
-.modal-body {
-    padding: 20px;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 5px;
-    font-size: 14px;
-}
-
-.form-input {
-    width: 100%;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 10px 12px;
-    color: var(--text-primary);
-    font-size: 14px;
-}
-
-.form-input:focus {
-    border-color: var(--text-accent);
-    outline: none;
-}
-
 /* Анимация для админки */
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
@@ -2008,8 +1889,7 @@ body {
 }
 
 .admin-stat input:focus, 
-.upgrade-control input:focus,
-.server-setting input:focus {
+.upgrade-control input:focus {
     border-color: var(--text-accent) !important;
     box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2) !important;
     outline: none;
@@ -2027,16 +1907,16 @@ body {
     }
     
     .paw-button {
-        width: 200px;
-        height: 200px;
+        width: 180px;
+        height: 180px;
     }
     
     .paw-icon {
-        font-size: 70px;
+        font-size: 60px;
     }
     
     .tab-content {
-        padding: 15px;
+        padding: 10px;
         padding-bottom: 70px;
     }
     
@@ -2119,9 +1999,7 @@ body {
     }
     
     .admin-stats,
-    .quick-actions,
-    .server-actions,
-    .debug-actions {
+    .quick-actions {
         grid-template-columns: 1fr;
     }
     
