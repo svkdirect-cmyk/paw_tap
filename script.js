@@ -951,7 +951,7 @@ class DarkPawsClicker {
         const oldScore = this.gameState.score;
         this.gameState.score += points;
         
-        // Проверка уровня
+        // Проверка уровня (только повышение)
         let leveledUp = false;
         const maxLevel = this.getMaxLevel();
         
@@ -1029,7 +1029,7 @@ class DarkPawsClicker {
             // Сохраняем текущий уровень перед покупкой
             const oldLevel = this.gameState.level;
             
-            // Вычитаем стоимость
+            // Вычитаем стоимость (уровень НЕ понижается)
             this.gameState.score -= cost;
             
             // Применяем улучшение
@@ -1045,8 +1045,8 @@ class DarkPawsClicker {
                     break;
             }
             
-            // Проверяем, не понизился ли уровень из-за траты очков
-            this.checkLevelAfterPurchase(oldLevel);
+            // Уровень остается прежним, даже если очков стало меньше требований для текущего уровня
+            // Это означает, что уровень никогда не понижается после достижения
             
             this.updateUI();
             this.saveGameState();
@@ -1054,27 +1054,6 @@ class DarkPawsClicker {
             this.showUpgradeNotification(upgradeType);
         } else {
             this.showInsufficientFundsNotification(cost);
-        }
-    }
-
-    checkLevelAfterPurchase(oldLevel) {
-        const maxLevel = this.getMaxLevel();
-        let newLevel = 1;
-        
-        // Находим максимальный уровень, который можем достичь с текущими очками
-        for (let level = maxLevel; level >= 1; level--) {
-            if (this.gameState.score >= this.getRequiredScoreForLevel(level)) {
-                newLevel = level;
-                break;
-            }
-        }
-        
-        // Устанавливаем новый уровень
-        this.gameState.level = newLevel;
-        
-        // Если уровень понизился, показываем сообщение
-        if (newLevel < oldLevel) {
-            console.log(`Уровень понизился с ${oldLevel} до ${newLevel} после покупки улучшения`);
         }
     }
 
