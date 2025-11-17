@@ -126,6 +126,14 @@ body {
 }
 
 /* Баланс монет */
+.earned-score-display {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-align: center;
+    margin-top: 8px;
+    font-weight: 500;
+}
+
 .coin-balance {
     display: flex;
     align-items: center;
