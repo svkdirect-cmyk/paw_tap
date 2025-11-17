@@ -48,11 +48,11 @@ class DarkPawsClicker {
     }
 
     init() {
-        console.log('Initializing Dark Paws Clicker...');
+        console.log('🚀 Initializing Dark Paws Clicker...');
         
         // Инициализируем Telegram Web App
         if (this.tg && this.tg.initDataUnsafe) {
-            console.log('Telegram WebApp initialized:', this.tg.initDataUnsafe);
+            console.log('📱 Telegram WebApp initialized');
         }
         
         this.setupEventListeners();
@@ -64,22 +64,29 @@ class DarkPawsClicker {
         this.startPlayTimeCounter();
         this.setupAdminPanel();
         
-        console.log('Game initialized successfully');
+        console.log('✅ Game initialized successfully');
     }
 
     setupEventListeners() {
+        console.log('🔧 Setting up event listeners...');
+        
         // Клик по лапке
         const pawButton = document.getElementById('paw-button');
         if (pawButton) {
+            console.log('🐾 Paw button found, adding listeners');
+            
             pawButton.addEventListener('click', (e) => {
+                console.log('👆 Paw button clicked');
                 this.handleClick(e);
             });
             
             pawButton.addEventListener('mousedown', () => {
+                console.log('🖱️ Paw button mouse down');
                 pawButton.classList.add('click-animation');
             });
             
             pawButton.addEventListener('mouseup', () => {
+                console.log('🖱️ Paw button mouse up');
                 setTimeout(() => {
                     pawButton.classList.remove('click-animation');
                 }, 150);
@@ -88,26 +95,32 @@ class DarkPawsClicker {
             // Touch события для мобильных устройств
             pawButton.addEventListener('touchstart', (e) => {
                 e.preventDefault();
+                console.log('📱 Paw button touch start');
                 pawButton.classList.add('click-animation');
-                this.startAdminTimer();
             });
 
             pawButton.addEventListener('touchend', (e) => {
                 e.preventDefault();
+                console.log('📱 Paw button touch end');
                 setTimeout(() => {
                     pawButton.classList.remove('click-animation');
                 }, 150);
-                this.clearAdminTimer();
             });
+        } else {
+            console.error('❌ Paw button not found!');
         }
 
         // Открытие профиля
         const profileOpener = document.getElementById('profile-opener');
         if (profileOpener) {
+            console.log('👤 Profile opener found');
             profileOpener.addEventListener('click', (e) => {
                 e.preventDefault();
+                console.log('📱 Opening profile');
                 this.openProfile();
             });
+        } else {
+            console.error('❌ Profile opener not found!');
         }
 
         // Закрытие профиля
@@ -115,6 +128,7 @@ class DarkPawsClicker {
         if (closeProfile) {
             closeProfile.addEventListener('click', (e) => {
                 e.preventDefault();
+                console.log('❌ Closing profile');
                 this.closeProfile();
             });
         }
@@ -137,24 +151,28 @@ class DarkPawsClicker {
                 this.inviteFriends();
             });
         }
+
+        console.log('✅ Event listeners setup completed');
     }
 
     setupTabs() {
+        console.log('📑 Setting up tabs...');
         const tabItems = document.querySelectorAll('.tab-item');
         
         tabItems.forEach(tab => {
             tab.addEventListener('click', (e) => {
                 e.preventDefault();
                 const tabId = tab.dataset.tab;
+                console.log('🔄 Switching to tab:', tabId);
                 this.switchTab(tabId);
             });
         });
 
-        console.log('Tabs setup completed');
+        console.log('✅ Tabs setup completed');
     }
 
     switchTab(tabId) {
-        console.log('Switching to tab:', tabId);
+        console.log('🔄 Switching to tab:', tabId);
         
         // Скрываем все вкладки
         document.querySelectorAll('.tab-content').forEach(content => {
@@ -177,11 +195,13 @@ class DarkPawsClicker {
             
             // Обновляем контент вкладки
             this.updateTabContent(tabId);
+        } else {
+            console.error('❌ Tab not found:', tabId);
         }
     }
 
     updateTabContent(tabId) {
-        console.log('Updating tab content:', tabId);
+        console.log('🔄 Updating tab content:', tabId);
         switch(tabId) {
             case 'game-tab':
                 this.updateUpgrades();
@@ -201,9 +221,9 @@ class DarkPawsClicker {
     initTelegramAuth() {
         if (this.tg && this.tg.initDataUnsafe && this.tg.initDataUnsafe.user) {
             this.user = this.tg.initDataUnsafe.user;
-            console.log('User authenticated:', this.user);
+            console.log('✅ User authenticated:', this.user);
         } else {
-            console.log('No Telegram user data available, using demo user');
+            console.log('👤 No Telegram user data available, using demo user');
             // Для демо создаем тестового пользователя
             this.user = {
                 id: Math.floor(Math.random() * 10000),
@@ -223,16 +243,21 @@ class DarkPawsClicker {
             const userAvatar = document.getElementById('user-avatar');
             const profileAvatar = document.getElementById('profile-avatar');
             
-            if (username) username.textContent = this.user.first_name || 'Player';
+            if (username) {
+                username.textContent = this.user.first_name || 'Player';
+                console.log('👤 Username updated:', this.user.first_name);
+            }
             if (profileName) profileName.textContent = this.user.first_name || 'Player';
             if (levelText) levelText.textContent = `Уровень ${this.gameState.level}`;
 
             // Загружаем аватарку из Telegram
             if (this.user.photo_url) {
+                console.log('🖼️ Loading avatar from Telegram:', this.user.photo_url);
                 if (userAvatar) {
                     userAvatar.src = this.user.photo_url;
                     userAvatar.style.display = 'block';
                     userAvatar.onerror = () => {
+                        console.error('❌ Failed to load user avatar');
                         userAvatar.style.display = 'none';
                     };
                 }
@@ -240,10 +265,12 @@ class DarkPawsClicker {
                     profileAvatar.src = this.user.photo_url;
                     profileAvatar.style.display = 'block';
                     profileAvatar.onerror = () => {
+                        console.error('❌ Failed to load profile avatar');
                         profileAvatar.style.display = 'none';
                     };
                 }
             } else {
+                console.log('🖼️ No avatar URL available');
                 // Скрываем аватарки если нет фото
                 if (userAvatar) userAvatar.style.display = 'none';
                 if (profileAvatar) profileAvatar.style.display = 'none';
@@ -252,7 +279,7 @@ class DarkPawsClicker {
     }
 
     updateUI() {
-        console.log('Updating UI...');
+        console.log('🎨 Updating UI...');
         
         // Обновляем счет и уровень
         const scoreElement = document.getElementById('score');
@@ -261,11 +288,11 @@ class DarkPawsClicker {
         
         if (scoreElement) {
             scoreElement.textContent = Math.floor(this.gameState.score).toLocaleString();
-            console.log('Score updated:', this.gameState.score);
+            console.log('💰 Score updated:', this.gameState.score);
         }
         if (levelBadge) {
             levelBadge.textContent = this.gameState.level;
-            console.log('Level badge updated:', this.gameState.level);
+            console.log('📊 Level badge updated:', this.gameState.level);
         }
         if (levelText) {
             levelText.textContent = `Уровень ${this.gameState.level}`;
@@ -277,7 +304,7 @@ class DarkPawsClicker {
         // Обновляем улучшения
         this.updateUpgrades();
         
-        console.log('UI update completed');
+        console.log('✅ UI update completed');
     }
 
     updateHeaderProgressBar() {
@@ -299,18 +326,18 @@ class DarkPawsClicker {
         const progressFillHeader = document.getElementById('level-progress-header');
         if (progressFillHeader) {
             progressFillHeader.style.width = `${percentage}%`;
-            console.log('Progress bar updated:', percentage + '%');
+            console.log('📈 Progress bar updated:', percentage + '%');
         }
     }
 
     updateUpgrades() {
         const container = document.getElementById('upgrades-grid');
         if (!container) {
-            console.error('Upgrades grid container not found!');
+            console.error('❌ Upgrades grid container not found!');
             return;
         }
 
-        console.log('Updating upgrades...', Object.keys(this.gameState.upgrades));
+        console.log('⚡ Updating upgrades...', Object.keys(this.gameState.upgrades));
 
         let html = '';
         Object.keys(this.gameState.upgrades).forEach(upgradeKey => {
@@ -335,22 +362,26 @@ class DarkPawsClicker {
         });
 
         container.innerHTML = html;
-        console.log('Upgrades HTML generated');
+        console.log('✅ Upgrades HTML generated');
 
         // Добавляем обработчики событий для кнопок улучшений
-        document.querySelectorAll('.upgrade-btn').forEach(btn => {
+        const upgradeButtons = document.querySelectorAll('.upgrade-btn');
+        console.log(`🔘 Found ${upgradeButtons.length} upgrade buttons`);
+        
+        upgradeButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 const upgradeCard = e.target.closest('.upgrade-card');
                 if (upgradeCard) {
                     const upgradeType = upgradeCard.dataset.upgrade;
-                    console.log('Buying upgrade:', upgradeType);
+                    console.log('🛒 Buying upgrade:', upgradeType);
                     this.buyUpgrade(upgradeType);
                 }
             });
         });
 
-        console.log('Upgrades update completed');
+        console.log('✅ Upgrades update completed');
     }
 
     calculateUpgradeCost(upgradeKey) {
@@ -375,6 +406,7 @@ class DarkPawsClicker {
     }
 
     handleClick(event) {
+        console.log('👆 Handle click called');
         this.gameState.stats.totalClicks++;
         
         // Вычисляем очки
@@ -387,6 +419,7 @@ class DarkPawsClicker {
             points *= 3;
             isCritical = true;
             this.gameState.stats.criticalHits++;
+            console.log('🎯 Critical hit!');
         }
         
         this.addScore(points, isCritical);
@@ -394,6 +427,8 @@ class DarkPawsClicker {
         
         // Создаем эффекты частиц
         this.createParticles(event);
+        
+        console.log(`💰 Added ${points} points, total: ${this.gameState.score}`);
     }
 
     addScore(points, isCritical = false) {
@@ -406,6 +441,7 @@ class DarkPawsClicker {
         while (this.gameState.score >= this.getRequiredScoreForLevel(this.gameState.level + 1) && this.gameState.level < this.getMaxLevel()) {
             this.gameState.level++;
             leveledUp = true;
+            console.log('🎉 Level up! New level:', this.gameState.level);
         }
         
         this.updateUI();
@@ -487,6 +523,7 @@ class DarkPawsClicker {
     }
 
     startAutoClicker() {
+        console.log('🤖 Starting auto-clicker');
         setInterval(() => {
             if (this.gameState.upgrades.autoClick.level > 0) {
                 const autoPoints = this.gameState.upgrades.autoClick.level;
@@ -503,57 +540,78 @@ class DarkPawsClicker {
 
     // Админ-панель
     setupAdminPanel() {
-        console.log('Setting up admin panel...');
+        console.log('🔧 Setting up admin panel...');
         const pawButton = document.getElementById('paw-button');
-        if (!pawButton) return;
+        if (!pawButton) {
+            console.error('❌ Paw button not found for admin panel');
+            return;
+        }
 
         let pressStartTime = 0;
+        let pressTimer = null;
         
         pawButton.addEventListener('mousedown', (e) => {
+            console.log('🖱️ Admin panel: mouse down');
             pressStartTime = Date.now();
-            this.startAdminTimer();
+            pressTimer = setTimeout(() => {
+                this.showAdminActivation();
+            }, 3000);
         });
 
         pawButton.addEventListener('mouseup', (e) => {
-            this.clearAdminTimer();
+            console.log('🖱️ Admin panel: mouse up');
+            if (pressTimer) {
+                clearTimeout(pressTimer);
+                pressTimer = null;
+            }
         });
 
         pawButton.addEventListener('mouseleave', (e) => {
-            this.clearAdminTimer();
+            console.log('🖱️ Admin panel: mouse leave');
+            if (pressTimer) {
+                clearTimeout(pressTimer);
+                pressTimer = null;
+            }
+        });
+
+        // Touch события
+        pawButton.addEventListener('touchstart', (e) => {
+            console.log('📱 Admin panel: touch start');
+            pressStartTime = Date.now();
+            pressTimer = setTimeout(() => {
+                this.showAdminActivation();
+            }, 3000);
+        });
+
+        pawButton.addEventListener('touchend', (e) => {
+            console.log('📱 Admin panel: touch end');
+            if (pressTimer) {
+                clearTimeout(pressTimer);
+                pressTimer = null;
+            }
         });
 
         this.setupAdminEventListeners();
         this.setupAdminNavigation();
         
-        console.log('Admin panel setup completed');
-    }
-
-    startAdminTimer() {
-        this.clearAdminTimer();
-        this.adminPressTimer = setTimeout(() => {
-            this.showAdminActivation();
-        }, 3000);
-    }
-
-    clearAdminTimer() {
-        if (this.adminPressTimer) {
-            clearTimeout(this.adminPressTimer);
-            this.adminPressTimer = null;
-        }
+        console.log('✅ Admin panel setup completed');
     }
 
     setupAdminNavigation() {
         const navButtons = document.querySelectorAll('.admin-nav-btn');
+        console.log(`🔘 Found ${navButtons.length} admin nav buttons`);
+        
         navButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 const section = btn.dataset.section;
+                console.log('📱 Admin nav clicked:', section);
                 this.switchAdminSection(section);
             });
         });
     }
 
     switchAdminSection(sectionId) {
-        console.log('Switching admin section:', sectionId);
+        console.log('🔄 Switching admin section:', sectionId);
         
         // Скрываем все секции
         document.querySelectorAll('.admin-section').forEach(section => {
@@ -573,10 +631,13 @@ class DarkPawsClicker {
             targetSection.classList.add('active');
             targetButton.classList.add('active');
             this.updateAdminSection(sectionId);
+        } else {
+            console.error('❌ Admin section not found:', sectionId);
         }
     }
 
     updateAdminSection(sectionId) {
+        console.log('🔄 Updating admin section:', sectionId);
         switch(sectionId) {
             case 'upgrades':
                 this.updateAdminUpgrades();
@@ -594,15 +655,18 @@ class DarkPawsClicker {
     }
 
     setupAdminEventListeners() {
-        console.log('Setting up admin event listeners...');
+        console.log('🔧 Setting up admin event listeners...');
         
         // Закрытие админ-панели
         const closeAdmin = document.getElementById('close-admin');
         if (closeAdmin) {
             closeAdmin.addEventListener('click', (e) => {
                 e.preventDefault();
+                console.log('❌ Closing admin panel');
                 this.closeAdminPanel();
             });
+        } else {
+            console.error('❌ Close admin button not found!');
         }
 
         // Клик по фону для закрытия
@@ -613,65 +677,83 @@ class DarkPawsClicker {
                     this.closeAdminPanel();
                 }
             });
+        } else {
+            console.error('❌ Admin panel element not found!');
         }
 
         // Быстрые действия
-        document.getElementById('admin-add-1000')?.addEventListener('click', () => this.adminAddScore(1000));
-        document.getElementById('admin-add-10000')?.addEventListener('click', () => this.adminAddScore(10000));
-        document.getElementById('admin-level-up')?.addEventListener('click', () => this.adminLevelUp());
-        document.getElementById('admin-max-all')?.addEventListener('click', () => this.adminMaxAll());
-        document.getElementById('admin-reset-game')?.addEventListener('click', () => this.adminResetGame());
+        this.setupAdminButton('admin-add-1000', () => this.adminAddScore(1000));
+        this.setupAdminButton('admin-add-10000', () => this.adminAddScore(10000));
+        this.setupAdminButton('admin-level-up', () => this.adminLevelUp());
+        this.setupAdminButton('admin-max-all', () => this.adminMaxAll());
+        this.setupAdminButton('admin-reset-game', () => this.adminResetGame());
 
         // Управление улучшениями
-        document.getElementById('admin-max-upgrades')?.addEventListener('click', () => this.adminMaxUpgrades());
+        this.setupAdminButton('admin-max-upgrades', () => this.adminMaxUpgrades());
 
         // Управление уровнями
-        document.getElementById('admin-unlock-all-levels')?.addEventListener('click', () => this.adminUnlockAllLevels());
+        this.setupAdminButton('admin-unlock-all-levels', () => this.adminUnlockAllLevels());
 
         // Управление достижениями
-        document.getElementById('admin-unlock-all-achievements')?.addEventListener('click', () => this.adminUnlockAllAchievements());
+        this.setupAdminButton('admin-unlock-all-achievements', () => this.adminUnlockAllAchievements());
 
         // Управление картами
-        document.getElementById('admin-unlock-all-cards')?.addEventListener('click', () => this.adminUnlockAllCards());
+        this.setupAdminButton('admin-unlock-all-cards', () => this.adminUnlockAllCards());
 
         // Основные кнопки
-        document.getElementById('admin-apply')?.addEventListener('click', () => this.adminApplyChanges());
-        document.getElementById('admin-save-close')?.addEventListener('click', () => this.adminSaveAndClose());
+        this.setupAdminButton('admin-apply', () => this.adminApplyChanges());
+        this.setupAdminButton('admin-save-close', () => this.adminSaveAndClose());
 
-        console.log('Admin event listeners setup completed');
+        console.log('✅ Admin event listeners setup completed');
+    }
+
+    setupAdminButton(buttonId, callback) {
+        const button = document.getElementById(buttonId);
+        if (button) {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log(`🔘 Admin button clicked: ${buttonId}`);
+                callback();
+            });
+        } else {
+            console.error(`❌ Admin button not found: ${buttonId}`);
+        }
     }
 
     showAdminActivation() {
-        console.log('Showing admin activation');
+        console.log('🔓 Showing admin activation');
         if (this.adminEnabled) {
+            console.log('✅ Admin already enabled, opening panel');
             this.openAdminPanel();
             return;
         }
 
+        console.log('🔐 Requesting admin code');
         const code = prompt('Введите код доступа к админ-панели:');
         if (code === this.adminCode) {
             this.adminEnabled = true;
+            console.log('✅ Admin panel activated successfully');
             this.openAdminPanel();
-            console.log('Admin panel activated');
         } else if (code) {
             alert('Неверный код доступа!');
+            console.log('❌ Invalid admin code entered');
         }
     }
 
     openAdminPanel() {
         if (!this.adminEnabled) {
-            console.log('Admin panel not enabled');
+            console.log('❌ Admin panel not enabled');
             return;
         }
         
-        console.log('Opening admin panel');
+        console.log('🚪 Opening admin panel');
         this.updateAdminPanel();
         const adminPanel = document.getElementById('admin-panel');
         if (adminPanel) {
             adminPanel.classList.add('active');
-            console.log('Admin panel opened successfully');
+            console.log('✅ Admin panel opened successfully');
         } else {
-            console.error('Admin panel element not found!');
+            console.error('❌ Admin panel element not found!');
         }
     }
 
@@ -679,17 +761,17 @@ class DarkPawsClicker {
         const adminPanel = document.getElementById('admin-panel');
         if (adminPanel) {
             adminPanel.classList.remove('active');
-            console.log('Admin panel closed');
+            console.log('✅ Admin panel closed');
         }
     }
 
     updateAdminPanel() {
-        console.log('Updating admin panel data');
+        console.log('🔄 Updating admin panel data');
         
         // Заполняем поля текущими значениями
-        document.getElementById('admin-score').value = this.gameState.score;
-        document.getElementById('admin-level').value = this.gameState.level;
-        document.getElementById('admin-total-clicks').value = this.gameState.stats.totalClicks;
+        this.setAdminInputValue('admin-score', this.gameState.score);
+        this.setAdminInputValue('admin-level', this.gameState.level);
+        this.setAdminInputValue('admin-total-clicks', this.gameState.stats.totalClicks);
         
         this.updateAdminUpgrades();
         this.updateAdminLevels();
@@ -697,10 +779,19 @@ class DarkPawsClicker {
         this.updateAdminComboCards();
     }
 
+    setAdminInputValue(inputId, value) {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.value = value;
+        } else {
+            console.error(`❌ Admin input not found: ${inputId}`);
+        }
+    }
+
     updateAdminUpgrades() {
         const container = document.getElementById('admin-upgrades-list');
         if (!container) {
-            console.error('Admin upgrades list container not found!');
+            console.error('❌ Admin upgrades list container not found!');
             return;
         }
 
@@ -728,12 +819,15 @@ class DarkPawsClicker {
         });
 
         container.innerHTML = html;
-        console.log('Admin upgrades updated');
+        console.log('✅ Admin upgrades updated');
     }
 
     updateAdminLevels() {
         const container = document.getElementById('admin-levels-list');
-        if (!container) return;
+        if (!container) {
+            console.error('❌ Admin levels list container not found!');
+            return;
+        }
 
         let html = '';
         this.gameState.levels.forEach(level => {
@@ -756,11 +850,15 @@ class DarkPawsClicker {
         });
 
         container.innerHTML = html;
+        console.log('✅ Admin levels updated');
     }
 
     updateAdminAchievements() {
         const container = document.getElementById('admin-achievements-list');
-        if (!container) return;
+        if (!container) {
+            console.error('❌ Admin achievements list container not found!');
+            return;
+        }
 
         let html = '';
         this.gameState.achievements.forEach(achievement => {
@@ -783,11 +881,15 @@ class DarkPawsClicker {
         });
 
         container.innerHTML = html;
+        console.log('✅ Admin achievements updated');
     }
 
     updateAdminComboCards() {
         const container = document.getElementById('admin-cards-list');
-        if (!container) return;
+        if (!container) {
+            console.error('❌ Admin cards list container not found!');
+            return;
+        }
 
         let html = '';
         this.gameState.comboCards.forEach(card => {
@@ -801,6 +903,7 @@ class DarkPawsClicker {
         });
 
         container.innerHTML = html;
+        console.log('✅ Admin combo cards updated');
     }
 
     // Методы админ-панели
@@ -808,6 +911,7 @@ class DarkPawsClicker {
         this.gameState.score += amount;
         this.updateUI();
         this.updateAdminPanel();
+        console.log(`💰 Admin added ${amount} points`);
     }
 
     adminLevelUp() {
@@ -815,6 +919,7 @@ class DarkPawsClicker {
         this.showLevelUp();
         this.updateUI();
         this.updateAdminPanel();
+        console.log(`📈 Admin level up to ${this.gameState.level}`);
     }
 
     adminMaxUpgrades() {
@@ -823,6 +928,7 @@ class DarkPawsClicker {
         });
         this.updateUI();
         this.updateAdminPanel();
+        console.log('⚡ Admin maxed all upgrades');
     }
 
     adminUnlockAllLevels() {
@@ -832,6 +938,7 @@ class DarkPawsClicker {
         this.gameState.level = this.gameState.levels.length;
         this.updateUI();
         this.updateAdminPanel();
+        console.log('🔓 Admin unlocked all levels');
     }
 
     adminUnlockAllAchievements() {
@@ -840,6 +947,7 @@ class DarkPawsClicker {
         });
         this.updateUI();
         this.updateAdminPanel();
+        console.log('🏆 Admin unlocked all achievements');
     }
 
     adminUnlockAllCards() {
@@ -848,6 +956,7 @@ class DarkPawsClicker {
         });
         this.updateUI();
         this.updateAdminPanel();
+        console.log('🃏 Admin unlocked all cards');
     }
 
     adminMaxAll() {
@@ -859,6 +968,7 @@ class DarkPawsClicker {
         this.gameState.level = this.gameState.levels.length;
         this.updateUI();
         this.updateAdminPanel();
+        console.log('🎯 Admin maxed everything');
     }
 
     adminResetGame() {
@@ -903,10 +1013,12 @@ class DarkPawsClicker {
             this.updateUI();
             this.updateAdminPanel();
             this.saveGameState();
+            console.log('🔄 Game reset by admin');
         }
     }
 
     adminApplyChanges() {
+        console.log('🔄 Applying admin changes');
         // Применяем изменения из полей ввода
         this.gameState.score = parseInt(document.getElementById('admin-score').value) || 0;
         this.gameState.level = parseInt(document.getElementById('admin-level').value) || 1;
@@ -937,12 +1049,14 @@ class DarkPawsClicker {
         });
         
         this.updateUI();
+        console.log('✅ Admin changes applied');
     }
 
     adminSaveAndClose() {
         this.adminApplyChanges();
         this.saveGameState();
         this.closeAdminPanel();
+        console.log('💾 Admin changes saved and panel closed');
     }
 
     // Вкладка друзей
@@ -1117,10 +1231,14 @@ class DarkPawsClicker {
 
     // Профиль
     openProfile() {
+        console.log('📱 Opening profile modal');
         this.updateProfileModal();
         const profileModal = document.getElementById('profile-modal');
         if (profileModal) {
             profileModal.classList.add('active');
+            console.log('✅ Profile modal opened');
+        } else {
+            console.error('❌ Profile modal not found!');
         }
     }
 
@@ -1128,10 +1246,12 @@ class DarkPawsClicker {
         const profileModal = document.getElementById('profile-modal');
         if (profileModal) {
             profileModal.classList.remove('active');
+            console.log('✅ Profile modal closed');
         }
     }
 
     updateProfileModal() {
+        console.log('🔄 Updating profile modal');
         // Обновляем основную информацию
         const profileName = document.getElementById('profile-name');
         const profileLevel = document.getElementById('profile-level');
@@ -1145,6 +1265,7 @@ class DarkPawsClicker {
         this.updateProfileStats();
         this.updateProfileAchievements();
         this.updateProfileUpgrades();
+        console.log('✅ Profile modal updated');
     }
 
     updateProfileStats() {
@@ -1235,9 +1356,9 @@ class DarkPawsClicker {
                 lastSave: Date.now()
             };
             localStorage.setItem('darkPawsClicker_save', JSON.stringify(saveData));
-            console.log('Game state saved');
+            console.log('💾 Game state saved');
         } catch (error) {
-            console.error('Local storage save error:', error);
+            console.error('❌ Local storage save error:', error);
         }
     }
 
@@ -1247,17 +1368,19 @@ class DarkPawsClicker {
             if (saved) {
                 const saveData = JSON.parse(saved);
                 this.gameState = { ...this.gameState, ...saveData };
-                console.log('Game state loaded from localStorage');
+                console.log('💾 Game state loaded from localStorage');
+            } else {
+                console.log('💾 No saved game state found');
             }
         } catch (error) {
-            console.error('Error loading game state from localStorage:', error);
+            console.error('❌ Error loading game state from localStorage:', error);
         }
     }
 }
 
 // Инициализация игры
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, initializing game...');
+    console.log('🚀 DOM loaded, initializing game...');
     window.clickerGame = new DarkPawsClicker();
 });
 
@@ -1272,6 +1395,7 @@ window.addEventListener('beforeunload', () => {
 document.addEventListener('keydown', (e) => {
     if (e.ctrlKey && e.altKey && e.key === 'a') {
         e.preventDefault();
+        console.log('🔑 Admin hotkey pressed');
         if (window.clickerGame) {
             window.clickerGame.showAdminActivation();
         }
