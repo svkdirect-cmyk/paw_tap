@@ -13,7 +13,7 @@
     <div id="app">
         <!-- Экран игры -->
         <div id="game-tab" class="tab-content active">
-            <!-- Шапка -->
+            <!-- Исправленная шапка -->
             <div class="header">
                 <div class="header-main">
                     <div class="user-section clickable" id="profile-opener">
@@ -35,7 +35,7 @@
                     </div>
                 </div>
                 
-                <!-- Прогресс бар -->
+                <!-- Прогресс бар под шапкой -->
                 <div class="header-progress">
                     <div class="progress-bar-header">
                         <div class="progress-fill-header" id="level-progress-header"></div>
@@ -61,8 +61,33 @@
             <!-- Улучшения -->
             <div class="upgrades-section">
                 <h3 class="section-title">УЛУЧШЕНИЯ</h3>
-                <div class="upgrades-grid" id="upgrades-grid">
-                    <!-- Динамически генерируется -->
+                <div class="upgrades-grid">
+                    <div class="upgrade-card" data-upgrade="click-power">
+                        <div class="upgrade-icon">💪</div>
+                        <div class="upgrade-info">
+                            <div class="upgrade-name">Сила лапы</div>
+                            <div class="upgrade-level">Уровень <span>1</span></div>
+                        </div>
+                        <button class="upgrade-btn" data-cost="10">10</button>
+                    </div>
+                    
+                    <div class="upgrade-card" data-upgrade="auto-click">
+                        <div class="upgrade-icon">⚡</div>
+                        <div class="upgrade-info">
+                            <div class="upgrade-name">Авто-клик</div>
+                            <div class="upgrade-level">Уровень <span>0</span></div>
+                        </div>
+                        <button class="upgrade-btn" data-cost="50">50</button>
+                    </div>
+                    
+                    <div class="upgrade-card" data-upgrade="critical-chance">
+                        <div class="upgrade-icon">🎯</div>
+                        <div class="upgrade-info">
+                            <div class="upgrade-name">Точность</div>
+                            <div class="upgrade-level">Уровень <span>1</span></div>
+                        </div>
+                        <button class="upgrade-btn" data-cost="25">25</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -102,8 +127,31 @@
 
                 <div class="friends-bonuses">
                     <h4>Бонусы за друзей</h4>
-                    <div class="bonus-grid" id="bonus-grid">
-                        <!-- Бонусы генерируются динамически -->
+                    <div class="bonus-grid">
+                        <div class="bonus-card">
+                            <div class="bonus-icon">🔥</div>
+                            <div class="bonus-info">
+                                <div class="bonus-name">+1 друг</div>
+                                <div class="bonus-desc">+5% к силе клика</div>
+                            </div>
+                            <div class="bonus-status">Не активно</div>
+                        </div>
+                        <div class="bonus-card">
+                            <div class="bonus-icon">🚀</div>
+                            <div class="bonus-info">
+                                <div class="bonus-name">+3 друга</div>
+                                <div class="bonus-desc">+10% к авто-клику</div>
+                            </div>
+                            <div class="bonus-status">Не активно</div>
+                        </div>
+                        <div class="bonus-card">
+                            <div class="bonus-icon">💎</div>
+                            <div class="bonus-info">
+                                <div class="bonus-name">+5 друзей</div>
+                                <div class="bonus-desc">+15% к шансу крита</div>
+                            </div>
+                            <div class="bonus-status">Не активно</div>
+                        </div>
                     </div>
                 </div>
 
@@ -127,13 +175,85 @@
 
             <div class="levels-content">
                 <div class="levels-progress">
-                    <div class="level-indicator" id="level-indicator">
-                        <!-- Динамически генерируется -->
+                    <div class="level-indicator">
+                        <div class="level-circle active">
+                            <span>1</span>
+                        </div>
+                        <div class="level-line"></div>
+                        <div class="level-circle">
+                            <span>2</span>
+                        </div>
+                        <div class="level-line"></div>
+                        <div class="level-circle">
+                            <span>3</span>
+                        </div>
+                        <div class="level-line"></div>
+                        <div class="level-circle">
+                            <span>4</span>
+                        </div>
+                        <div class="level-line"></div>
+                        <div class="level-circle">
+                            <span>5</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="levels-grid" id="levels-grid">
-                    <!-- Динамически генерируется -->
+                <div class="levels-grid">
+                    <div class="level-card active">
+                        <div class="level-header">
+                            <div class="level-number">Уровень 1</div>
+                            <div class="level-status completed">Пройден</div>
+                        </div>
+                        <div class="level-reward">
+                            <div class="reward-icon">🎁</div>
+                            <div class="reward-info">
+                                <div class="reward-name">Начальный набор</div>
+                                <div class="reward-desc">+10 к силе клика</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="level-card">
+                        <div class="level-header">
+                            <div class="level-number">Уровень 2</div>
+                            <div class="level-status">1000 очков</div>
+                        </div>
+                        <div class="level-reward">
+                            <div class="reward-icon">⚡</div>
+                            <div class="reward-info">
+                                <div class="reward-name">Авто-кликер</div>
+                                <div class="reward-desc">+1 авто-клик/сек</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="level-card locked">
+                        <div class="level-header">
+                            <div class="level-number">Уровень 3</div>
+                            <div class="level-status">5000 очков</div>
+                        </div>
+                        <div class="level-reward">
+                            <div class="reward-icon">🎯</div>
+                            <div class="reward-info">
+                                <div class="reward-name">Критический удар</div>
+                                <div class="reward-desc">+10% шанс крита</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="level-card locked">
+                        <div class="level-header">
+                            <div class="level-number">Уровень 4</div>
+                            <div class="level-status">15000 очков</div>
+                        </div>
+                        <div class="level-reward">
+                            <div class="reward-icon">💎</div>
+                            <div class="reward-info">
+                                <div class="reward-name">Премиум буст</div>
+                                <div class="reward-desc">x2 все бонусы</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -143,7 +263,7 @@
             <div class="tab-header">
                 <h2>Комбо карты</h2>
                 <div class="tab-stats">
-                    <div class="combo-count">Карт: <span>0/4</span></div>
+                    <div class="combo-count">Карт: <span>0/8</span></div>
                 </div>
             </div>
 
@@ -173,8 +293,8 @@
 
                 <div class="combo-collection">
                     <h4>Коллекция карт</h4>
-                    <div class="cards-grid" id="cards-grid">
-                        <!-- Динамически генерируется -->
+                    <div class="cards-grid">
+                        <!-- Карточки будут добавляться через JavaScript -->
                     </div>
                 </div>
 
@@ -276,15 +396,53 @@
 
                     <div class="profile-achievements">
                         <h4>Достижения</h4>
-                        <div class="achievements-grid" id="profile-achievements-grid">
-                            <!-- Динамически генерируется -->
+                        <div class="achievements-grid">
+                            <div class="achievement unlocked">
+                                <div class="achievement-icon">🎮</div>
+                                <div class="achievement-info">
+                                    <div class="achievement-name">Первые шаги</div>
+                                    <div class="achievement-desc">Сделать 100 кликов</div>
+                                </div>
+                            </div>
+                            <div class="achievement locked">
+                                <div class="achievement-icon">💪</div>
+                                <div class="achievement-info">
+                                    <div class="achievement-name">Усердный работник</div>
+                                    <div class="achievement-desc">Сделать 1000 кликов</div>
+                                </div>
+                            </div>
+                            <div class="achievement locked">
+                                <div class="achievement-icon">🚀</div>
+                                <div class="achievement-info">
+                                    <div class="achievement-name">Клик-мастер</div>
+                                    <div class="achievement-desc">Сделать 10000 кликов</div>
+                                </div>
+                            </div>
+                            <div class="achievement locked">
+                                <div class="achievement-icon">🏆</div>
+                                <div class="achievement-info">
+                                    <div class="achievement-name">Легенда кликов</div>
+                                    <div class="achievement-desc">Сделать 50000 кликов</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="profile-upgrades">
                         <h4>Мои улучшения</h4>
-                        <div class="upgrades-list" id="profile-upgrades-list">
-                            <!-- Динамически генерируется -->
+                        <div class="upgrades-list">
+                            <div class="profile-upgrade">
+                                <div class="upgrade-name">Сила лапы</div>
+                                <div class="upgrade-level">Уровень <span id="profile-click-power">1</span></div>
+                            </div>
+                            <div class="profile-upgrade">
+                                <div class="upgrade-name">Авто-клик</div>
+                                <div class="upgrade-level">Уровень <span id="profile-auto-click">0</span></div>
+                            </div>
+                            <div class="profile-upgrade">
+                                <div class="upgrade-name">Точность</div>
+                                <div class="upgrade-level">Уровень <span id="profile-critical">1</span></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -298,7 +456,7 @@
             </div>
         </div>
 
-        <!-- Админ панель -->
+        <!-- Скрытая админ панель -->
         <div id="admin-panel" class="modal">
             <div class="modal-content admin-modal">
                 <div class="modal-header">
@@ -309,17 +467,8 @@
                 </div>
                 
                 <div class="admin-content">
-                    <!-- Навигация админки -->
-                    <div class="admin-nav">
-                        <button class="admin-nav-btn active" data-section="stats">📊 Статистика</button>
-                        <button class="admin-nav-btn" data-section="upgrades">⚡ Улучшения</button>
-                        <button class="admin-nav-btn" data-section="levels">📈 Уровни</button>
-                        <button class="admin-nav-btn" data-section="achievements">🏆 Достижения</button>
-                        <button class="admin-nav-btn" data-section="combo">🃏 Комбо-карты</button>
-                    </div>
-
                     <!-- Статистика игры -->
-                    <div id="admin-stats-section" class="admin-section active">
+                    <div class="admin-section">
                         <h3>📊 Статистика игры</h3>
                         <div class="admin-stats">
                             <div class="admin-stat">
@@ -334,58 +483,76 @@
                                 <span>Всего кликов:</span>
                                 <input type="number" id="admin-total-clicks" value="0">
                             </div>
-                        </div>
-
-                        <div class="quick-actions">
-                            <button class="btn-admin" id="admin-add-1000">+1000 очков</button>
-                            <button class="btn-admin" id="admin-add-10000">+10000 очков</button>
-                            <button class="btn-admin" id="admin-level-up">Уровень ↑</button>
-                            <button class="btn-admin" id="admin-max-all">Макс всё</button>
-                            <button class="btn-admin" id="admin-reset-game">Сброс игры</button>
+                            <div class="admin-stat">
+                                <span>Время игры (ч):</span>
+                                <input type="number" id="admin-play-time" value="0" step="0.1">
+                            </div>
                         </div>
                     </div>
 
                     <!-- Управление улучшениями -->
-                    <div id="admin-upgrades-section" class="admin-section">
+                    <div class="admin-section">
                         <h3>⚡ Управление улучшениями</h3>
-                        <div class="admin-actions">
-                            <button class="btn-admin" id="admin-max-upgrades">📈 Макс улучшения</button>
-                        </div>
-                        <div class="upgrades-controls" id="admin-upgrades-list">
-                            <!-- Динамически генерируется -->
-                        </div>
-                    </div>
-
-                    <!-- Управление уровнями -->
-                    <div id="admin-levels-section" class="admin-section">
-                        <h3>📈 Управление уровнями</h3>
-                        <div class="admin-actions">
-                            <button class="btn-admin" id="admin-unlock-all-levels">🔓 Разблокировать все</button>
-                        </div>
-                        <div class="levels-controls" id="admin-levels-list">
-                            <!-- Динамически генерируется -->
+                        <div class="upgrades-controls">
+                            <div class="upgrade-control">
+                                <label>Сила клика:</label>
+                                <input type="number" id="admin-click-power" value="1" min="1" max="1000">
+                            </div>
+                            <div class="upgrade-control">
+                                <label>Авто-клик:</label>
+                                <input type="number" id="admin-auto-click" value="0" min="0" max="1000">
+                            </div>
+                            <div class="upgrade-control">
+                                <label>Шанс крита:</label>
+                                <input type="number" id="admin-critical" value="1" min="1" max="1000">
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Управление достижениями -->
-                    <div id="admin-achievements-section" class="admin-section">
-                        <h3>🏆 Управление достижениями</h3>
-                        <div class="admin-actions">
-                            <button class="btn-admin" id="admin-unlock-all-achievements">🔓 Разблокировать все</button>
-                        </div>
-                        <div class="achievements-controls" id="admin-achievements-list">
-                            <!-- Динамически генерируется -->
+                    <!-- Быстрые действия -->
+                    <div class="admin-section">
+                        <h3>🎮 Быстрые действия</h3>
+                        <div class="quick-actions">
+                            <button class="btn-admin" id="admin-add-1000">+1000 очков</button>
+                            <button class="btn-admin" id="admin-add-10000">+10000 очков</button>
+                            <button class="btn-admin" id="admin-level-up">Уровень ↑</button>
+                            <button class="btn-admin" id="admin-max-upgrades">Макс улучшения</button>
+                            <button class="btn-admin" id="admin-reset-game">Сброс игры</button>
+                            <button class="btn-admin" id="admin-unlock-all">Разблокировать всё</button>
                         </div>
                     </div>
 
-                    <!-- Управление комбо-картами -->
-                    <div id="admin-combo-section" class="admin-section">
-                        <h3>🃏 Управление комбо-картами</h3>
-                        <div class="admin-actions">
-                            <button class="btn-admin" id="admin-unlock-all-cards">🔓 Разблокировать все</button>
+                    <!-- Настройки сервера -->
+                    <div class="admin-section">
+                        <h3>🔧 Настройки сервера</h3>
+                        <div class="server-settings">
+                            <div class="server-setting">
+                                <label>API URL:</label>
+                                <input type="text" id="admin-api-url" value="https://your-server.com/api">
+                            </div>
+                            <div class="server-setting">
+                                <label>Bot Token:</label>
+                                <input type="text" id="admin-bot-token" value="YOUR_BOT_TOKEN_HERE">
+                            </div>
+                            <div class="server-actions">
+                                <button class="btn-admin" id="admin-test-connection">Тест соединения</button>
+                                <button class="btn-admin" id="admin-force-save">Принудительное сохранение</button>
+                                <button class="btn-admin" id="admin-force-load">Принудительная загрузка</button>
+                            </div>
                         </div>
-                        <div class="cards-controls" id="admin-cards-list">
-                            <!-- Динамически генерируется -->
+                    </div>
+
+                    <!-- Отладка -->
+                    <div class="admin-section">
+                        <h3>🐛 Отладка</h3>
+                        <div class="debug-actions">
+                            <button class="btn-admin" id="admin-export-save">Экспорт сохранения</button>
+                            <button class="btn-admin" id="admin-import-save">Импорт сохранения</button>
+                            <button class="btn-admin" id="admin-show-logs">Показать логи</button>
+                            <button class="btn-admin" id="admin-clear-data">Очистить все данные</button>
+                        </div>
+                        <div class="debug-info">
+                            <textarea id="admin-debug-output" placeholder="Логи и отладочная информация..." readonly></textarea>
                         </div>
                     </div>
                 </div>
