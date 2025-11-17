@@ -497,6 +497,114 @@
                 </div>
             </div>
         </div>
+
+        <!-- Скрытая админ панель -->
+        <div id="admin-panel" class="modal">
+            <div class="modal-content admin-modal">
+                <div class="modal-header">
+                    <h2>🤫 Админ Панель</h2>
+                    <button class="modal-close" id="close-admin">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="admin-content">
+                    <!-- Статистика игры -->
+                    <div class="admin-section">
+                        <h3>📊 Статистика игры</h3>
+                        <div class="admin-stats">
+                            <div class="admin-stat">
+                                <span>Очки:</span>
+                                <input type="number" id="admin-score" value="0">
+                            </div>
+                            <div class="admin-stat">
+                                <span>Уровень:</span>
+                                <input type="number" id="admin-level" value="1" min="1" max="100">
+                            </div>
+                            <div class="admin-stat">
+                                <span>Всего кликов:</span>
+                                <input type="number" id="admin-total-clicks" value="0">
+                            </div>
+                            <div class="admin-stat">
+                                <span>Время игры (ч):</span>
+                                <input type="number" id="admin-play-time" value="0" step="0.1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Управление улучшениями -->
+                    <div class="admin-section">
+                        <h3>⚡ Управление улучшениями</h3>
+                        <div class="upgrades-controls">
+                            <div class="upgrade-control">
+                                <label>Сила клика:</label>
+                                <input type="number" id="admin-click-power" value="1" min="1" max="1000">
+                            </div>
+                            <div class="upgrade-control">
+                                <label>Авто-клик:</label>
+                                <input type="number" id="admin-auto-click" value="0" min="0" max="1000">
+                            </div>
+                            <div class="upgrade-control">
+                                <label>Шанс крита:</label>
+                                <input type="number" id="admin-critical" value="1" min="1" max="1000">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Быстрые действия -->
+                    <div class="admin-section">
+                        <h3>🎮 Быстрые действия</h3>
+                        <div class="quick-actions">
+                            <button class="btn-admin" id="admin-add-1000">+1000 очков</button>
+                            <button class="btn-admin" id="admin-add-10000">+10000 очков</button>
+                            <button class="btn-admin" id="admin-level-up">Уровень ↑</button>
+                            <button class="btn-admin" id="admin-max-upgrades">Макс улучшения</button>
+                            <button class="btn-admin" id="admin-reset-game">Сброс игры</button>
+                            <button class="btn-admin" id="admin-unlock-all">Разблокировать всё</button>
+                        </div>
+                    </div>
+
+                    <!-- Настройки сервера -->
+                    <div class="admin-section">
+                        <h3>🔧 Настройки сервера</h3>
+                        <div class="server-settings">
+                            <div class="server-setting">
+                                <label>API URL:</label>
+                                <input type="text" id="admin-api-url" value="https://your-server.com/api">
+                            </div>
+                            <div class="server-setting">
+                                <label>Bot Token:</label>
+                                <input type="text" id="admin-bot-token" value="YOUR_BOT_TOKEN_HERE">
+                            </div>
+                            <div class="server-actions">
+                                <button class="btn-admin" id="admin-test-connection">Тест соединения</button>
+                                <button class="btn-admin" id="admin-force-save">Принудительное сохранение</button>
+                                <button class="btn-admin" id="admin-force-load">Принудительная загрузка</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Отладка -->
+                    <div class="admin-section">
+                        <h3>🐛 Отладка</h3>
+                        <div class="debug-actions">
+                            <button class="btn-admin" id="admin-export-save">Экспорт сохранения</button>
+                            <button class="btn-admin" id="admin-import-save">Импорт сохранения</button>
+                            <button class="btn-admin" id="admin-show-logs">Показать логи</button>
+                            <button class="btn-admin" id="admin-clear-data">Очистить все данные</button>
+                        </div>
+                        <div class="debug-info">
+                            <textarea id="admin-debug-output" placeholder="Логи и отладочная информация..." readonly></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-secondary" id="admin-apply">Применить изменения</button>
+                    <button class="btn-primary" id="admin-save-close">Сохранить и закрыть</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
