@@ -13,12 +13,12 @@
     <div id="app">
         <!-- Экран игры -->
         <div id="game-tab" class="tab-content active">
-            <!-- Исправленная шапка -->
+            <!-- Шапка -->
             <div class="header">
                 <div class="header-main">
                     <div class="user-section clickable" id="profile-opener">
                         <div class="avatar-container">
-                            <img id="user-avatar" src="" alt="Avatar" class="avatar">
+                            <div class="avatar" id="user-avatar"></div>
                             <div class="level-badge">1</div>
                         </div>
                         <div class="user-info">
@@ -176,25 +176,15 @@
             <div class="levels-content">
                 <div class="levels-progress">
                     <div class="level-indicator">
-                        <div class="level-circle active">
-                            <span>1</span>
-                        </div>
+                        <div class="level-circle active">1</div>
                         <div class="level-line"></div>
-                        <div class="level-circle">
-                            <span>2</span>
-                        </div>
+                        <div class="level-circle">2</div>
                         <div class="level-line"></div>
-                        <div class="level-circle">
-                            <span>3</span>
-                        </div>
+                        <div class="level-circle">3</div>
                         <div class="level-line"></div>
-                        <div class="level-circle">
-                            <span>4</span>
-                        </div>
+                        <div class="level-circle">4</div>
                         <div class="level-line"></div>
-                        <div class="level-circle">
-                            <span>5</span>
-                        </div>
+                        <div class="level-circle">5</div>
                     </div>
                 </div>
 
@@ -293,7 +283,7 @@
 
                 <div class="combo-collection">
                     <h4>Коллекция карт</h4>
-                    <div class="cards-grid">
+                    <div class="cards-grid" id="cards-grid-container">
                         <!-- Карточки будут добавляться через JavaScript -->
                     </div>
                 </div>
@@ -343,7 +333,7 @@
                 <div class="profile-content">
                     <div class="profile-header">
                         <div class="profile-avatar">
-                            <img id="profile-avatar" src="" alt="Avatar" class="avatar-large">
+                            <div class="avatar-large" id="profile-avatar"></div>
                             <div class="profile-level">
                                 <span id="profile-level">1</span>
                             </div>
@@ -404,21 +394,21 @@
                                     <div class="achievement-desc">Сделать 100 кликов</div>
                                 </div>
                             </div>
-                            <div class="achievement locked">
+                            <div class="achievement">
                                 <div class="achievement-icon">💪</div>
                                 <div class="achievement-info">
                                     <div class="achievement-name">Усердный работник</div>
                                     <div class="achievement-desc">Сделать 1000 кликов</div>
                                 </div>
                             </div>
-                            <div class="achievement locked">
+                            <div class="achievement">
                                 <div class="achievement-icon">🚀</div>
                                 <div class="achievement-info">
                                     <div class="achievement-name">Клик-мастер</div>
                                     <div class="achievement-desc">Сделать 10000 кликов</div>
                                 </div>
                             </div>
-                            <div class="achievement locked">
+                            <div class="achievement">
                                 <div class="achievement-icon">🏆</div>
                                 <div class="achievement-info">
                                     <div class="achievement-name">Легенда кликов</div>
