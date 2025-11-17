@@ -3,7 +3,8 @@ class DarkPawsClicker {
         this.tg = window.Telegram.WebApp;
         this.user = null;
         this.gameState = {
-            score: 0,
+            score: 0,                    // Текущий баланс (для покупок)
+            totalEarnedScore: 0,         // Всего заработано очков (для прогресса уровня)
             level: 1,
             upgrades: {
                 clickPower: 1,
@@ -451,10 +452,10 @@ class DarkPawsClicker {
             } else if (levelNumber === this.gameState.level) {
                 card.classList.add('active');
                 
-                // Показываем прогресс до следующего уровня
+                // Показываем прогресс до следующего уровня (на основе ОБЩИХ заработанных очков)
                 const currentLevelScore = this.getRequiredScoreForLevel(this.gameState.level);
                 const nextLevelScore = this.getRequiredScoreForLevel(this.gameState.level + 1);
-                const progress = Math.max(0, this.gameState.score - currentLevelScore);
+                const progress = Math.max(0, this.gameState.totalEarnedScore - currentLevelScore);
                 const totalNeeded = nextLevelScore - currentLevelScore;
                 
                 if (status) {
@@ -948,15 +949,16 @@ class DarkPawsClicker {
     }
 
     addScore(points, isCritical = false) {
-        const oldScore = this.gameState.score;
-        this.gameState.score += points;
+        // Добавляем очки в оба счета
+        this.gameState.score += points;                    // Текущий баланс
+        this.gameState.totalEarnedScore += points;        // Общие заработанные очки (для прогресса)
         
-        // Проверка уровня (только повышение)
+        // Проверка уровня (только повышение) на основе ОБЩИХ заработанных очков
         let leveledUp = false;
         const maxLevel = this.getMaxLevel();
         
         while (this.gameState.level < maxLevel && 
-               this.gameState.score >= this.getRequiredScoreForLevel(this.gameState.level + 1)) {
+               this.gameState.totalEarnedScore >= this.getRequiredScoreForLevel(this.gameState.level + 1)) {
             this.gameState.level++;
             leveledUp = true;
             
@@ -1026,8 +1028,8 @@ class DarkPawsClicker {
         const cost = costs[upgradeType];
         
         if (this.gameState.score >= cost) {
-            // Вычитаем стоимость ТОЛЬКО из общего баланса (score)
-            // Прогресс уровня НЕ затрагивается
+            // Вычитаем стоимость ТОЛЬКО из текущего баланса
+            // Общие заработанные очки и прогресс уровня НЕ затрагиваются
             this.gameState.score -= cost;
             
             // Применяем улучшение
@@ -1042,9 +1044,6 @@ class DarkPawsClicker {
                     this.gameState.upgrades.criticalChance++;
                     break;
             }
-            
-            // Уровень остается неизменным
-            // Прогресс уровня не уменьшается
             
             this.updateUI();
             this.saveGameState();
@@ -1099,7 +1098,7 @@ class DarkPawsClicker {
     }
 
     updateUI() {
-        // Обновляем счет и уровень
+        // Обновляем счет (текущий баланс)
         const scoreElement = document.getElementById('score');
         const levelBadge = document.querySelector('.level-badge');
         const levelText = document.querySelector('.level-text');
@@ -1108,7 +1107,7 @@ class DarkPawsClicker {
         if (levelBadge) levelBadge.textContent = this.gameState.level;
         if (levelText) levelText.textContent = `Уровень ${this.gameState.level}`;
         
-        // Обновляем прогресс бар в шапке
+        // Обновляем прогресс бар в шапке (на основе ОБЩИХ заработанных очков)
         this.updateHeaderProgressBar();
         
         // Обновляем кнопки улучшений
@@ -1122,7 +1121,8 @@ class DarkPawsClicker {
         const currentLevelScore = this.getRequiredScoreForLevel(this.gameState.level);
         const nextLevelScore = this.getRequiredScoreForLevel(this.gameState.level + 1);
         
-        let progress = Math.max(0, this.gameState.score - currentLevelScore);
+        // Используем ОБЩИЕ заработанные очки для прогресса
+        let progress = Math.max(0, this.gameState.totalEarnedScore - currentLevelScore);
         const totalNeeded = nextLevelScore - currentLevelScore;
         
         let percentage = 0;
@@ -1205,6 +1205,11 @@ class DarkPawsClicker {
             const saved = localStorage.getItem('darkPawsClicker_save');
             if (saved) {
                 const saveData = JSON.parse(saved);
+                
+                // Миграция для старых сохранений
+                if (!saveData.totalEarnedScore) {
+                    saveData.totalEarnedScore = saveData.score || 0;
+                }
                 
                 if (!this.user || saveData.userId === this.user.id) {
                     this.gameState = { ...this.gameState, ...saveData };
