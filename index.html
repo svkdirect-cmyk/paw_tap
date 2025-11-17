@@ -13,7 +13,7 @@
     <div id="app">
         <!-- Экран игры -->
         <div id="game-tab" class="tab-content active">
-            <!-- Исправленная шапка -->
+            <!-- Шапка -->
             <div class="header">
                 <div class="header-main">
                     <div class="user-section clickable" id="profile-opener">
@@ -35,7 +35,7 @@
                     </div>
                 </div>
                 
-                <!-- Прогресс бар под шапкой -->
+                <!-- Прогресс бар -->
                 <div class="header-progress">
                     <div class="progress-bar-header">
                         <div class="progress-fill-header" id="level-progress-header"></div>
@@ -103,7 +103,7 @@
                 <div class="friends-bonuses">
                     <h4>Бонусы за друзей</h4>
                     <div class="bonus-grid" id="bonus-grid">
-                        <!-- Динамически генерируется -->
+                        <!-- Бонусы генерируются динамически -->
                     </div>
                 </div>
 
@@ -298,7 +298,7 @@
             </div>
         </div>
 
-        <!-- Скрытая админ панель -->
+        <!-- Админ панель -->
         <div id="admin-panel" class="modal">
             <div class="modal-content admin-modal">
                 <div class="modal-header">
@@ -316,9 +316,6 @@
                         <button class="admin-nav-btn" data-section="levels">📈 Уровни</button>
                         <button class="admin-nav-btn" data-section="achievements">🏆 Достижения</button>
                         <button class="admin-nav-btn" data-section="combo">🃏 Комбо-карты</button>
-                        <button class="admin-nav-btn" data-section="players">👥 Игроки</button>
-                        <button class="admin-nav-btn" data-section="server">🔧 Сервер</button>
-                        <button class="admin-nav-btn" data-section="debug">🐛 Отладка</button>
                     </div>
 
                     <!-- Статистика игры -->
@@ -337,14 +334,6 @@
                                 <span>Всего кликов:</span>
                                 <input type="number" id="admin-total-clicks" value="0">
                             </div>
-                            <div class="admin-stat">
-                                <span>Время игры (ч):</span>
-                                <input type="number" id="admin-play-time" value="0" step="0.1">
-                            </div>
-                            <div class="admin-stat">
-                                <span>Критические удары:</span>
-                                <input type="number" id="admin-critical-hits" value="0">
-                            </div>
                         </div>
 
                         <div class="quick-actions">
@@ -360,7 +349,6 @@
                     <div id="admin-upgrades-section" class="admin-section">
                         <h3>⚡ Управление улучшениями</h3>
                         <div class="admin-actions">
-                            <button class="btn-admin" id="admin-add-upgrade">➕ Добавить улучшение</button>
                             <button class="btn-admin" id="admin-max-upgrades">📈 Макс улучшения</button>
                         </div>
                         <div class="upgrades-controls" id="admin-upgrades-list">
@@ -372,7 +360,6 @@
                     <div id="admin-levels-section" class="admin-section">
                         <h3>📈 Управление уровнями</h3>
                         <div class="admin-actions">
-                            <button class="btn-admin" id="admin-add-level">➕ Добавить уровень</button>
                             <button class="btn-admin" id="admin-unlock-all-levels">🔓 Разблокировать все</button>
                         </div>
                         <div class="levels-controls" id="admin-levels-list">
@@ -384,7 +371,6 @@
                     <div id="admin-achievements-section" class="admin-section">
                         <h3>🏆 Управление достижениями</h3>
                         <div class="admin-actions">
-                            <button class="btn-admin" id="admin-add-achievement">➕ Добавить достижение</button>
                             <button class="btn-admin" id="admin-unlock-all-achievements">🔓 Разблокировать все</button>
                         </div>
                         <div class="achievements-controls" id="admin-achievements-list">
@@ -396,68 +382,10 @@
                     <div id="admin-combo-section" class="admin-section">
                         <h3>🃏 Управление комбо-картами</h3>
                         <div class="admin-actions">
-                            <button class="btn-admin" id="admin-add-card">➕ Добавить карту</button>
                             <button class="btn-admin" id="admin-unlock-all-cards">🔓 Разблокировать все</button>
                         </div>
                         <div class="cards-controls" id="admin-cards-list">
                             <!-- Динамически генерируется -->
-                        </div>
-                    </div>
-
-                    <!-- Управление игроками -->
-                    <div id="admin-players-section" class="admin-section">
-                        <h3>👥 Управление игроками</h3>
-                        <div class="players-controls">
-                            <div class="admin-stat">
-                                <span>Текущий игрок ID:</span>
-                                <input type="text" id="admin-player-id" value="" readonly>
-                            </div>
-                            <div class="admin-stat">
-                                <span>Имя игрока:</span>
-                                <input type="text" id="admin-player-name" value="">
-                            </div>
-                            <div class="admin-actions">
-                                <button class="btn-admin" id="admin-save-player">💾 Сохранить игрока</button>
-                                <button class="btn-admin" id="admin-load-players">🔄 Загрузить игроков</button>
-                                <button class="btn-admin" id="admin-clear-players">🗑️ Очистить игроков</button>
-                            </div>
-                            <div class="players-list" id="admin-players-list">
-                                <!-- Список игроков -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Настройки сервера -->
-                    <div id="admin-server-section" class="admin-section">
-                        <h3>🔧 Настройки сервера</h3>
-                        <div class="server-settings">
-                            <div class="server-setting">
-                                <label>API URL:</label>
-                                <input type="text" id="admin-api-url" value="https://your-server.com/api">
-                            </div>
-                            <div class="server-setting">
-                                <label>Bot Token:</label>
-                                <input type="text" id="admin-bot-token" value="YOUR_BOT_TOKEN_HERE">
-                            </div>
-                            <div class="server-actions">
-                                <button class="btn-admin" id="admin-test-connection">🔗 Тест соединения</button>
-                                <button class="btn-admin" id="admin-force-save">💾 Принудительное сохранение</button>
-                                <button class="btn-admin" id="admin-force-load">🔄 Принудительная загрузка</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Отладка -->
-                    <div id="admin-debug-section" class="admin-section">
-                        <h3>🐛 Отладка</h3>
-                        <div class="debug-actions">
-                            <button class="btn-admin" id="admin-export-save">📤 Экспорт сохранения</button>
-                            <button class="btn-admin" id="admin-import-save">📥 Импорт сохранения</button>
-                            <button class="btn-admin" id="admin-show-logs">📋 Показать логи</button>
-                            <button class="btn-admin" id="admin-clear-data">🗑️ Очистить все данные</button>
-                        </div>
-                        <div class="debug-info">
-                            <textarea id="admin-debug-output" placeholder="Логи и отладочная информация..." readonly></textarea>
                         </div>
                     </div>
                 </div>
@@ -465,44 +393,6 @@
                 <div class="modal-actions">
                     <button class="btn-secondary" id="admin-apply">Применить изменения</button>
                     <button class="btn-primary" id="admin-save-close">Сохранить и закрыть</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Модальное окно редактирования улучшения -->
-        <div id="edit-upgrade-modal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>✏️ Редактирование улучшения</h2>
-                    <button class="modal-close" id="close-edit-upgrade">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>Название:</label>
-                        <input type="text" id="edit-upgrade-name" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label>Иконка:</label>
-                        <input type="text" id="edit-upgrade-icon" class="form-input" placeholder="⚡">
-                    </div>
-                    <div class="form-group">
-                        <label>Текущий уровень:</label>
-                        <input type="number" id="edit-upgrade-level" class="form-input" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label>Базовая стоимость:</label>
-                        <input type="number" id="edit-upgrade-base-cost" class="form-input" min="1">
-                    </div>
-                    <div class="form-group">
-                        <label>Множитель стоимости:</label>
-                        <input type="number" id="edit-upgrade-cost-multiplier" class="form-input" step="0.1" min="1">
-                    </div>
-                </div>
-                <div class="modal-actions">
-                    <button class="btn-secondary" id="cancel-edit-upgrade">Отмена</button>
-                    <button class="btn-primary" id="save-edit-upgrade">Сохранить</button>
                 </div>
             </div>
         </div>
