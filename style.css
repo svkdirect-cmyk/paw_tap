@@ -20,6 +20,10 @@
     --success-color: #2ecc71;
     --danger-color: #e74c3c;
     --particle-color: #404040;
+    --purple-dark: #4a1e6a;
+    --purple-medium: #6b2c9c;
+    --purple-light: #8b5cf6;
+    --purple-glow: #a78bfa;
 }
 
 body {
@@ -156,7 +160,7 @@ body {
 
 .progress-fill-header {
     height: 100%;
-    background: linear-gradient(90deg, #8b5cf6, #ec4899, #8b5cf6);
+    background: linear-gradient(90deg, var(--purple-light), #ec4899, var(--purple-light));
     border-radius: 3px;
     transition: width 0.3s ease;
     width: 0%;
@@ -173,11 +177,11 @@ body {
     }
 }
 
-/* Увеличенная кнопка-лапка */
+/* Улучшенная кнопка-лапка с фиолетовым градиентом */
 .paw-button {
     width: 220px;
     height: 220px;
-    background: var(--bg-secondary);
+    background: linear-gradient(135deg, var(--purple-dark), var(--purple-medium), var(--purple-dark));
     border: 3px solid transparent;
     border-radius: 50%;
     display: flex;
@@ -187,8 +191,27 @@ body {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow: 
+        0 8px 32px rgba(139, 92, 246, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
     -webkit-tap-highlight-color: transparent;
+    animation: paw-glow 3s ease-in-out infinite;
+}
+
+/* Анимация переливающегося градиента */
+@keyframes paw-glow {
+    0%, 100% {
+        background: linear-gradient(135deg, var(--purple-dark), var(--purple-medium), var(--purple-dark));
+        box-shadow: 
+            0 8px 32px rgba(139, 92, 246, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    50% {
+        background: linear-gradient(135deg, var(--purple-medium), var(--purple-light), var(--purple-medium));
+        box-shadow: 
+            0 8px 40px rgba(139, 92, 246, 0.5),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
 }
 
 /* Фиолетовая рассеянная обводка */
@@ -199,7 +222,7 @@ body {
     left: -10px;
     right: -10px;
     bottom: -10px;
-    background: linear-gradient(45deg, #8b5cf6, #ec4899, #8b5cf6);
+    background: linear-gradient(45deg, var(--purple-light), #ec4899, var(--purple-light));
     border-radius: 50%;
     z-index: -1;
     opacity: 0.7;
@@ -225,7 +248,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at center, var(--bg-tertiary) 0%, transparent 70%);
+    background: radial-gradient(circle at center, transparent 30%, rgba(139, 92, 246, 0.1) 70%);
     opacity: 0;
     transition: opacity 0.3s ease;
     border-radius: 50%;
@@ -237,18 +260,23 @@ body {
 
 .paw-button:active {
     transform: scale(0.85);
+    animation: none;
+    background: linear-gradient(135deg, var(--purple-light), var(--purple-glow), var(--purple-light));
 }
 
 .paw-icon {
     font-size: 80px;
-    color: var(--text-primary);
+    color: white;
     transition: all 0.3s ease;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    text-shadow: 
+        0 2px 10px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(168, 85, 247, 0.5);
+    filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.3));
 }
 
 .paw-button:active .paw-icon {
     transform: scale(0.9);
-    color: var(--text-accent);
+    filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.8));
 }
 
 .paw-glow {
@@ -257,7 +285,7 @@ body {
     left: 50%;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, transparent 70%);
     transform: translate(-50%, -50%);
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -318,7 +346,7 @@ body {
     position: absolute;
     width: 6px;
     height: 6px;
-    background: linear-gradient(45deg, #8b5cf6, #ec4899);
+    background: linear-gradient(45deg, var(--purple-light), #ec4899);
     border-radius: 50%;
     pointer-events: none;
     box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
@@ -1463,10 +1491,50 @@ body {
     max-height: 60vh;
 }
 
+/* Навигация админки */
+.admin-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.admin-nav-btn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+}
+
+.admin-nav-btn.active {
+    background: var(--text-accent);
+    color: var(--bg-primary);
+    border-color: var(--text-accent);
+}
+
+.admin-nav-btn:hover:not(.active) {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
 .admin-section {
+    display: none;
     margin-bottom: 25px;
     padding-bottom: 20px;
     border-bottom: 1px solid var(--border-color);
+}
+
+.admin-section.active {
+    display: block;
 }
 
 .admin-section:last-child {
@@ -1486,6 +1554,7 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
+    margin-bottom: 15px;
 }
 
 .admin-stat {
@@ -1514,41 +1583,16 @@ body {
     text-align: center;
 }
 
-.upgrades-controls {
+.admin-actions {
     display: flex;
-    flex-direction: column;
     gap: 10px;
-}
-
-.upgrade-control {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background: var(--bg-secondary);
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-}
-
-.upgrade-control label {
-    font-weight: 600;
-    font-size: 14px;
-}
-
-.upgrade-control input {
-    width: 80px;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    padding: 6px 8px;
-    color: var(--text-primary);
-    font-size: 14px;
-    text-align: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
 }
 
 .quick-actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 10px;
 }
 
@@ -1563,6 +1607,10 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
 }
 
 .btn-admin:hover {
@@ -1575,6 +1623,292 @@ body {
     transform: translateY(0);
 }
 
+/* Управление улучшениями */
+.upgrades-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.upgrade-control {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    gap: 10px;
+}
+
+.upgrade-control-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.upgrade-control-icon {
+    font-size: 20px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-tertiary);
+    border-radius: 6px;
+}
+
+.upgrade-control-details {
+    flex: 1;
+}
+
+.upgrade-control-name {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.upgrade-control-stats {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.upgrade-control-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.upgrade-control input {
+    width: 60px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 6px 8px;
+    color: var(--text-primary);
+    font-size: 14px;
+    text-align: center;
+}
+
+/* Управление уровнями */
+.levels-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.level-control {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    gap: 10px;
+}
+
+.level-control-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.level-control-number {
+    width: 30px;
+    height: 30px;
+    background: var(--bg-tertiary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.level-control-details {
+    flex: 1;
+}
+
+.level-control-name {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.level-control-requirements {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.level-control-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.level-control input {
+    width: 80px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 6px 8px;
+    color: var(--text-primary);
+    font-size: 14px;
+    text-align: center;
+}
+
+/* Управление достижениями */
+.achievements-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.achievement-control {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    gap: 10px;
+}
+
+.achievement-control-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.achievement-control-icon {
+    font-size: 20px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-tertiary);
+    border-radius: 6px;
+}
+
+.achievement-control-details {
+    flex: 1;
+}
+
+.achievement-control-name {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.achievement-control-desc {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.achievement-control-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.achievement-control input {
+    width: 100px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 6px 8px;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+/* Управление картами */
+.cards-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+}
+
+.card-control {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    padding: 12px;
+    text-align: center;
+}
+
+.card-control-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.card-control-name {
+    font-weight: 600;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.card-control-rarity {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    display: inline-block;
+}
+
+.card-control-actions {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+}
+
+/* Управление игроками */
+.players-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.players-list {
+    max-height: 200px;
+    overflow-y: auto;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    padding: 10px;
+}
+
+.player-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.player-item:last-child {
+    border-bottom: none;
+}
+
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.player-name {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.player-stats {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+/* Серверные настройки */
 .server-settings {
     display: flex;
     flex-direction: column;
@@ -1629,11 +1963,61 @@ body {
     resize: vertical;
 }
 
+/* Формы редактирования */
+.modal-body {
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.form-input {
+    width: 100%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.form-input:focus {
+    border-color: var(--text-accent);
+    outline: none;
+}
+
 /* Анимация для админки */
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-5px); }
     75% { transform: translateX(5px); }
+}
+
+.save-indicator {
+    background: var(--success-color) !important;
+    color: white !important;
+    transition: all 0.3s ease;
+}
+
+.admin-stat input:focus, 
+.upgrade-control input:focus,
+.server-setting input:focus {
+    border-color: var(--text-accent) !important;
+    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2) !important;
+    outline: none;
+}
+
+.btn-admin.saving {
+    background: var(--success-color) !important;
+    color: white !important;
 }
 
 /* Адаптивность */
@@ -1726,6 +2110,14 @@ body {
     }
     
     /* Адаптивность для админ панели */
+    .admin-nav {
+        flex-direction: column;
+    }
+    
+    .admin-nav-btn {
+        min-width: auto;
+    }
+    
     .admin-stats,
     .quick-actions,
     .server-actions,
@@ -1734,15 +2126,29 @@ body {
     }
     
     .admin-stat,
-    .upgrade-control {
+    .upgrade-control,
+    .level-control,
+    .achievement-control {
         flex-direction: column;
         gap: 8px;
         text-align: center;
     }
     
     .admin-stat input,
-    .upgrade-control input {
+    .upgrade-control input,
+    .level-control input,
+    .achievement-control input {
         width: 100%;
+    }
+    
+    .upgrade-control-actions,
+    .level-control-actions,
+    .achievement-control-actions {
+        justify-content: center;
+    }
+    
+    .cards-controls {
+        grid-template-columns: 1fr;
     }
 }
 
