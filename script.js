@@ -32,11 +32,6 @@ class DarkPawsClicker {
         this.currentTab = 'game-tab';
         this.startTime = Date.now();
         this.lastTouch = null;
-        this.cardClickHandlers = [];
-        
-        // Настройки сервера
-        this.apiUrl = 'https://your-server.com/api';
-        this.botToken = 'YOUR_BOT_TOKEN_HERE';
         
         this.init();
     }
@@ -55,7 +50,6 @@ class DarkPawsClicker {
         this.loadGameState();
         this.updateUI();
         this.startAutoClicker();
-        this.animateParticles();
         
         // Инициализируем вкладки
         this.setupTabs();
@@ -63,18 +57,8 @@ class DarkPawsClicker {
         // Запускаем отсчет времени игры
         this.startPlayTimeCounter();
         
-        // Инициализируем серверные функции
-        this.initServerFeatures();
-    }
-
-    initServerFeatures() {
-        // Автоматическая загрузка состояния при старте
-        if (this.user && this.user.id) {
-            this.loadGameStateFromServer();
-        }
-        
-        // Обработка реферальных ссылок
-        this.processReferralLink();
+        // Инициализируем комбо карты
+        this.updateComboTab();
     }
 
     setupEventListeners() {
@@ -99,7 +83,6 @@ class DarkPawsClicker {
             pawButton.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 pawButton.classList.add('click-animation');
-                // Сохраняем позицию касания для создания частиц
                 this.lastTouch = {
                     clientX: e.touches[0].clientX,
                     clientY: e.touches[0].clientY
@@ -112,7 +95,6 @@ class DarkPawsClicker {
                     pawButton.classList.remove('click-animation');
                 }, 150);
                 
-                // Обрабатываем клик с позицией касания
                 if (this.lastTouch) {
                     const touchEvent = {
                         clientX: this.lastTouch.clientX,
@@ -204,316 +186,29 @@ class DarkPawsClicker {
             this.user = {
                 id: Math.floor(Math.random() * 10000),
                 first_name: 'Игрок',
-                username: 'player_' + Math.floor(Math.random() * 1000),
-                photo_url: ''
+                username: 'player_' + Math.floor(Math.random() * 1000)
             };
             this.updateUserInfo();
         }
     }
 
-    // СЕРВЕРНЫЕ ФУНКЦИИ
-
-    // Серверное сохранение
-    async saveGameStateToServer() {
-        if (!this.apiUrl || this.apiUrl === 'https://your-server.com/api') {
-            console.log('Server URL not configured, skipping server save');
-            return false;
-        }
-
-        try {
-            const response = await fetch(`${this.apiUrl}/save-game`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    user: this.user,
-                    gameState: this.gameState,
-                    timestamp: new Date().toISOString()
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const result = await response.json();
+    updateUserInfo() {
+        if (this.user) {
+            const avatar = document.getElementById('user-avatar');
+            const username = document.getElementById('user-name');
+            const levelText = document.querySelector('.level-text');
             
-            if (result.success) {
-                console.log('Game saved to server');
-                return true;
-            } else {
-                console.error('Server save failed:', result.error);
-                return false;
+            if (avatar) {
+                avatar.textContent = this.user.first_name ? this.user.first_name.charAt(0).toUpperCase() : 'P';
             }
-        } catch (error) {
-            console.error('Server save error:', error);
-            return false;
-        }
-    }
-
-    // Серверная загрузка
-    async loadGameStateFromServer() {
-        if (!this.apiUrl || this.apiUrl === 'https://your-server.com/api' || !this.user?.id) {
-            console.log('Server URL or user ID not configured, skipping server load');
-            return false;
-        }
-
-        try {
-            const response = await fetch(`${this.apiUrl}/load-game/${this.user.id}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            if (username) {
+                username.textContent = this.user.first_name || 'Player';
             }
-
-            const result = await response.json();
-
-            if (result.exists && result.gameState) {
-                // Сохраняем важные данные, но обновляем состояние игры
-                const currentStats = { ...this.gameState.stats };
-                this.gameState = { ...this.gameState, ...result.gameState };
-                this.gameState.stats = { ...this.gameState.stats, ...currentStats };
-                console.log('Game loaded from server');
-                this.updateUI();
-                return true;
-            } else {
-                console.log('No server save found');
-                return false;
-            }
-        } catch (error) {
-            console.error('Server load error:', error);
-            return false;
-        }
-    }
-
-    // Улучшенная система приглашения друзей
-    async inviteFriends() {
-        if (this.tg && this.tg.showContactPicker) {
-            try {
-                const contact = await this.tg.showContactPicker();
-                
-                if (contact) {
-                    const inviteMessage = `🎮 <b>Dark Paws Clicker</b>\n\n` +
-                        `Привет! ${this.user.first_name} приглашает тебя в увлекательную игру-кликер!\n\n` +
-                        `• Прокачивай свою лапу 🐾\n` +
-                        `• Открывай улучшения ⚡\n` +
-                        `• Соревнуйся с друзьями 🏆\n\n` +
-                        `Присоединяйся и стань легендой кликов!`;
-
-                    // Отправляем приглашение через сервер
-                    const response = await fetch(`${this.apiUrl}/invite-friend`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            fromUserId: this.user.id,
-                            toUserId: contact.user_id,
-                            message: inviteMessage
-                        })
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        this.tg.showPopup({
-                            title: '✅ Приглашение отправлено',
-                            message: `Приглашение успешно отправлено ${contact.first_name || 'другу'}`,
-                            buttons: [{ type: 'ok' }]
-                        });
-                    } else {
-                        throw new Error(result.error || 'Failed to send invite');
-                    }
-                }
-            } catch (error) {
-                console.error('Invite error:', error);
-                this.tg.showPopup({
-                    title: '❌ Ошибка',
-                    message: 'Не удалось отправить приглашение',
-                    buttons: [{ type: 'ok' }]
-                });
-            }
-        } else {
-            // Fallback для браузера
-            const shareText = `Присоединяйся к Dark Paws Clicker! 🎮\nИграй и прокачивай свою лапу!\n\nСсылка: ${window.location.href}?ref=${this.user.id}`;
-            
-            if (navigator.share) {
-                try {
-                    await navigator.share({
-                        title: 'Dark Paws Clicker',
-                        text: shareText,
-                        url: window.location.href + `?ref=${this.user.id}`
-                    });
-                } catch (error) {
-                    console.log('Share cancelled:', error);
-                }
-            } else {
-                // Копирование ссылки в буфер обмена
-                try {
-                    await navigator.clipboard.writeText(window.location.href + `?ref=${this.user.id}`);
-                    alert('Ссылка скопирована в буфер обмена! Отправь её другу: ' + shareText);
-                } catch (error) {
-                    console.error('Clipboard error:', error);
-                    alert('Поделитесь ссылкой: ' + window.location.href + `?ref=${this.user.id}`);
-                }
+            if (levelText) {
+                levelText.textContent = `Уровень ${this.gameState.level}`;
             }
         }
     }
-
-    // Добавление друга
-    async addFriend(friendId) {
-        try {
-            const response = await fetch(`${this.apiUrl}/add-friend`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    userId: this.user.id,
-                    friendId: friendId
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const result = await response.json();
-            return result.success;
-        } catch (error) {
-            console.error('Add friend error:', error);
-            return false;
-        }
-    }
-
-    // Загрузка списка друзей
-    async loadFriendsList() {
-        if (!this.user?.id) return false;
-
-        try {
-            const response = await fetch(`${this.apiUrl}/friends/${this.user.id}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const result = await response.json();
-            
-            if (result.friends) {
-                this.gameState.friends = result.friends;
-                this.updateFriendsTab();
-                return true;
-            }
-            return false;
-        } catch (error) {
-            console.error('Load friends error:', error);
-            return false;
-        }
-    }
-
-    // Загрузка таблицы лидеров
-    async loadLeaderboard() {
-        try {
-            const response = await fetch(`${this.apiUrl}/leaderboard`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const result = await response.json();
-            
-            if (result.leaderboard) {
-                this.updateLeaderboard(result.leaderboard);
-                return true;
-            }
-            return false;
-        } catch (error) {
-            console.error('Load leaderboard error:', error);
-            return false;
-        }
-    }
-
-    // Обработка реферальных ссылок
-    async processReferral(referrerId) {
-        if (!referrerId || referrerId === this.user.id.toString() || !this.user?.id) {
-            return false;
-        }
-
-        try {
-            const response = await fetch(`${this.apiUrl}/referral/${referrerId}?userId=${this.user.id}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const result = await response.json();
-            
-            if (result.success && result.bonusApplied) {
-                // Начисляем бонусы
-                this.gameState.score += 100;
-                this.updateUI();
-                
-                if (this.tg && this.tg.showPopup) {
-                    this.tg.showPopup({
-                        title: '🎁 Бонус за приглашение!',
-                        message: 'Вы получили +100 очков за присоединение по приглашению друга!',
-                        buttons: [{ type: 'ok' }]
-                    });
-                }
-            }
-            return result.success;
-        } catch (error) {
-            console.error('Referral processing error:', error);
-            return false;
-        }
-    }
-
-    // Автоматическая обработка реферальной ссылки при загрузке
-    processReferralLink() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const refParam = urlParams.get('ref');
-        const startParam = urlParams.get('startapp');
-        
-        let referrerId = refParam;
-        if (!referrerId && startParam && startParam.startsWith('ref_')) {
-            referrerId = startParam.replace('ref_', '');
-        }
-        
-        if (referrerId) {
-            // Обрабатываем реферала после инициализации игры
-            setTimeout(() => {
-                if (this.user && this.user.id) {
-                    this.processReferral(referrerId);
-                }
-            }, 3000);
-        }
-    }
-
-    // ОСТАЛЬНЫЕ ФУНКЦИИ ИГРЫ
 
     setupTabs() {
         const tabItems = document.querySelectorAll('.tab-item');
@@ -592,9 +287,6 @@ class DarkPawsClicker {
         
         // Обновляем бонусы
         this.updateFriendsBonuses();
-        
-        // Загружаем таблицу лидеров
-        this.loadLeaderboard();
     }
 
     updateFriendsList() {
@@ -648,14 +340,26 @@ class DarkPawsClicker {
         });
     }
 
-    updateLeaderboard(leaderboard) {
+    loadFriendsList() {
+        // Заглушка для демо
+        this.gameState.friends = [
+            { first_name: 'Друг 1', level: 5, score: 1500 },
+            { first_name: 'Друг 2', level: 3, score: 800 }
+        ];
+        this.updateFriendsTab();
+    }
+
+    loadLeaderboard() {
         const container = document.getElementById('leaderboard-container');
         if (!container) return;
         
-        if (!leaderboard || leaderboard.length === 0) {
-            container.innerHTML = '<div class="loading">Нет данных</div>';
-            return;
-        }
+        // Заглушка для демо
+        const leaderboard = [
+            { first_name: 'Чемпион', score: 50000 },
+            { first_name: 'Профи', score: 25000 },
+            { first_name: 'Любитель', score: 12000 },
+            { first_name: 'Новичок', score: 5000 }
+        ];
         
         let leaderboardHTML = '';
         leaderboard.forEach((player, index) => {
@@ -724,7 +428,7 @@ class DarkPawsClicker {
             } else if (levelNumber === this.gameState.level) {
                 card.classList.add('active');
                 
-                // Показываем прогресс до следующего уровня (от накопленных очков)
+                // Показываем прогресс до следующего уровня
                 const currentLevelScore = this.getRequiredScoreForLevel(this.gameState.level);
                 const nextLevelScore = this.getRequiredScoreForLevel(this.gameState.level + 1);
                 const progress = Math.max(0, this.gameState.score - currentLevelScore);
@@ -775,7 +479,6 @@ class DarkPawsClicker {
     }
 
     calculateDeckPower() {
-        // Простой расчет силы колоды
         return this.gameState.comboCards.length * 10;
     }
 
@@ -787,7 +490,7 @@ class DarkPawsClicker {
                 rarity: 'common',
                 icon: '🐾',
                 stats: '+5% к клику',
-                unlocked: false
+                unlocked: this.gameState.level >= 1
             },
             {
                 id: 2,
@@ -795,7 +498,7 @@ class DarkPawsClicker {
                 rarity: 'rare',
                 icon: '⚡',
                 stats: '+3 авто-клика',
-                unlocked: false
+                unlocked: this.gameState.level >= 2
             },
             {
                 id: 3,
@@ -803,7 +506,7 @@ class DarkPawsClicker {
                 rarity: 'epic',
                 icon: '🎯',
                 stats: '+15% шанс крита',
-                unlocked: false
+                unlocked: this.gameState.level >= 3
             },
             {
                 id: 4,
@@ -811,7 +514,7 @@ class DarkPawsClicker {
                 rarity: 'legendary',
                 icon: '💎',
                 stats: 'x2 все бонусы',
-                unlocked: false
+                unlocked: this.gameState.level >= 5
             },
             {
                 id: 5,
@@ -819,7 +522,7 @@ class DarkPawsClicker {
                 rarity: 'common',
                 icon: '🍀',
                 stats: '+10% к шансу крита',
-                unlocked: false
+                unlocked: this.gameState.level >= 1
             },
             {
                 id: 6,
@@ -827,7 +530,7 @@ class DarkPawsClicker {
                 rarity: 'rare',
                 icon: '🚀',
                 stats: '+5 авто-кликов',
-                unlocked: false
+                unlocked: this.gameState.level >= 2
             },
             {
                 id: 7,
@@ -835,7 +538,7 @@ class DarkPawsClicker {
                 rarity: 'epic',
                 icon: '💪',
                 stats: '+25% к силе клика',
-                unlocked: false
+                unlocked: this.gameState.level >= 4
             },
             {
                 id: 8,
@@ -843,11 +546,11 @@ class DarkPawsClicker {
                 rarity: 'legendary',
                 icon: '🔥',
                 stats: 'x3 бонус при крите',
-                unlocked: false
+                unlocked: this.gameState.level >= 6
             }
         ];
 
-        const cardsGrid = document.querySelector('.cards-grid');
+        const cardsGrid = document.getElementById('cards-grid-container');
         if (!cardsGrid) return;
 
         let cardsHTML = '';
@@ -884,23 +587,15 @@ class DarkPawsClicker {
     }
 
     setupComboCardListeners() {
-        // Удаляем старые обработчики
-        this.cardClickHandlers.forEach(({ card, handler }) => {
-            card.removeEventListener('click', handler);
-        });
-        this.cardClickHandlers = [];
-
         const cards = document.querySelectorAll('.combo-card');
         cards.forEach(card => {
-            const handler = () => {
+            card.addEventListener('click', () => {
                 if (card.classList.contains('locked')) {
                     this.showCardLockedMessage(card);
                 } else {
                     this.showCardInfo(card);
                 }
-            };
-            card.addEventListener('click', handler);
-            this.cardClickHandlers.push({ card, handler });
+            });
         });
     }
 
@@ -908,7 +603,6 @@ class DarkPawsClicker {
         const cardId = card.dataset.cardId;
         console.log(`Карта ${cardId} заблокирована`);
         
-        // Можно добавить красивое уведомление
         if (this.tg && this.tg.showPopup) {
             this.tg.showPopup({
                 title: '🔒 Карта заблокирована',
@@ -924,7 +618,6 @@ class DarkPawsClicker {
         const cardId = card.dataset.cardId;
         console.log(`Информация о карте ${cardId}`);
         
-        // Можно добавить модальное окно с информацией о карте
         if (this.tg && this.tg.showPopup) {
             this.tg.showPopup({
                 title: 'ℹ️ Информация о карте',
@@ -957,12 +650,7 @@ class DarkPawsClicker {
         // Обновляем аватар
         const profileAvatar = document.getElementById('profile-avatar');
         if (profileAvatar) {
-            if (this.user && this.user.photo_url) {
-                profileAvatar.src = this.user.photo_url;
-                profileAvatar.style.display = 'block';
-            } else {
-                profileAvatar.style.display = 'none';
-            }
+            profileAvatar.textContent = this.user.first_name ? this.user.first_name.charAt(0).toUpperCase() : 'P';
         }
 
         // Обновляем основную информацию
@@ -1066,40 +754,55 @@ class DarkPawsClicker {
     }
 
     shareProfile() {
+        const shareText = `Мой профиль в Dark Paws Clicker!\nУровень: ${this.gameState.level}\nОчки: ${this.gameState.score}\nПрисоединяйся!`;
+        
         if (this.tg && this.tg.showPopup) {
             this.tg.showPopup({
                 title: 'Поделиться профилем',
-                message: `Мой профиль в Dark Paws Clicker!\nУровень: ${this.gameState.level}\nОчки: ${this.gameState.score}\nПрисоединяйся!`,
+                message: shareText,
                 buttons: [
                     { type: 'default', text: 'Поделиться' },
                     { type: 'cancel', text: 'Отмена' }
                 ]
             });
+        } else if (navigator.share) {
+            navigator.share({
+                title: 'Dark Paws Clicker',
+                text: shareText,
+                url: window.location.href
+            });
         } else {
-            // Заглушка для браузера
-            const shareText = `Мой профиль в Dark Paws Clicker!\nУровень: ${this.gameState.level}\nОчки: ${this.gameState.score}\nПрисоединяйся!`;
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Dark Paws Clicker',
-                    text: shareText,
-                    url: window.location.href
-                });
-            } else {
-                alert(shareText);
-            }
+            alert(shareText);
+        }
+    }
+
+    inviteFriends() {
+        const shareText = `Присоединяйся к Dark Paws Clicker! 🎮\nИграй и прокачивай свою лапу!\n\nСсылка: ${window.location.href}?ref=${this.user.id}`;
+        
+        if (this.tg && this.tg.showPopup) {
+            this.tg.showPopup({
+                title: 'Пригласить друга',
+                message: 'Поделитесь ссылкой с друзьями!',
+                buttons: [{ type: 'ok' }]
+            });
+        } else if (navigator.share) {
+            navigator.share({
+                title: 'Dark Paws Clicker',
+                text: shareText,
+                url: window.location.href + `?ref=${this.user.id}`
+            });
+        } else {
+            navigator.clipboard.writeText(window.location.href + `?ref=${this.user.id}`);
+            alert('Ссылка скопирована в буфер обмена! Отправь её другу: ' + shareText);
         }
     }
 
     startPlayTimeCounter() {
-        let saveCounter = 0;
         setInterval(() => {
-            this.gameState.stats.playTime += 1000; // +1 секунда
-            saveCounter++;
-            
-            // Сохраняем на сервер каждую минуту
-            if (saveCounter >= 60) {
+            this.gameState.stats.playTime += 1000;
+            // Сохраняем каждую минуту
+            if (this.gameState.stats.playTime % 60000 === 0) {
                 this.saveGameState();
-                saveCounter = 0;
             }
         }, 1000);
     }
@@ -1129,7 +832,7 @@ class DarkPawsClicker {
         
         this.addScore(points, isCritical);
         
-        // Автосохранение на сервер каждые 10 кликов
+        // Автосохранение каждые 10 кликов
         if (this.gameState.stats.totalClicks % 10 === 0) {
             this.saveGameState();
         }
@@ -1157,7 +860,6 @@ class DarkPawsClicker {
     }
 
     showAchievementNotification(achievementName) {
-        // Можно добавить красивое уведомление
         console.log(`🎉 Достижение разблокировано: ${achievementName}`);
         
         if (this.tg && this.tg.showPopup) {
@@ -1170,7 +872,6 @@ class DarkPawsClicker {
             alert(`🎉 Новое достижение: ${achievementName}`);
         }
         
-        // Сохраняем достижение на сервер
         this.saveGameState();
     }
 
@@ -1178,30 +879,16 @@ class DarkPawsClicker {
         const container = document.getElementById('particles-container');
         if (!container) return;
         
-        // Ограничиваем количество частиц для производительности
-        const existingParticles = container.querySelectorAll('.particle');
-        if (existingParticles.length > 50) {
-            // Удаляем старые частицы
-            existingParticles.forEach((particle, index) => {
-                if (index < 10) {
-                    particle.remove();
-                }
-            });
-        }
-        
         // Получаем координаты клика
         let clientX, clientY;
         
         if (event.touches && event.touches.length > 0) {
-            // Для touch событий
             clientX = event.touches[0].clientX;
             clientY = event.touches[0].clientY;
         } else if (event.changedTouches && event.changedTouches.length > 0) {
-            // Для touchend событий
             clientX = event.changedTouches[0].clientX;
             clientY = event.changedTouches[0].clientY;
         } else {
-            // Для mouse событий
             clientX = event.clientX;
             clientY = event.clientY;
         }
@@ -1224,16 +911,13 @@ class DarkPawsClicker {
             const ty = Math.sin(angle) * distance;
             
             // Устанавливаем CSS переменные для анимации
-            particle.style.cssText = `
-                --tx: ${tx}px;
-                --ty: ${ty}px;
-                left: ${x}px;
-                top: ${y}px;
-                width: ${2 + Math.random() * 4}px;
-                height: ${2 + Math.random() * 4}px;
-                opacity: ${0.3 + Math.random() * 0.7};
-                animation: particle-float ${0.8 + Math.random() * 0.4}s ease-out forwards;
-            `;
+            particle.style.setProperty('--tx', tx + 'px');
+            particle.style.setProperty('--ty', ty + 'px');
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+            particle.style.width = (2 + Math.random() * 4) + 'px';
+            particle.style.height = (2 + Math.random() * 4) + 'px';
+            particle.style.opacity = (0.3 + Math.random() * 0.7);
             
             container.appendChild(particle);
             
@@ -1242,83 +926,15 @@ class DarkPawsClicker {
                 if (particle.parentNode === container) {
                     container.removeChild(particle);
                 }
-            }, 1200);
+            }, 1000);
         }
     }
 
-    animateParticles() {
-        // Фоновая анимация редких частиц
-        setInterval(() => {
-            if (Math.random() < 0.1) {
-                this.createBackgroundParticle();
-            }
-        }, 1000);
-    }
-
-    createBackgroundParticle() {
-        const container = document.getElementById('particles-container');
-        if (!container) return;
-        
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        
-        // Случайная позиция по краям
-        const side = Math.floor(Math.random() * 4);
-        let x, y;
-        
-        switch(side) {
-            case 0: // верх
-                x = Math.random() * container.offsetWidth;
-                y = 0;
-                break;
-            case 1: // право
-                x = container.offsetWidth;
-                y = Math.random() * container.offsetHeight;
-                break;
-            case 2: // низ
-                x = Math.random() * container.offsetWidth;
-                y = container.offsetHeight;
-                break;
-            case 3: // лево
-                x = 0;
-                y = Math.random() * container.offsetHeight;
-                break;
-        }
-        
-        // Направление к центру
-        const centerX = container.offsetWidth / 2;
-        const centerY = container.offsetHeight / 2;
-        const angle = Math.atan2(centerY - y, centerX - x);
-        const distance = 100 + Math.random() * 100;
-        const tx = Math.cos(angle) * distance;
-        const ty = Math.sin(angle) * distance;
-        
-        particle.style.cssText = `
-            --tx: ${tx}px;
-            --ty: ${ty}px;
-            left: ${x}px;
-            top: ${y}px;
-            width: ${1 + Math.random() * 2}px;
-            height: ${1 + Math.random() * 2}px;
-            opacity: ${0.1 + Math.random() * 0.2};
-            animation: particle-float ${2 + Math.random() * 2}s ease-out forwards;
-        `;
-        
-        container.appendChild(particle);
-        
-        setTimeout(() => {
-            if (particle.parentNode === container) {
-                container.removeChild(particle);
-            }
-        }, 4000);
-    }
-
-    // ИСПРАВЛЕННЫЙ МЕТОД ДОБАВЛЕНИЯ ОЧКОВ
     addScore(points, isCritical = false) {
         const oldScore = this.gameState.score;
         this.gameState.score += points;
         
-        // Проверка уровня - используем накопленные очки (не вычитаем потраченные на улучшения)
+        // Проверка уровня
         let leveledUp = false;
         const maxLevel = this.getMaxLevel();
         
@@ -1327,7 +943,6 @@ class DarkPawsClicker {
             this.gameState.level++;
             leveledUp = true;
             
-            // Защита от бесконечного цикла
             if (this.gameState.level >= maxLevel) break;
         }
         
@@ -1343,19 +958,16 @@ class DarkPawsClicker {
         }
     }
 
-    // Добавляем метод для получения максимального уровня
     getMaxLevel() {
-        return 100; // Максимальный уровень игры
+        return 100;
     }
 
-    // ИСПРАВЛЕННАЯ ФОРМУЛА РАСЧЕТА ОЧКОВ ДЛЯ УРОВНЕЙ
     getRequiredScoreForLevel(level) {
         if (level <= 1) return 0;
         return Math.pow(level - 1, 2) * 100;
     }
 
     showLevelUp() {
-        // Можно добавить анимацию уровня
         const levelBadge = document.querySelector('.level-badge');
         const levelText = document.querySelector('.level-text');
         if (levelBadge) {
@@ -1367,7 +979,6 @@ class DarkPawsClicker {
             levelText.textContent = `Уровень ${this.gameState.level}`;
         }
         
-        // Сохраняем на сервер при повышении уровня
         this.saveGameState();
     }
 
@@ -1376,20 +987,8 @@ class DarkPawsClicker {
         if (!container) return;
         
         const critText = document.createElement('div');
-        critText.className = 'particle critical-hit';
+        critText.className = 'critical-hit';
         critText.textContent = `CRIT! +${points}`;
-        critText.style.cssText = `
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--text-accent);
-            pointer-events: none;
-            z-index: 20;
-            animation: floatUp 1.5s ease-out forwards;
-        `;
         
         container.appendChild(critText);
         
@@ -1400,7 +999,6 @@ class DarkPawsClicker {
         }, 1500);
     }
 
-    // ИСПРАВЛЕННЫЙ МЕТОД ПОКУПКИ УЛУЧШЕНИЙ
     buyUpgrade(upgradeType) {
         const costs = {
             'click-power': 10 * Math.pow(2, this.gameState.upgrades.clickPower - 1),
@@ -1411,7 +1009,6 @@ class DarkPawsClicker {
         const cost = costs[upgradeType];
         
         if (this.gameState.score >= cost) {
-            // Просто вычитаем стоимость улучшения
             this.gameState.score -= cost;
             
             switch(upgradeType) {
@@ -1429,10 +1026,8 @@ class DarkPawsClicker {
             this.updateUI();
             this.saveGameState();
             
-            // Показываем сообщение о успешной покупке
             this.showUpgradeNotification(upgradeType);
         } else {
-            // Показываем сообщение о недостатке очков
             this.showInsufficientFundsNotification(cost);
         }
     }
@@ -1476,11 +1071,6 @@ class DarkPawsClicker {
             if (this.gameState.upgrades.autoClick > 0) {
                 const autoPoints = this.gameState.upgrades.autoClick;
                 this.addScore(autoPoints);
-                
-                // Сохраняем на сервер каждые 60 авто-кликов
-                if (Math.random() < 0.016) { // ~1 раз в минуту
-                    this.saveGameState();
-                }
             }
         }, 1000);
     }
@@ -1502,12 +1092,10 @@ class DarkPawsClicker {
         this.updateUpgradeButtons();
     }
 
-    // ИСПРАВЛЕННЫЙ МЕТОД ОБНОВЛЕНИЯ ПРОГРЕСС БАРА
     updateHeaderProgressBar() {
         const currentLevelScore = this.getRequiredScoreForLevel(this.gameState.level);
         const nextLevelScore = this.getRequiredScoreForLevel(this.gameState.level + 1);
         
-        // Прогресс рассчитывается от накопленных очков (включая потраченные на улучшения)
         let progress = Math.max(0, this.gameState.score - currentLevelScore);
         const totalNeeded = nextLevelScore - currentLevelScore;
         
@@ -1518,7 +1106,6 @@ class DarkPawsClicker {
             percentage = 100;
         }
         
-        // Ограничиваем процент от 0 до 100
         percentage = Math.max(0, Math.min(100, percentage));
         
         const progressFillHeader = document.getElementById('level-progress-header');
@@ -1546,7 +1133,6 @@ class DarkPawsClicker {
                     cost = 10 * Math.pow(2, level - 1);
                     levelSpan.textContent = level;
                     button.textContent = cost;
-                    button.dataset.cost = cost;
                     break;
                     
                 case 'auto-click':
@@ -1554,7 +1140,6 @@ class DarkPawsClicker {
                     cost = level === 0 ? 50 : 50 * Math.pow(2, level);
                     levelSpan.textContent = level;
                     button.textContent = cost;
-                    button.dataset.cost = cost;
                     break;
                     
                 case 'critical-chance':
@@ -1562,7 +1147,6 @@ class DarkPawsClicker {
                     cost = 25 * Math.pow(2, level - 1);
                     levelSpan.textContent = level;
                     button.textContent = cost;
-                    button.dataset.cost = cost;
                     break;
             }
             
@@ -1577,9 +1161,7 @@ class DarkPawsClicker {
         });
     }
 
-    // ОБНОВЛЕННАЯ СИСТЕМА СОХРАНЕНИЯ
     saveGameState() {
-        // Сохраняем в localStorage как fallback
         try {
             const saveData = {
                 ...this.gameState,
@@ -1590,11 +1172,6 @@ class DarkPawsClicker {
         } catch (error) {
             console.error('Local storage save error:', error);
         }
-
-        // Сохраняем на сервер
-        this.saveGameStateToServer().catch(error => {
-            console.error('Failed to save to server:', error);
-        });
     }
 
     loadGameState() {
@@ -1603,10 +1180,9 @@ class DarkPawsClicker {
             if (saved) {
                 const saveData = JSON.parse(saved);
                 
-                // Проверяем, что сохранение принадлежит текущему пользователю
                 if (!this.user || saveData.userId === this.user.id) {
                     this.gameState = { ...this.gameState, ...saveData };
-                    console.log('Game state loaded from localStorage:', this.gameState);
+                    console.log('Game state loaded from localStorage');
                 }
             }
         } catch (error) {
@@ -1614,28 +1190,6 @@ class DarkPawsClicker {
         }
     }
 }
-
-// Добавляем CSS анимацию
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes floatUp {
-        0% {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-        }
-        100% {
-            opacity: 0;
-            transform: translate(-50%, -100px) scale(1.2);
-        }
-    }
-    
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.3); }
-        100% { transform: scale(1); }
-    }
-`;
-document.head.appendChild(style);
 
 // Инициализация игры
 document.addEventListener('DOMContentLoaded', () => {
