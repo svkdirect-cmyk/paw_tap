@@ -338,15 +338,6 @@ body {
     margin: 25px 15px;
 }
 
-.section-title {
-    font-size: 14px;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 15px;
-    font-weight: 600;
-}
-
 .upgrades-grid {
     display: flex;
     flex-direction: column;
@@ -946,10 +937,20 @@ body {
 }
 
 .cards-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 12px;
-    margin-bottom: 20px;
+}
+
+.combo-cards-group {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.combo-cards-group .combo-card {
+    flex: 1;
+    min-width: 0;
 }
 
 .combo-card {
@@ -1426,9 +1427,8 @@ body {
         flex-direction: column;
     }
     
-    .cards-grid {
-        grid-template-columns: 1fr;
-        gap: 10px;
+    .combo-cards-group {
+        flex-direction: column;
     }
     
     .deck-info {
@@ -1520,10 +1520,6 @@ body {
     .particle {
         width: 4px;
         height: 4px;
-    }
-    
-    .cards-grid {
-        grid-template-columns: 1fr;
     }
     
     .friends-content,
