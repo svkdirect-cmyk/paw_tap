@@ -1074,17 +1074,17 @@ class DarkPawsClicker {
         }
     }
 
-    showInsufficientFundsNotification(requiredAmount) {
-        console.log(`❌ Недостаточно очков. Нужно: ${requiredAmount}`);
+    showInsufficientFundsNotification(cost) {
+        console.log(`❌ Недостаточно очков. Нужно: ${cost}`);
         
         if (this.tg && this.tg.showPopup) {
             this.tg.showPopup({
                 title: '❌ Недостаточно очков',
-                message: `Для покупки нужно: ${requiredAmount} очков`,
+                message: `Для покупки нужно: ${cost} очков`,
                 buttons: [{ type: 'ok' }]
             });
         } else {
-            alert(`❌ Недостаточно очков. Нужно: ${requiredAmount}`);
+            alert(`❌ Недостаточно очков. Нужно: ${cost}`);
         }
     }
 
@@ -1115,6 +1115,9 @@ class DarkPawsClicker {
         
         // Обновляем информацию пользователя (включая аватар)
         this.updateUserInfo();
+        
+        // Обновляем отображение заработанных очков
+        this.updateEarnedScoreDisplay();
     }
 
     updateHeaderProgressBar() {
@@ -1138,6 +1141,35 @@ class DarkPawsClicker {
         
         if (progressFillHeader) {
             progressFillHeader.style.width = `${percentage}%`;
+        }
+    }
+
+    updateEarnedScoreDisplay() {
+        // Создаем или обновляем отображение заработанных очков под прогресс-баром
+        let earnedScoreElement = document.getElementById('earned-score-display');
+        
+        if (!earnedScoreElement) {
+            // Создаем элемент если его нет
+            earnedScoreElement = document.createElement('div');
+            earnedScoreElement.id = 'earned-score-display';
+            earnedScoreElement.className = 'earned-score-display';
+            
+            const progressBar = document.querySelector('.header-progress');
+            if (progressBar) {
+                progressBar.appendChild(earnedScoreElement);
+            }
+        }
+        
+        // Обновляем текст
+        const currentLevelScore = this.getRequiredScoreForLevel(this.gameState.level);
+        const nextLevelScore = this.getRequiredScoreForLevel(this.gameState.level + 1);
+        const progress = Math.max(0, this.gameState.totalEarnedScore - currentLevelScore);
+        const totalNeeded = nextLevelScore - currentLevelScore;
+        
+        if (totalNeeded > 0) {
+            earnedScoreElement.textContent = `${Math.floor(progress).toLocaleString()} / ${totalNeeded.toLocaleString()} очков до уровня ${this.gameState.level + 1}`;
+        } else {
+            earnedScoreElement.textContent = 'Максимальный уровень достигнут!';
         }
     }
 
