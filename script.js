@@ -40,6 +40,7 @@ class DarkPawsClicker {
         // Настройки админ-панели
         this.adminEnabled = false;
         this.adminCode = '1337';
+        this.adminPressTimer = null;
         
         this.init();
     }
@@ -200,38 +201,148 @@ class DarkPawsClicker {
     }
 
     setupAdminPanel() {
-        // Секретная комбинация для открытия админки (удерживать палец на лапке 3 секунды)
         const pawButton = document.getElementById('paw-button');
-        let pressTimer;
-        
-        if (pawButton) {
-            pawButton.addEventListener('touchstart', (e) => {
-                pressTimer = setTimeout(() => {
-                    this.showAdminActivation();
-                }, 3000);
-            });
-            
-            pawButton.addEventListener('touchend', (e) => {
-                clearTimeout(pressTimer);
-            });
-            
-            pawButton.addEventListener('mousedown', (e) => {
-                pressTimer = setTimeout(() => {
-                    this.showAdminActivation();
-                }, 3000);
-            });
-            
-            pawButton.addEventListener('mouseup', (e) => {
-                clearTimeout(pressTimer);
-            });
-            
-            pawButton.addEventListener('mouseleave', (e) => {
-                clearTimeout(pressTimer);
-            });
-        }
+        if (!pawButton) return;
+
+        // Обработчики для мыши
+        pawButton.addEventListener('mousedown', (e) => {
+            this.startAdminTimer();
+        });
+
+        pawButton.addEventListener('mouseup', (e) => {
+            this.clearAdminTimer();
+        });
+
+        pawButton.addEventListener('mouseleave', (e) => {
+            this.clearAdminTimer();
+        });
+
+        // Обработчики для тача
+        pawButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            this.startAdminTimer();
+        });
+
+        pawButton.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            this.clearAdminTimer();
+        });
+
+        pawButton.addEventListener('touchcancel', (e) => {
+            this.clearAdminTimer();
+        });
 
         // Обработчики для админ-панели
         this.setupAdminEventListeners();
+    }
+
+    startAdminTimer() {
+        this.clearAdminTimer();
+        this.adminPressTimer = setTimeout(() => {
+            this.showAdminActivation();
+        }, 3000);
+    }
+
+    clearAdminTimer() {
+        if (this.adminPressTimer) {
+            clearTimeout(this.adminPressTimer);
+            this.adminPressTimer = null;
+        }
+    }
+
+    showAdminActivation() {
+        if (this.adminEnabled) {
+            this.openAdminPanel();
+            return;
+        }
+
+        // Создаем свое модальное окно вместо prompt
+        this.createAdminActivationModal();
+    }
+
+    createAdminActivationModal() {
+        // Удаляем существующее модальное окно если есть
+        const existingModal = document.getElementById('admin-activation-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        const modal = document.createElement('div');
+        modal.id = 'admin-activation-modal';
+        modal.className = 'modal active';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 300px;">
+                <div class="modal-header">
+                    <h2>🔐 Админ доступ</h2>
+                    <button class="modal-close" id="close-admin-activation">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div style="padding: 20px;">
+                    <input type="password" id="admin-code-input" 
+                           placeholder="Введите код доступа" 
+                           style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); margin-bottom: 15px;">
+                    <button id="admin-submit-code" class="btn-primary" style="width: 100%;">
+                        <i class="fas fa-key"></i> Войти
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Обработчики для модального окна активации
+        document.getElementById('close-admin-activation').addEventListener('click', () => {
+            modal.remove();
+        });
+
+        document.getElementById('admin-submit-code').addEventListener('click', () => {
+            const code = document.getElementById('admin-code-input').value;
+            this.checkAdminCode(code, modal);
+        });
+
+        // Закрытие по клику на фон
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+
+        // Enter для отправки
+        document.getElementById('admin-code-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const code = document.getElementById('admin-code-input').value;
+                this.checkAdminCode(code, modal);
+            }
+        });
+
+        // Фокус на поле ввода
+        setTimeout(() => {
+            document.getElementById('admin-code-input').focus();
+        }, 100);
+    }
+
+    checkAdminCode(code, modal) {
+        if (code === this.adminCode) {
+            this.adminEnabled = true;
+            modal.remove();
+            this.openAdminPanel();
+            this.adminLog('Админ панель активирована');
+        } else {
+            // Анимация ошибки
+            const input = document.getElementById('admin-code-input');
+            input.style.borderColor = 'var(--danger-color)';
+            input.style.animation = 'shake 0.5s ease-in-out';
+            
+            setTimeout(() => {
+                input.style.borderColor = 'var(--border-color)';
+                input.style.animation = '';
+                input.value = '';
+                input.focus();
+            }, 500);
+            
+            this.adminLog('Неверный код доступа');
+        }
     }
 
     setupAdminEventListeners() {
@@ -276,22 +387,6 @@ class DarkPawsClicker {
         // Основные кнопки
         document.getElementById('admin-apply')?.addEventListener('click', () => this.adminApplyChanges());
         document.getElementById('admin-save-close')?.addEventListener('click', () => this.adminSaveAndClose());
-    }
-
-    showAdminActivation() {
-        if (this.adminEnabled) {
-            this.openAdminPanel();
-            return;
-        }
-
-        const code = prompt('🔐 Введите админ код:');
-        if (code === this.adminCode) {
-            this.adminEnabled = true;
-            this.openAdminPanel();
-            this.adminLog('Админ панель активирована');
-        } else if (code) {
-            alert('❌ Неверный код доступа');
-        }
     }
 
     openAdminPanel() {
@@ -1047,13 +1142,148 @@ Admin Enabled: ${this.adminEnabled}
     }
 
     updateComboCards() {
-        const comboCards = document.querySelectorAll('.combo-card');
-        
-        comboCards.forEach((card, index) => {
-            // В реальном приложении здесь будет проверка наличия карт
-            // Сейчас все карты заблокированы
-            card.classList.add('locked');
+        const comboCards = [
+            {
+                id: 1,
+                name: 'Лапа новичка',
+                rarity: 'common',
+                icon: '🐾',
+                stats: '+5% к клику',
+                unlocked: false
+            },
+            {
+                id: 2,
+                name: 'Энергия',
+                rarity: 'rare',
+                icon: '⚡',
+                stats: '+3 авто-клика',
+                unlocked: false
+            },
+            {
+                id: 3,
+                name: 'Точность',
+                rarity: 'epic',
+                icon: '🎯',
+                stats: '+15% шанс крита',
+                unlocked: false
+            },
+            {
+                id: 4,
+                name: 'Алмазная лапа',
+                rarity: 'legendary',
+                icon: '💎',
+                stats: 'x2 все бонусы',
+                unlocked: false
+            },
+            {
+                id: 5,
+                name: 'Удача',
+                rarity: 'common',
+                icon: '🍀',
+                stats: '+10% к шансу крита',
+                unlocked: false
+            },
+            {
+                id: 6,
+                name: 'Скорость',
+                rarity: 'rare',
+                icon: '🚀',
+                stats: '+5 авто-кликов',
+                unlocked: false
+            },
+            {
+                id: 7,
+                name: 'Мощь',
+                rarity: 'epic',
+                icon: '💪',
+                stats: '+25% к силе клика',
+                unlocked: false
+            },
+            {
+                id: 8,
+                name: 'Феникс',
+                rarity: 'legendary',
+                icon: '🔥',
+                stats: 'x3 бонус при крите',
+                unlocked: false
+            }
+        ];
+
+        const cardsGrid = document.querySelector('.cards-grid');
+        if (!cardsGrid) return;
+
+        let cardsHTML = '';
+        comboCards.forEach(card => {
+            const lockedClass = card.unlocked ? '' : 'locked';
+            cardsHTML += `
+                <div class="combo-card ${lockedClass}" data-card-id="${card.id}">
+                    <div class="card-frame">
+                        <div class="card-rarity ${card.rarity}">
+                            ${this.getRarityText(card.rarity)}
+                        </div>
+                        <div class="card-icon">${card.icon}</div>
+                        <div class="card-name">${card.name}</div>
+                        <div class="card-stats">${card.stats}</div>
+                    </div>
+                </div>
+            `;
         });
+
+        cardsGrid.innerHTML = cardsHTML;
+
+        // Добавляем обработчики для карточек
+        this.setupComboCardListeners();
+    }
+
+    getRarityText(rarity) {
+        const rarityMap = {
+            'common': 'Обычная',
+            'rare': 'Редкая',
+            'epic': 'Эпическая',
+            'legendary': 'Легендарная'
+        };
+        return rarityMap[rarity] || rarity;
+    }
+
+    setupComboCardListeners() {
+        const cards = document.querySelectorAll('.combo-card');
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                if (card.classList.contains('locked')) {
+                    this.showCardLockedMessage(card);
+                } else {
+                    this.showCardInfo(card);
+                }
+            });
+        });
+    }
+
+    showCardLockedMessage(card) {
+        const cardId = card.dataset.cardId;
+        console.log(`Карта ${cardId} заблокирована`);
+        
+        // Можно добавить красивое уведомление
+        if (this.tg && this.tg.showPopup) {
+            this.tg.showPopup({
+                title: '🔒 Карта заблокирована',
+                message: 'Эта карта будет доступна на более высоких уровнях',
+                buttons: [{ type: 'ok' }]
+            });
+        }
+    }
+
+    showCardInfo(card) {
+        const cardId = card.dataset.cardId;
+        console.log(`Информация о карте ${cardId}`);
+        
+        // Можно добавить модальное окно с информацией о карте
+        if (this.tg && this.tg.showPopup) {
+            this.tg.showPopup({
+                title: 'ℹ️ Информация о карте',
+                message: 'Подробная информация о карте будет здесь',
+                buttons: [{ type: 'ok' }]
+            });
+        }
     }
 
     openProfile() {
@@ -1702,6 +1932,34 @@ Admin Enabled: ${this.adminEnabled}
     }
 }
 
+// Добавляем CSS анимацию для встряски
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+    
+    @keyframes floatUp {
+        0% {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        100% {
+            opacity: 0;
+            transform: translate(-50%, -100px) scale(1.2);
+        }
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.3); }
+        100% { transform: scale(1); }
+    }
+`;
+document.head.appendChild(style);
+
 // Инициализация игры
 document.addEventListener('DOMContentLoaded', () => {
     window.clickerGame = new DarkPawsClicker();
@@ -1720,6 +1978,12 @@ document.addEventListener('keydown', (e) => {
         if (window.clickerGame) {
             window.clickerGame.closeProfile();
             window.clickerGame.closeAdminPanel();
+            
+            // Закрытие модального окна активации админки
+            const adminActivationModal = document.getElementById('admin-activation-modal');
+            if (adminActivationModal) {
+                adminActivationModal.remove();
+            }
         }
     }
     
