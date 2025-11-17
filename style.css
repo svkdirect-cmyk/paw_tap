@@ -981,6 +981,7 @@ body {
     color: var(--text-primary);
 }
 
+/* Исправленная сетка для карточек комбо */
 .cards-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -991,11 +992,21 @@ body {
 .combo-card {
     aspect-ratio: 2/3;
     perspective: 1000px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.combo-card:hover {
+    transform: translateY(-2px);
 }
 
 .combo-card.locked {
     opacity: 0.5;
     filter: grayscale(1);
+}
+
+.combo-card.locked:hover {
+    transform: none;
 }
 
 .card-frame {
@@ -1011,6 +1022,12 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
+    transition: all 0.3s ease;
+}
+
+.combo-card:not(.locked):hover .card-frame {
+    border-color: var(--text-accent);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
 }
 
 .card-rarity {
@@ -1613,6 +1630,13 @@ body {
     resize: vertical;
 }
 
+/* Анимация для встряски */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
 /* Адаптивность */
 @media (max-width: 768px) {
     .header-main {
@@ -1646,10 +1670,6 @@ body {
     
     .friends-actions {
         flex-direction: column;
-    }
-    
-    .cards-grid {
-        grid-template-columns: 1fr;
     }
     
     .deck-info {
@@ -1720,6 +1740,12 @@ body {
     .upgrade-control input {
         width: 100%;
     }
+    
+    /* Адаптивность для карточек комбо */
+    .cards-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1762,6 +1788,10 @@ body {
     .particle {
         width: 4px;
         height: 4px;
+    }
+    
+    .cards-grid {
+        grid-template-columns: 1fr;
     }
 }
 
