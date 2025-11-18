@@ -3,8 +3,8 @@ class DarkPawsClicker {
         this.tg = window.Telegram.WebApp;
         this.user = null;
         this.gameState = {
-            score: 0,
-            totalEarnedScore: 0,
+            score: 0,                    // Текущий баланс (для покупок)
+            totalEarnedScore: 0,         // Всего заработано очков (для прогресса уровня)
             level: 1,
             upgrades: {
                 clickPower: 1,
@@ -19,16 +19,104 @@ class DarkPawsClicker {
                 criticalHits: 0
             },
             friends: [],
-            comboCards: [],
-            activeDeck: [],
-            cardEffects: {
-                clickPower: 1,
-                autoClick: 0,
-                criticalChance: 0,
-                criticalMultiplier: 1,
-                multiplier: 1,
-                chaos: false
-            },
+            comboCards: [
+                {
+                    id: 1,
+                    name: 'Лапа новичка',
+                    rarity: 'common',
+                    icon: '🐾',
+                    stats: '+5% к клику',
+                    unlocked: true,
+                    level: 1,
+                    maxLevel: 10,
+                    baseBonus: 0.05,
+                    upgradeCost: 50
+                },
+                {
+                    id: 2,
+                    name: 'Энергия',
+                    rarity: 'rare',
+                    icon: '⚡',
+                    stats: '+3 авто-клика',
+                    unlocked: false,
+                    level: 0,
+                    maxLevel: 5,
+                    baseBonus: 3,
+                    upgradeCost: 100
+                },
+                {
+                    id: 3,
+                    name: 'Точность',
+                    rarity: 'epic',
+                    icon: '🎯',
+                    stats: '+15% шанс крита',
+                    unlocked: false,
+                    level: 0,
+                    maxLevel: 3,
+                    baseBonus: 0.15,
+                    upgradeCost: 200
+                },
+                {
+                    id: 4,
+                    name: 'Алмазная лапа',
+                    rarity: 'legendary',
+                    icon: '💎',
+                    stats: 'x2 все бонусы',
+                    unlocked: false,
+                    level: 0,
+                    maxLevel: 1,
+                    baseBonus: 2.0,
+                    upgradeCost: 1000
+                },
+                {
+                    id: 5,
+                    name: 'Удача',
+                    rarity: 'common',
+                    icon: '🍀',
+                    stats: '+10% к шансу крита',
+                    unlocked: true,
+                    level: 1,
+                    maxLevel: 8,
+                    baseBonus: 0.10,
+                    upgradeCost: 75
+                },
+                {
+                    id: 6,
+                    name: 'Скорость',
+                    rarity: 'rare',
+                    icon: '🚀',
+                    stats: '+5 авто-кликов',
+                    unlocked: false,
+                    level: 0,
+                    maxLevel: 4,
+                    baseBonus: 5,
+                    upgradeCost: 150
+                },
+                {
+                    id: 7,
+                    name: 'Мощь',
+                    rarity: 'epic',
+                    icon: '💪',
+                    stats: '+25% к силе клика',
+                    unlocked: false,
+                    level: 0,
+                    maxLevel: 2,
+                    baseBonus: 0.25,
+                    upgradeCost: 300
+                },
+                {
+                    id: 8,
+                    name: 'Феникс',
+                    rarity: 'legendary',
+                    icon: '🔥',
+                    stats: 'x3 бонус при крите',
+                    unlocked: false,
+                    level: 0,
+                    maxLevel: 1,
+                    baseBonus: 3.0,
+                    upgradeCost: 1500
+                }
+            ],
             achievements: {
                 firstSteps: false,
                 hardWorker: false,
@@ -49,6 +137,7 @@ class DarkPawsClicker {
     init() {
         console.log('Initializing Dark Paws Clicker...');
         
+        // Инициализируем Telegram Web App
         if (this.tg && this.tg.expand) {
             this.tg.expand();
             this.tg.enableClosingConfirmation();
@@ -59,18 +148,26 @@ class DarkPawsClicker {
         this.loadGameState();
         this.updateUI();
         this.startAutoClicker();
+        
+        // Инициализируем вкладки
         this.setupTabs();
+        
+        // Запускаем отсчет времени игры
         this.startPlayTimeCounter();
+        
+        // Инициализируем комбо карты
         this.updateComboTab();
     }
 
     setupEventListeners() {
+        // Клик по лапке
         const pawButton = document.getElementById('paw-button');
         if (pawButton) {
             pawButton.addEventListener('click', (e) => {
                 this.handleClick(e);
             });
             
+            // Добавляем тактильную обратную связь
             pawButton.addEventListener('mousedown', () => {
                 pawButton.classList.add('click-animation');
             });
@@ -107,6 +204,7 @@ class DarkPawsClicker {
             });
         }
 
+        // Кнопки улучшений
         document.querySelectorAll('.upgrade-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -118,6 +216,7 @@ class DarkPawsClicker {
             });
         });
 
+        // Кнопка приглашения друзей
         const inviteBtn = document.getElementById('invite-friends');
         if (inviteBtn) {
             inviteBtn.addEventListener('click', (e) => {
@@ -126,6 +225,7 @@ class DarkPawsClicker {
             });
         }
 
+        // Кнопка обновления списка друзей
         const refreshBtn = document.getElementById('refresh-friends');
         if (refreshBtn) {
             refreshBtn.addEventListener('click', (e) => {
@@ -135,6 +235,7 @@ class DarkPawsClicker {
             });
         }
 
+        // Клик по всей секции профиля для открытия
         const profileOpener = document.getElementById('profile-opener');
         if (profileOpener) {
             profileOpener.addEventListener('click', (e) => {
@@ -143,6 +244,7 @@ class DarkPawsClicker {
             });
         }
 
+        // Закрытие модального окна профиля
         const closeProfile = document.getElementById('close-profile');
         if (closeProfile) {
             closeProfile.addEventListener('click', (e) => {
@@ -151,6 +253,7 @@ class DarkPawsClicker {
             });
         }
 
+        // Клик по фону для закрытия модального окна
         const profileModal = document.getElementById('profile-modal');
         if (profileModal) {
             profileModal.addEventListener('click', (e) => {
@@ -160,6 +263,7 @@ class DarkPawsClicker {
             });
         }
 
+        // Кнопка поделиться профилем
         const shareProfile = document.getElementById('share-profile');
         if (shareProfile) {
             shareProfile.addEventListener('click', (e) => {
@@ -176,6 +280,7 @@ class DarkPawsClicker {
             this.updateUserInfo();
         } else {
             console.log('No user data available');
+            // Для демо создаем тестового пользователя
             this.user = {
                 id: Math.floor(Math.random() * 10000),
                 first_name: 'Игрок',
@@ -193,6 +298,7 @@ class DarkPawsClicker {
             const levelText = document.querySelector('.level-text');
             
             if (avatar) {
+                // Используем фото профиля Telegram если доступно
                 if (this.user.photo_url) {
                     avatar.style.backgroundImage = `url(${this.user.photo_url})`;
                     avatar.style.backgroundSize = 'cover';
@@ -238,14 +344,17 @@ class DarkPawsClicker {
     }
 
     switchTab(tabId) {
+        // Скрываем все вкладки
         document.querySelectorAll('.tab-content').forEach(content => {
             content.classList.remove('active');
         });
         
+        // Убираем активный класс со всех кнопок
         document.querySelectorAll('.tab-item').forEach(tab => {
             tab.classList.remove('active');
         });
         
+        // Показываем выбранную вкладку
         const targetTab = document.getElementById(tabId);
         const targetTabButton = document.querySelector(`[data-tab="${tabId}"]`);
         
@@ -253,6 +362,8 @@ class DarkPawsClicker {
             targetTab.classList.add('active');
             targetTabButton.classList.add('active');
             this.currentTab = tabId;
+            
+            // Обновляем контент вкладки если нужно
             this.updateTabContent(tabId);
         }
     }
@@ -272,6 +383,7 @@ class DarkPawsClicker {
     }
 
     updateFriendsTab() {
+        // Обновляем счетчик друзей
         const friendsCount = document.querySelector('.friends-count span');
         const friendsBonus = document.querySelector('.friends-bonus span');
         
@@ -279,6 +391,7 @@ class DarkPawsClicker {
             friendsCount.textContent = this.gameState.friends.length;
         }
         
+        // Рассчитываем бонусы за друзей
         const friendCount = this.gameState.friends.length;
         let bonusPercent = 0;
         
@@ -290,7 +403,10 @@ class DarkPawsClicker {
             friendsBonus.textContent = bonusPercent + '%';
         }
         
+        // Обновляем список друзей
         this.updateFriendsList();
+        
+        // Обновляем бонусы
         this.updateFriendsBonuses();
     }
 
@@ -346,6 +462,7 @@ class DarkPawsClicker {
     }
 
     loadFriendsList() {
+        // Заглушка для демо
         this.gameState.friends = [
             { first_name: 'Друг 1', level: 5, score: 1500 },
             { first_name: 'Друг 2', level: 3, score: 800 }
@@ -357,6 +474,7 @@ class DarkPawsClicker {
         const container = document.getElementById('leaderboard-container');
         if (!container) return;
         
+        // Заглушка для демо
         const leaderboard = [
             { first_name: 'Чемпион', score: 50000 },
             { first_name: 'Профи', score: 25000 },
@@ -387,12 +505,16 @@ class DarkPawsClicker {
     }
 
     updateLevelsTab() {
+        // Обновляем текущий уровень
         const currentLevel = document.querySelector('.current-level span');
         if (currentLevel) {
             currentLevel.textContent = this.gameState.level;
         }
         
+        // Обновляем индикатор прогресса
         this.updateLevelsProgress();
+        
+        // Обновляем карточки уровней
         this.updateLevelCards();
     }
 
@@ -415,6 +537,7 @@ class DarkPawsClicker {
             const levelNumber = index + 1;
             const status = card.querySelector('.level-status');
             
+            // Убираем все классы статуса
             card.classList.remove('active', 'locked', 'completed');
             
             if (levelNumber < this.gameState.level) {
@@ -426,6 +549,7 @@ class DarkPawsClicker {
             } else if (levelNumber === this.gameState.level) {
                 card.classList.add('active');
                 
+                // Показываем прогресс до следующего уровня (на основе ОБЩИХ заработанных очков)
                 const currentLevelScore = this.getRequiredScoreForLevel(this.gameState.level);
                 const nextLevelScore = this.getRequiredScoreForLevel(this.gameState.level + 1);
                 const progress = Math.max(0, this.gameState.totalEarnedScore - currentLevelScore);
@@ -453,93 +577,140 @@ class DarkPawsClicker {
 
     updateComboTab() {
         console.log('Updating combo tab...');
+        
+        // Обновляем статистику колоды
         this.updateDeckStats();
+        
+        // Обновляем коллекцию карт
         this.updateComboCards();
+        
+        // Обновляем счетчик карт
+        this.updateComboCount();
+    }
+
+    updateComboCount() {
+        const comboCount = document.querySelector('.combo-count span');
+        if (comboCount) {
+            const unlockedCards = this.gameState.comboCards.filter(card => card.unlocked).length;
+            comboCount.textContent = `${unlockedCards}/${this.gameState.comboCards.length}`;
+        }
     }
 
     updateDeckStats() {
         const deckPower = document.querySelector('.power-value');
         const deckStats = document.querySelectorAll('.stat-value');
-        const comboCount = document.querySelector('.combo-count span');
-        const deckSize = document.querySelector('.deck-size span');
-        
+        const bonuses = this.calculateCardBonuses();
+
         if (deckPower) {
             deckPower.textContent = this.calculateDeckPower();
         }
         
-        if (comboCount) {
-            comboCount.textContent = `${this.gameState.activeDeck.length}/4`;
-        }
-        
-        if (deckSize) {
-            deckSize.textContent = `${this.gameState.activeDeck.length}/4`;
-        }
-        
-        const clickBonus = ((this.gameState.cardEffects.clickPower - 1) * 100).toFixed(0);
-        const autoBonus = this.gameState.cardEffects.autoClick;
-        const critBonus = (this.gameState.cardEffects.criticalChance * 100).toFixed(0);
-        
         if (deckStats.length >= 3) {
-            deckStats[0].textContent = `${clickBonus}%`;
-            deckStats[1].textContent = `${autoBonus}`;
-            deckStats[2].textContent = `${critBonus}%`;
+            deckStats[0].textContent = `${Math.floor(bonuses.clickBonus * 100)}%`;
+            deckStats[1].textContent = `${Math.floor(bonuses.autoClickBonus)}`;
+            deckStats[2].textContent = `${Math.floor(bonuses.critBonus * 100)}%`;
         }
     }
 
-    calculateDeckPower() {
-        let power = this.gameState.activeDeck.length * 10;
-        
-        this.gameState.activeDeck.forEach(cardId => {
-            const card = this.getCardData(cardId);
-            if (card) {
-                switch(card.rarity) {
-                    case 'common': power += 5; break;
-                    case 'rare': power += 15; break;
-                    case 'epic': power += 30; break;
-                    case 'legendary': power += 50; break;
-                    case 'mythic': power += 100; break;
+    calculateCardBonuses() {
+        let clickBonus = 0;
+        let autoClickBonus = 0;
+        let critBonus = 0;
+
+        this.gameState.comboCards.forEach(card => {
+            if (card.unlocked && card.level > 0) {
+                const bonus = card.baseBonus * card.level;
+                
+                switch(card.id) {
+                    case 1: // Лапа новичка
+                    case 7: // Мощь
+                        clickBonus += bonus;
+                        break;
+                    case 2: // Энергия
+                    case 6: // Скорость
+                        autoClickBonus += bonus;
+                        break;
+                    case 3: // Точность
+                    case 5: // Удача
+                        critBonus += bonus;
+                        break;
+                    case 4: // Алмазная лапа
+                        if (card.level > 0) {
+                            clickBonus *= card.baseBonus;
+                            autoClickBonus *= card.baseBonus;
+                            critBonus *= card.baseBonus;
+                        }
+                        break;
+                    case 8: // Феникс
+                        // Обрабатывается отдельно в handleClick
+                        break;
                 }
             }
         });
-        
+
+        return { clickBonus, autoClickBonus, critBonus };
+    }
+
+    calculateDeckPower() {
+        let power = 0;
+        this.gameState.comboCards.forEach(card => {
+            if (card.unlocked) {
+                const rarityMultiplier = {
+                    'common': 1,
+                    'rare': 2,
+                    'epic': 3,
+                    'legendary': 5
+                };
+                power += card.level * (rarityMultiplier[card.rarity] || 1);
+            }
+        });
         return power;
     }
 
     updateComboCards() {
-        const comboCards = this.getAllCards();
-        const cardsGrid = document.getElementById('cards-grid-container');
+        console.log('Updating combo cards with levels...');
         
+        const cardsGrid = document.getElementById('cards-grid-container');
         if (!cardsGrid) {
             console.error('cards-grid-container not found!');
             return;
         }
 
-        console.log('Found cards grid container, generating cards...');
-
         let cardsHTML = '';
-        comboCards.forEach(card => {
+        this.gameState.comboCards.forEach(card => {
             const lockedClass = card.unlocked ? '' : 'locked';
-            const activeClass = this.gameState.activeDeck.includes(card.id) ? 'active' : '';
+            const upgradableClass = card.unlocked && card.level < card.maxLevel && this.gameState.score >= card.upgradeCost ? 'upgradable' : '';
+            const levelText = card.unlocked ? `Ур. ${card.level}/${card.maxLevel}` : 'Заблокировано';
             
             cardsHTML += `
-                <div class="combo-card ${lockedClass} ${activeClass}" data-card-id="${card.id}">
+                <div class="combo-card ${lockedClass} ${upgradableClass}" data-card-id="${card.id}">
                     <div class="card-frame">
                         <div class="card-rarity ${card.rarity}">
                             ${this.getRarityText(card.rarity)}
                         </div>
                         <div class="card-icon">${card.icon}</div>
                         <div class="card-name">${card.name}</div>
-                        <div class="card-stats">${card.description}</div>
-                        ${activeClass ? '<div class="card-active-indicator">✓</div>' : ''}
+                        <div class="card-stats">${card.stats}</div>
+                        <div class="card-level">${levelText}</div>
+                        ${card.unlocked && card.level < card.maxLevel ? 
+                            `<div class="card-upgrade-cost">${card.upgradeCost} 🪙</div>` : ''}
                     </div>
                 </div>
             `;
         });
 
         cardsGrid.innerHTML = cardsHTML;
-        console.log(`Generated ${comboCards.length} cards in the grid`);
-
         this.setupComboCardListeners();
+    }
+
+    getRarityText(rarity) {
+        const rarityMap = {
+            'common': 'Обычная',
+            'rare': 'Редкая',
+            'epic': 'Эпическая',
+            'legendary': 'Легендарная'
+        };
+        return rarityMap[rarity] || rarity;
     }
 
     setupComboCardListeners() {
@@ -548,187 +719,54 @@ class DarkPawsClicker {
         
         cards.forEach(card => {
             card.addEventListener('click', () => {
-                if (card.classList.contains('locked')) {
+                const cardId = parseInt(card.dataset.cardId);
+                const comboCard = this.gameState.comboCards.find(c => c.id === cardId);
+                
+                if (!comboCard.unlocked) {
                     this.showCardLockedMessage(card);
+                } else if (comboCard.level < comboCard.maxLevel) {
+                    this.upgradeComboCard(cardId);
                 } else {
-                    this.toggleCardInDeck(card);
+                    this.showCardInfo(card);
                 }
             });
         });
     }
 
-    toggleCardInDeck(card) {
-        const cardId = parseInt(card.dataset.cardId);
-        const cardIndex = this.gameState.activeDeck.indexOf(cardId);
-        const cardData = this.getCardData(cardId);
+    upgradeComboCard(cardId) {
+        const card = this.gameState.comboCards.find(c => c.id === cardId);
+        if (!card || !card.unlocked) return false;
+
+        if (card.level < card.maxLevel && this.gameState.score >= card.upgradeCost) {
+            this.gameState.score -= card.upgradeCost;
+            card.level++;
+            
+            // Увеличиваем стоимость улучшения для следующего уровня
+            card.upgradeCost = Math.floor(card.upgradeCost * 1.5);
+            
+            this.updateUI();
+            this.updateComboTab();
+            this.saveGameState();
+            this.showCardUpgradeNotification(card);
+            return true;
+        } else if (this.gameState.score < card.upgradeCost) {
+            this.showInsufficientFundsNotification(card.upgradeCost);
+        }
+        return false;
+    }
+
+    showCardUpgradeNotification(card) {
+        console.log(`🔼 Карта улучшена: ${card.name} Ур. ${card.level}`);
         
-        if (cardIndex === -1) {
-            if (this.gameState.activeDeck.length < 4) {
-                this.gameState.activeDeck.push(cardId);
-                card.classList.add('active');
-                this.applyCardEffects();
-                this.showCardNotification('Карта добавлена в колоду', cardData);
-            } else {
-                this.showCardNotification('Колода полна! Максимум 4 карты', cardData);
-            }
+        if (this.tg && this.tg.showPopup) {
+            this.tg.showPopup({
+                title: '✅ Карта улучшена!',
+                message: `${card.name} теперь уровень ${card.level}`,
+                buttons: [{ type: 'ok' }]
+            });
         } else {
-            this.gameState.activeDeck.splice(cardIndex, 1);
-            card.classList.remove('active');
-            this.applyCardEffects();
-            this.showCardNotification('Карта убрана из колоды', cardData);
+            alert(`✅ Карта улучшена: ${card.name} теперь уровень ${card.level}`);
         }
-        
-        this.updateDeckStats();
-        this.saveGameState();
-    }
-
-    getCardData(cardId) {
-        const allCards = this.getAllCards();
-        return allCards.find(card => card.id === cardId);
-    }
-
-    getAllCards() {
-        return [
-            {
-                id: 1,
-                name: 'Лапа новичка',
-                rarity: 'common',
-                icon: '🐾',
-                stats: { clickPower: 1.05 },
-                description: 'Увеличивает силу клика на 5%',
-                unlocked: this.gameState.level >= 1
-            },
-            {
-                id: 2,
-                name: 'Энергия',
-                rarity: 'rare',
-                icon: '⚡',
-                stats: { autoClick: 3 },
-                description: 'Добавляет 3 авто-клика в секунду',
-                unlocked: this.gameState.level >= 2
-            },
-            {
-                id: 3,
-                name: 'Точность',
-                rarity: 'epic',
-                icon: '🎯',
-                stats: { criticalChance: 0.15 },
-                description: 'Увеличивает шанс критического удара на 15%',
-                unlocked: this.gameState.level >= 3
-            },
-            {
-                id: 4,
-                name: 'Алмазная лапа',
-                rarity: 'legendary',
-                icon: '💎',
-                stats: { multiplier: 2 },
-                description: 'Удваивает все бонусы от карт в колоде',
-                unlocked: this.gameState.level >= 5
-            },
-            {
-                id: 5,
-                name: 'Удача',
-                rarity: 'common',
-                icon: '🍀',
-                stats: { criticalChance: 0.10 },
-                description: 'Увеличивает шанс критического удара на 10%',
-                unlocked: this.gameState.level >= 1
-            },
-            {
-                id: 6,
-                name: 'Скорость',
-                rarity: 'rare',
-                icon: '🚀',
-                stats: { autoClick: 5 },
-                description: 'Добавляет 5 авто-кликов в секунду',
-                unlocked: this.gameState.level >= 2
-            },
-            {
-                id: 7,
-                name: 'Мощь',
-                rarity: 'epic',
-                icon: '💪',
-                stats: { clickPower: 1.25 },
-                description: 'Увеличивает силу клика на 25%',
-                unlocked: this.gameState.level >= 4
-            },
-            {
-                id: 8,
-                name: 'Феникс',
-                rarity: 'legendary',
-                icon: '🔥',
-                stats: { criticalMultiplier: 3 },
-                description: 'Утраивает множитель критического удара',
-                unlocked: this.gameState.level >= 6
-            },
-            {
-                id: 9,
-                name: 'Бесконечность',
-                rarity: 'mythic',
-                icon: '♾️',
-                stats: { clickPower: 1.5, autoClick: 10, criticalChance: 0.25 },
-                description: 'Мощная карта, увеличивающая все характеристики значительно',
-                unlocked: this.gameState.level >= 8
-            },
-            {
-                id: 10,
-                name: 'Хаос',
-                rarity: 'mythic',
-                icon: '🌪️',
-                stats: { chaos: true, multiplier: 1.5 },
-                description: 'Случайным образом усиливает все показатели каждый клик',
-                unlocked: this.gameState.level >= 10
-            }
-        ];
-    }
-
-    applyCardEffects() {
-        this.gameState.cardEffects = {
-            clickPower: 1,
-            autoClick: 0,
-            criticalChance: 0,
-            criticalMultiplier: 1,
-            multiplier: 1,
-            chaos: false
-        };
-        
-        let hasDiamondPaw = false;
-        
-        this.gameState.activeDeck.forEach(cardId => {
-            const card = this.getCardData(cardId);
-            if (!card) return;
-            
-            if (card.id === 4) hasDiamondPaw = true;
-            
-            Object.keys(card.stats).forEach(stat => {
-                if (typeof card.stats[stat] === 'number') {
-                    if (stat === 'clickPower' || stat === 'multiplier') {
-                        this.gameState.cardEffects[stat] *= card.stats[stat];
-                    } else {
-                        this.gameState.cardEffects[stat] += card.stats[stat];
-                    }
-                } else {
-                    this.gameState.cardEffects[stat] = card.stats[stat];
-                }
-            });
-        });
-        
-        if (hasDiamondPaw) {
-            this.gameState.cardEffects.clickPower *= this.gameState.cardEffects.multiplier;
-            this.gameState.cardEffects.autoClick *= this.gameState.cardEffects.multiplier;
-            this.gameState.cardEffects.criticalChance *= this.gameState.cardEffects.multiplier;
-        }
-    }
-
-    getRarityText(rarity) {
-        const rarityMap = {
-            'common': 'Обычная',
-            'rare': 'Редкая',
-            'epic': 'Эпическая',
-            'legendary': 'Легендарная',
-            'mythic': 'Мифическая'
-        };
-        return rarityMap[rarity] || rarity;
     }
 
     showCardLockedMessage(card) {
@@ -746,15 +784,18 @@ class DarkPawsClicker {
         }
     }
 
-    showCardNotification(message, cardData) {
+    showCardInfo(card) {
+        const cardId = card.dataset.cardId;
+        const comboCard = this.gameState.comboCards.find(c => c.id === parseInt(cardId));
+        
         if (this.tg && this.tg.showPopup) {
             this.tg.showPopup({
-                title: `🎴 ${cardData.name}`,
-                message: `${message}\n\n${cardData.description}`,
+                title: `ℹ️ ${comboCard.name}`,
+                message: `Уровень: ${comboCard.level}/${comboCard.maxLevel}\nРедкость: ${this.getRarityText(comboCard.rarity)}\nБонус: ${comboCard.stats}`,
                 buttons: [{ type: 'ok' }]
             });
         } else {
-            alert(`🎴 ${cardData.name}\n${message}\n\n${cardData.description}`);
+            alert(`ℹ️ ${comboCard.name}\nУровень: ${comboCard.level}/${comboCard.maxLevel}\nРедкость: ${this.getRarityText(comboCard.rarity)}\nБонус: ${comboCard.stats}`);
         }
     }
 
@@ -776,6 +817,7 @@ class DarkPawsClicker {
     }
 
     updateProfileModal() {
+        // Обновляем аватар (уже обновляется в updateUserInfo)
         const profileName = document.getElementById('profile-name');
         const profileLevel = document.getElementById('profile-level');
         const profileId = document.getElementById('profile-id');
@@ -794,8 +836,13 @@ class DarkPawsClicker {
             profileRank.textContent = this.getPlayerRank();
         }
 
+        // Обновляем статистику
         this.updateProfileStats();
+
+        // Обновляем достижения
         this.updateProfileAchievements();
+
+        // Обновляем улучшения
         this.updateProfileUpgrades();
     }
 
@@ -813,7 +860,7 @@ class DarkPawsClicker {
             playTime.textContent = `${hours}ч`;
         }
         if (totalScore) {
-            totalScore.textContent = this.gameState.totalEarnedScore.toLocaleString();
+            totalScore.textContent = this.gameState.totalEarnedScore.toLocaleString(); // Используем общие заработанные очки
         }
         if (joinDate) {
             const joinDateObj = new Date(this.gameState.stats.joinDate);
@@ -834,6 +881,7 @@ class DarkPawsClicker {
     }
 
     updateProfileAchievements() {
+        // Обновляем статус достижений
         const achievements = document.querySelectorAll('.achievement');
         
         if (achievements.length >= 4) {
@@ -916,6 +964,7 @@ class DarkPawsClicker {
     startPlayTimeCounter() {
         setInterval(() => {
             this.gameState.stats.playTime += 1000;
+            // Сохраняем каждую минуту
             if (this.gameState.stats.playTime % 60000 === 0) {
                 this.saveGameState();
             }
@@ -923,42 +972,41 @@ class DarkPawsClicker {
     }
 
     handleClick(event) {
+        // Увеличиваем счетчик кликов
         this.gameState.stats.totalClicks++;
+        this.gameState.stats.totalScore += this.gameState.upgrades.clickPower;
+
+        // Проверяем достижения
+        this.checkAchievements();
+
+        // Создаем эффекты частиц
+        this.createParticles(event);
         
-        if (this.gameState.cardEffects.chaos) {
-            this.applyChaosEffect();
-        }
-        
-        let points = this.gameState.upgrades.clickPower;
+        // Вычисляем очки с учетом бонусов карт
+        const cardBonuses = this.calculateCardBonuses();
+        let points = this.gameState.upgrades.clickPower * (1 + cardBonuses.clickBonus);
         let isCritical = false;
         
-        points *= this.gameState.cardEffects.clickPower;
-        
-        const baseCritChance = this.gameState.upgrades.criticalChance * 0.03;
-        const totalCritChance = baseCritChance + this.gameState.cardEffects.criticalChance;
-        
-        if (Math.random() < totalCritChance) {
-            const critMultiplier = this.gameState.cardEffects.criticalMultiplier;
-            points *= (critMultiplier > 1 ? critMultiplier : 3);
+        // Шанс критического удара с учетом бонусов карт
+        const critChance = this.gameState.upgrades.criticalChance * 0.03 + cardBonuses.critBonus;
+        if (Math.random() < critChance) {
+            // Проверяем наличие карты Феникс для дополнительного множителя
+            const phoenixCard = this.gameState.comboCards.find(card => card.id === 8 && card.unlocked && card.level > 0);
+            const critMultiplier = phoenixCard ? phoenixCard.baseBonus : 3;
+            
+            points *= critMultiplier;
             isCritical = true;
             this.gameState.stats.criticalHits++;
         }
         
-        this.addScore(points, isCritical);
-        this.createParticles(event);
+        // Добавляем авто-клик бонус
+        points += cardBonuses.autoClickBonus;
         
+        this.addScore(points, isCritical);
+        
+        // Автосохранение каждые 10 кликов
         if (this.gameState.stats.totalClicks % 10 === 0) {
             this.saveGameState();
-        }
-    }
-
-    applyChaosEffect() {
-        const randomEffect = Math.random();
-        if (randomEffect < 0.3) {
-            this.gameState.cardEffects.clickPower *= 1.5;
-            setTimeout(() => {
-                this.gameState.cardEffects.clickPower /= 1.5;
-            }, 3000);
         }
     }
 
@@ -1003,6 +1051,7 @@ class DarkPawsClicker {
         const container = document.getElementById('particles-container');
         if (!container) return;
         
+        // Получаем координаты клика
         let clientX, clientY;
         
         if (event.touches && event.touches.length > 0) {
@@ -1020,17 +1069,20 @@ class DarkPawsClicker {
         const x = clientX - rect.left;
         const y = clientY - rect.top;
         
+        // Создаем 8-12 частиц
         const particleCount = 8 + Math.floor(Math.random() * 5);
         
         for (let i = 0; i < particleCount; i++) {
             const particle = document.createElement('div');
             particle.className = 'particle';
             
+            // Случайное направление и расстояние
             const angle = Math.random() * Math.PI * 2;
             const distance = 30 + Math.random() * 50;
             const tx = Math.cos(angle) * distance;
             const ty = Math.sin(angle) * distance;
             
+            // Устанавливаем CSS переменные для анимации
             particle.style.setProperty('--tx', tx + 'px');
             particle.style.setProperty('--ty', ty + 'px');
             particle.style.left = x + 'px';
@@ -1041,6 +1093,7 @@ class DarkPawsClicker {
             
             container.appendChild(particle);
             
+            // Удаляем частицу после анимации
             setTimeout(() => {
                 if (particle.parentNode === container) {
                     container.removeChild(particle);
@@ -1050,9 +1103,11 @@ class DarkPawsClicker {
     }
 
     addScore(points, isCritical = false) {
-        this.gameState.score += points;
-        this.gameState.totalEarnedScore += points;
+        // Добавляем очки в оба счета
+        this.gameState.score += points;                    // Текущий баланс
+        this.gameState.totalEarnedScore += points;        // Общие заработанные очки (для прогресса)
         
+        // Проверка уровня (только повышение) на основе ОБЩИХ заработанных очков
         let leveledUp = false;
         const maxLevel = this.getMaxLevel();
         
@@ -1060,6 +1115,9 @@ class DarkPawsClicker {
                this.gameState.totalEarnedScore >= this.getRequiredScoreForLevel(this.gameState.level + 1)) {
             this.gameState.level++;
             leveledUp = true;
+            
+            // Разблокируем карты при достижении определенных уровней
+            this.unlockCardsByLevel();
             
             if (this.gameState.level >= maxLevel) break;
         }
@@ -1070,9 +1128,31 @@ class DarkPawsClicker {
             this.showLevelUp();
         }
         
+        // Визуальный эффект при критическом ударе
         if (isCritical) {
             this.showCriticalEffect(points);
         }
+    }
+
+    unlockCardsByLevel() {
+        this.gameState.comboCards.forEach(card => {
+            if (!card.unlocked) {
+                // Карты разблокируются на разных уровнях
+                const unlockLevels = {
+                    2: 2,   // Энергия
+                    3: 3,   // Точность
+                    4: 5,   // Алмазная лапа
+                    6: 4,   // Скорость
+                    7: 6,   // Мощь
+                    8: 8    // Феникс
+                };
+                
+                if (unlockLevels[card.id] && this.gameState.level >= unlockLevels[card.id]) {
+                    card.unlocked = true;
+                    console.log(`🎴 Карта разблокирована: ${card.name}`);
+                }
+            }
+        });
     }
 
     getMaxLevel() {
@@ -1105,7 +1185,7 @@ class DarkPawsClicker {
         
         const critText = document.createElement('div');
         critText.className = 'critical-hit';
-        critText.textContent = `CRIT! +${points}`;
+        critText.textContent = `CRIT! +${Math.floor(points)}`;
         
         container.appendChild(critText);
         
@@ -1126,8 +1206,11 @@ class DarkPawsClicker {
         const cost = costs[upgradeType];
         
         if (this.gameState.score >= cost) {
+            // Вычитаем стоимость ТОЛЬКО из текущего баланса
+            // Общие заработанные очки и прогресс уровня НЕ затрагиваются
             this.gameState.score -= cost;
             
+            // Применяем улучшение
             switch(upgradeType) {
                 case 'click-power':
                     this.gameState.upgrades.clickPower++;
@@ -1185,20 +1268,16 @@ class DarkPawsClicker {
 
     startAutoClicker() {
         setInterval(() => {
-            if (this.gameState.upgrades.autoClick > 0 || this.gameState.cardEffects.autoClick > 0) {
-                const baseAutoPoints = this.gameState.upgrades.autoClick;
-                const cardAutoPoints = this.gameState.cardEffects.autoClick;
-                const totalPoints = baseAutoPoints + cardAutoPoints;
-                
-                if (totalPoints > 0) {
-                    let points = totalPoints * this.gameState.cardEffects.clickPower;
-                    this.addScore(points);
-                }
+            if (this.gameState.upgrades.autoClick > 0) {
+                const cardBonuses = this.calculateCardBonuses();
+                const autoPoints = this.gameState.upgrades.autoClick + cardBonuses.autoClickBonus;
+                this.addScore(autoPoints);
             }
         }, 1000);
     }
 
     updateUI() {
+        // Обновляем счет (текущий баланс)
         const scoreElement = document.getElementById('score');
         const levelBadge = document.querySelector('.level-badge');
         const levelText = document.querySelector('.level-text');
@@ -1207,9 +1286,16 @@ class DarkPawsClicker {
         if (levelBadge) levelBadge.textContent = this.gameState.level;
         if (levelText) levelText.textContent = `Уровень ${this.gameState.level}`;
         
+        // Обновляем прогресс бар в шапке (на основе ОБЩИХ заработанных очков)
         this.updateHeaderProgressBar();
+        
+        // Обновляем кнопки улучшений
         this.updateUpgradeButtons();
+        
+        // Обновляем информацию пользователя (включая аватар)
         this.updateUserInfo();
+        
+        // Обновляем отображение заработанных очков
         this.updateEarnedScoreDisplay();
     }
 
@@ -1217,6 +1303,7 @@ class DarkPawsClicker {
         const currentLevelScore = this.getRequiredScoreForLevel(this.gameState.level);
         const nextLevelScore = this.getRequiredScoreForLevel(this.gameState.level + 1);
         
+        // Используем ОБЩИЕ заработанные очки для прогресса
         let progress = Math.max(0, this.gameState.totalEarnedScore - currentLevelScore);
         const totalNeeded = nextLevelScore - currentLevelScore;
         
@@ -1237,9 +1324,11 @@ class DarkPawsClicker {
     }
 
     updateEarnedScoreDisplay() {
+        // Создаем или обновляем отображение заработанных очков под прогресс-баром
         let earnedScoreElement = document.getElementById('earned-score-display');
         
         if (!earnedScoreElement) {
+            // Создаем элемент если его нет
             earnedScoreElement = document.createElement('div');
             earnedScoreElement.id = 'earned-score-display';
             earnedScoreElement.className = 'earned-score-display';
@@ -1250,6 +1339,7 @@ class DarkPawsClicker {
             }
         }
         
+        // Обновляем текст
         const currentLevelScore = this.getRequiredScoreForLevel(this.gameState.level);
         const nextLevelScore = this.getRequiredScoreForLevel(this.gameState.level + 1);
         const progress = Math.max(0, this.gameState.totalEarnedScore - currentLevelScore);
@@ -1297,6 +1387,7 @@ class DarkPawsClicker {
                     break;
             }
             
+            // Обновляем доступность кнопок
             if (this.gameState.score >= cost) {
                 button.disabled = false;
                 button.classList.add('affordable');
@@ -1326,28 +1417,29 @@ class DarkPawsClicker {
             if (saved) {
                 const saveData = JSON.parse(saved);
                 
+                // Миграция для старых сохранений
                 if (!saveData.totalEarnedScore) {
                     saveData.totalEarnedScore = saveData.score || 0;
                 }
                 
-                if (!saveData.activeDeck) {
-                    saveData.activeDeck = [];
-                }
-                
-                if (!saveData.cardEffects) {
-                    saveData.cardEffects = {
-                        clickPower: 1,
-                        autoClick: 0,
-                        criticalChance: 0,
-                        criticalMultiplier: 1,
-                        multiplier: 1,
-                        chaos: false
-                    };
+                // Миграция для системы уровней карт
+                if (!saveData.comboCards || saveData.comboCards.length === 0) {
+                    saveData.comboCards = this.gameState.comboCards;
+                } else {
+                    // Обновляем существующие карты с новой структурой
+                    saveData.comboCards.forEach(savedCard => {
+                        const defaultCard = this.gameState.comboCards.find(c => c.id === savedCard.id);
+                        if (defaultCard) {
+                            // Сохраняем уровень и разблокировку, но используем новые значения по умолчанию
+                            savedCard.maxLevel = defaultCard.maxLevel;
+                            savedCard.baseBonus = defaultCard.baseBonus;
+                            savedCard.upgradeCost = savedCard.upgradeCost || defaultCard.upgradeCost;
+                        }
+                    });
                 }
                 
                 if (!this.user || saveData.userId === this.user.id) {
                     this.gameState = { ...this.gameState, ...saveData };
-                    this.applyCardEffects();
                     console.log('Game state loaded from localStorage');
                 }
             }
@@ -1357,10 +1449,12 @@ class DarkPawsClicker {
     }
 }
 
+// Инициализация игры
 document.addEventListener('DOMContentLoaded', () => {
     window.clickerGame = new DarkPawsClicker();
 });
 
+// Авто-сохранение при закрытии
 window.addEventListener('beforeunload', () => {
     if (window.clickerGame) {
         window.clickerGame.saveGameState();
