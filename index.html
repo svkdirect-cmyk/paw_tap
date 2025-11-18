@@ -40,7 +40,6 @@
                     <div class="progress-bar-header">
                         <div class="progress-fill-header" id="level-progress-header"></div>
                     </div>
-                    <div id="earned-score-display" class="earned-score-display"></div>
                 </div>
             </div>
 
@@ -254,7 +253,7 @@
             <div class="tab-header">
                 <h2>Комбо карты</h2>
                 <div class="tab-stats">
-                    <div class="combo-count">Активно: <span>0/4</span></div>
+                    <div class="combo-count">Карт: <span>0/8</span></div>
                 </div>
             </div>
 
@@ -267,15 +266,15 @@
                         </div>
                         <div class="deck-stats">
                             <div class="deck-stat">
-                                <div class="stat-value">+0</div>
+                                <div class="stat-value">0%</div>
                                 <div class="stat-label">Бонус клика</div>
                             </div>
                             <div class="deck-stat">
-                                <div class="stat-value">+0</div>
+                                <div class="stat-value">0%</div>
                                 <div class="stat-label">Бонус авто</div>
                             </div>
                             <div class="deck-stat">
-                                <div class="stat-value">+0%</div>
+                                <div class="stat-value">0%</div>
                                 <div class="stat-label">Бонус крита</div>
                             </div>
                         </div>
@@ -293,10 +292,9 @@
                     <h4>Как работают комбо карты?</h4>
                     <ul class="combo-rules">
                         <li>Собирайте карты для усиления характеристик</li>
-                        <li>Активируйте до 4 карт одновременно</li>
-                        <li>Улучшайте карты для увеличения бонусов</li>
-                        <li>Комбинируйте карты для получения дополнительных бонусов</li>
+                        <li>Комбинируйте карты для получения бонусов</li>
                         <li>Редкость карт: Обычная, Редкая, Эпическая, Легендарная</li>
+                        <li>Карты открываются при достижении уровней</li>
                     </ul>
                 </div>
             </div>
@@ -437,24 +435,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="profile-cards">
-                        <h4>Мои карты</h4>
-                        <div class="cards-summary">
-                            <div class="card-summary-item">
-                                <div class="summary-label">Активных карт</div>
-                                <div class="summary-value" id="profile-active-cards">0/4</div>
-                            </div>
-                            <div class="card-summary-item">
-                                <div class="summary-label">Общая сила</div>
-                                <div class="summary-value" id="profile-deck-power">0</div>
-                            </div>
-                            <div class="card-summary-item">
-                                <div class="summary-label">Всего карт</div>
-                                <div class="summary-value" id="profile-total-cards">2/8</div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="modal-actions">
@@ -466,6 +446,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Контейнер для кислотных частиц крита -->
+    <div id="critical-particles-container" class="critical-particles-container"></div>
 
     <script src="script.js"></script>
 </body>
