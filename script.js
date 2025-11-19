@@ -18,7 +18,6 @@ class DarkPawsClicker {
                 joinDate: new Date().toISOString(),
                 criticalHits: 0
             },
-            friends: [],
             comboCards: [],
             activeDeck: [],
             cardEffects: {
@@ -42,16 +41,109 @@ class DarkPawsClicker {
         this.currentTab = 'game-tab';
         this.startTime = Date.now();
         this.lastTouch = null;
+        this.isTelegram = false;
         
         this.init();
     }
 
-    init() {
-        console.log('Initializing Dark Paws Clicker...');
+    // Добавляем функцию форматирования чисел
+    formatNumber(number) {
+        if (number < 1000) {
+            return Math.floor(number).toString();
+        }
         
-        if (this.tg && this.tg.expand) {
+        const suffixes = ['', 'K', 'M', 'B', 'T'];
+        const tier = Math.floor(Math.log10(Math.abs(number)) / 3);
+        
+        if (tier >= suffixes.length) {
+            return Math.floor(number).toLocaleString();
+        }
+        
+        const suffix = suffixes[tier];
+        const scale = Math.pow(10, tier * 3);
+        const scaled = number / scale;
+        
+        // Форматируем с 1-2 знаками после запятой для больших чисел
+        if (tier > 0) {
+            if (scaled < 10) {
+                return scaled.toFixed(2) + suffix;
+            } else if (scaled < 100) {
+                return scaled.toFixed(1) + suffix;
+            } else {
+                return Math.floor(scaled) + suffix;
+            }
+        }
+        
+        return Math.floor(number).toLocaleString();
+    }
+
+    // Функция для форматирования с округлением до целых
+    formatNumberRounded(number) {
+        if (number < 1000) {
+            return Math.floor(number).toString();
+        }
+        
+        const suffixes = ['', 'K', 'M', 'B', 'T'];
+        const tier = Math.floor(Math.log10(Math.abs(number)) / 3);
+        
+        if (tier >= suffixes.length) {
+            return Math.floor(number).toLocaleString();
+        }
+        
+        const suffix = suffixes[tier];
+        const scale = Math.pow(10, tier * 3);
+        const scaled = number / scale;
+        
+        return Math.floor(scaled) + suffix;
+    }
+
+    // Функция для точного форматирования (для улучшений)
+    formatNumberPrecise(number) {
+        if (number < 1000) {
+            return Math.floor(number).toString();
+        }
+        
+        const suffixes = ['', 'K', 'M', 'B', 'T'];
+        const tier = Math.floor(Math.log10(Math.abs(number)) / 3);
+        
+        if (tier >= suffixes.length) {
+            return Math.floor(number).toLocaleString();
+        }
+        
+        const suffix = suffixes[tier];
+        const scale = Math.pow(10, tier * 3);
+        const scaled = number / scale;
+        
+        // Для очень больших чисел показываем без десятичных
+        if (scaled >= 1000) {
+            return this.formatNumberPrecise(scaled) + suffix;
+        }
+        
+        // Определяем количество знаков после запятой
+        if (scaled < 10) {
+            return scaled.toFixed(2) + suffix;
+        } else if (scaled < 100) {
+            return scaled.toFixed(1) + suffix;
+        } else {
+            return Math.floor(scaled) + suffix;
+        }
+    }
+
+    init() {
+        console.log('Initializing Dark Paws Clicker for Telegram Mini Apps...');
+        
+        // Инициализация Telegram Web App
+        if (this.tg) {
+            this.isTelegram = true;
             this.tg.expand();
             this.tg.enableClosingConfirmation();
+            this.tg.BackButton.hide();
+            
+            // Установка цветовой схемы Telegram
+            this.applyTelegramTheme();
+            
+            // Запрет масштабирования в Telegram Mini Apps
+            this.disableZoom();
         }
         
         this.setupEventListeners();
@@ -64,23 +156,57 @@ class DarkPawsClicker {
         this.updateComboTab();
     }
 
+    disableZoom() {
+        // Запрет масштабирования, но разрешение скролла
+        document.addEventListener('touchstart', function(event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        document.addEventListener('gesturestart', function(event) {
+            event.preventDefault();
+        });
+
+        document.addEventListener('gesturechange', function(event) {
+            event.preventDefault();
+        });
+
+        document.addEventListener('gestureend', function(event) {
+            event.preventDefault();
+        });
+    }
+
+    applyTelegramTheme() {
+    // Принудительно устанавливаем темные цвета
+    document.documentElement.style.setProperty('--tg-theme-bg-color', '#0a0a0a');
+    document.documentElement.style.setProperty('--tg-theme-text-color', '#e0e0e0');
+    document.documentElement.style.setProperty('--tg-theme-hint-color', '#888');
+    document.documentElement.style.setProperty('--tg-theme-link-color', '#8b5cf6');
+    document.documentElement.style.setProperty('--tg-theme-button-color', '#8b5cf6');
+    document.documentElement.style.setProperty('--tg-theme-button-text-color', '#ffffff');
+    document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', '#1a1a1a');
+}
+
     setupEventListeners() {
         const pawButton = document.getElementById('paw-button');
         if (pawButton) {
+            // Оптимизированная обработка кликов для Telegram Mini Apps
             pawButton.addEventListener('click', (e) => {
+                e.preventDefault();
                 this.handleClick(e);
             });
             
-            pawButton.addEventListener('mousedown', () => {
-                pawButton.classList.add('click-animation');
-            });
-            
-            pawButton.addEventListener('mouseup', () => {
-                setTimeout(() => {
-                    pawButton.classList.remove('click-animation');
-                }, 150);
-            });
-            
+            // Улучшенные touch события для мобильных устройств
             pawButton.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 pawButton.classList.add('click-animation');
@@ -88,7 +214,7 @@ class DarkPawsClicker {
                     clientX: e.touches[0].clientX,
                     clientY: e.touches[0].clientY
                 };
-            });
+            }, { passive: false });
             
             pawButton.addEventListener('touchend', (e) => {
                 e.preventDefault();
@@ -104,9 +230,16 @@ class DarkPawsClicker {
                     this.handleClick(touchEvent);
                     this.lastTouch = null;
                 }
+            }, { passive: false });
+            
+            // Предотвращение контекстного меню на долгий тап
+            pawButton.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                return false;
             });
         }
 
+        // Улучшения
         document.querySelectorAll('.upgrade-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -118,23 +251,7 @@ class DarkPawsClicker {
             });
         });
 
-        const inviteBtn = document.getElementById('invite-friends');
-        if (inviteBtn) {
-            inviteBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.inviteFriends();
-            });
-        }
-
-        const refreshBtn = document.getElementById('refresh-friends');
-        if (refreshBtn) {
-            refreshBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.loadFriendsList();
-                this.loadLeaderboard();
-            });
-        }
-
+        // Профиль
         const profileOpener = document.getElementById('profile-opener');
         if (profileOpener) {
             profileOpener.addEventListener('click', (e) => {
@@ -167,15 +284,40 @@ class DarkPawsClicker {
                 this.shareProfile();
             });
         }
+
+        // Обработка видимости приложения
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                this.saveGameState();
+            }
+        });
+
+        // Обработка ухода со страницы
+        window.addEventListener('beforeunload', () => {
+            this.saveGameState();
+        });
+        
+        // Запрет масштабирования на всем документе
+        document.addEventListener('gesturestart', (e) => {
+            e.preventDefault();
+        });
+        
+        document.addEventListener('gesturechange', (e) => {
+            e.preventDefault();
+        });
+        
+        document.addEventListener('gestureend', (e) => {
+            e.preventDefault();
+        });
     }
 
     initTelegramAuth() {
         if (this.tg && this.tg.initDataUnsafe && this.tg.initDataUnsafe.user) {
             this.user = this.tg.initDataUnsafe.user;
-            console.log('User authenticated:', this.user);
+            console.log('Telegram user authenticated:', this.user);
             this.updateUserInfo();
         } else {
-            console.log('No user data available');
+            console.log('No Telegram user data available, using mock data');
             this.user = {
                 id: Math.floor(Math.random() * 10000),
                 first_name: 'Игрок',
@@ -259,9 +401,6 @@ class DarkPawsClicker {
 
     updateTabContent(tabId) {
         switch(tabId) {
-            case 'friends-tab':
-                this.updateFriendsTab();
-                break;
             case 'levels-tab':
                 this.updateLevelsTab();
                 break;
@@ -271,170 +410,154 @@ class DarkPawsClicker {
         }
     }
 
-    updateFriendsTab() {
-        const friendsCount = document.querySelector('.friends-count span');
-        const friendsBonus = document.querySelector('.friends-bonus span');
-        
-        if (friendsCount) {
-            friendsCount.textContent = this.gameState.friends.length;
-        }
-        
-        const friendCount = this.gameState.friends.length;
-        let bonusPercent = 0;
-        
-        if (friendCount >= 5) bonusPercent = 15;
-        else if (friendCount >= 3) bonusPercent = 10;
-        else if (friendCount >= 1) bonusPercent = 5;
-        
-        if (friendsBonus) {
-            friendsBonus.textContent = bonusPercent + '%';
-        }
-        
-        this.updateFriendsList();
-        this.updateFriendsBonuses();
-    }
-
-    updateFriendsList() {
-        const container = document.getElementById('friends-list-container');
-        if (!container) return;
-        
-        if (this.gameState.friends.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon">👥</div>
-                    <h3>Друзей пока нет</h3>
-                    <p>Пригласите друзей и получайте бонусы за их прогресс</p>
-                </div>
-            `;
-        } else {
-            let friendsHTML = '';
-            this.gameState.friends.forEach(friend => {
-                friendsHTML += `
-                    <div class="friend-item">
-                        <div class="friend-avatar">
-                            ${friend.first_name ? friend.first_name.charAt(0).toUpperCase() : 'U'}
-                        </div>
-                        <div class="friend-info">
-                            <div class="friend-name">${friend.first_name || 'Unknown'}</div>
-                            <div class="friend-stats">Уровень ${friend.level || 1} • <span class="friend-score">${friend.score || 0} очков</span></div>
-                        </div>
-                    </div>
-                `;
-            });
-            container.innerHTML = friendsHTML;
-        }
-    }
-
-    updateFriendsBonuses() {
-        const bonusCards = document.querySelectorAll('.bonus-card');
-        const friendCount = this.gameState.friends.length;
-        
-        bonusCards.forEach((card, index) => {
-            const status = card.querySelector('.bonus-status');
-            const requiredFriends = [1, 3, 5][index];
-            
-            if (status) {
-                if (friendCount >= requiredFriends) {
-                    status.textContent = 'Активно';
-                    status.classList.add('active');
-                } else {
-                    status.textContent = 'Не активно';
-                    status.classList.remove('active');
-                }
-            }
-        });
-    }
-
-    loadFriendsList() {
-        this.gameState.friends = [
-            { first_name: 'Друг 1', level: 5, score: 1500 },
-            { first_name: 'Друг 2', level: 3, score: 800 }
-        ];
-        this.updateFriendsTab();
-    }
-
-    loadLeaderboard() {
-        const container = document.getElementById('leaderboard-container');
-        if (!container) return;
-        
-        const leaderboard = [
-            { first_name: 'Чемпион', score: 50000 },
-            { first_name: 'Профи', score: 25000 },
-            { first_name: 'Любитель', score: 12000 },
-            { first_name: 'Новичок', score: 5000 }
-        ];
-        
-        let leaderboardHTML = '';
-        leaderboard.forEach((player, index) => {
-            const rank = index + 1;
-            const rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank + '.';
-            
-            leaderboardHTML += `
-                <div class="leaderboard-item">
-                    <div class="leaderboard-rank">${rankIcon}</div>
-                    <div class="leaderboard-user">
-                        <div class="leaderboard-avatar">
-                            ${player.first_name ? player.first_name.charAt(0).toUpperCase() : 'U'}
-                        </div>
-                        <div class="leaderboard-name">${player.first_name || 'Unknown'}</div>
-                    </div>
-                    <div class="leaderboard-score">${player.score || 0}</div>
-                </div>
-            `;
-        });
-        
-        container.innerHTML = leaderboardHTML;
-    }
-
     updateLevelsTab() {
-        const currentLevel = document.querySelector('.current-level span');
-        if (currentLevel) {
-            currentLevel.textContent = this.gameState.level;
-        }
-        
         this.updateLevelsProgress();
         this.updateLevelCards();
     }
 
     updateLevelsProgress() {
         const levelCircles = document.querySelectorAll('.level-circle');
-        levelCircles.forEach((circle, index) => {
-            const levelNumber = index + 1;
-            
-            circle.classList.remove('active');
-            if (levelNumber <= this.gameState.level) {
-                circle.classList.add('active');
+        const levelLines = document.querySelectorAll('.level-line');
+        
+        // Создаем элементы для заполнения линий если их нет
+        levelLines.forEach(line => {
+            if (!line.querySelector('.level-line-fill')) {
+                const fill = document.createElement('div');
+                fill.className = 'level-line-fill';
+                line.appendChild(fill);
             }
         });
+        
+        // Сбрасываем все стили
+        levelCircles.forEach(circle => {
+            circle.classList.remove('active', 'completed', 'current');
+            // Восстанавливаем изначальный текст кружочка из data-level
+            const originalLevel = circle.dataset.level;
+            if (originalLevel) {
+                circle.textContent = originalLevel;
+            }
+        });
+        
+        // Определяем milestone уровни
+        const milestoneLevels = [1, 25, 50, 75, 100];
+        const currentLevel = this.gameState.level;
+        
+        levelCircles.forEach((circle, index) => {
+            const circleLevel = parseInt(circle.dataset.level);
+            const isLastCircle = index === levelCircles.length - 1;
+            
+            if (currentLevel >= circleLevel) {
+                // Полностью заполненный кружок
+                circle.classList.add('completed');
+                
+                // Если это текущий уровень игрока, показываем текущий уровень в кружке
+                if (currentLevel === circleLevel) {
+                    circle.textContent = currentLevel;
+                    circle.classList.add('active');
+                } else {
+                    // Для предыдущих пройденных кружков показываем изначальный уровень
+                    circle.textContent = circleLevel;
+                }
+                
+                // Заполняем линию до этого кружка (кроме первого)
+                if (index > 0) {
+                    const prevLine = levelLines[index - 1];
+                    const fill = prevLine.querySelector('.level-line-fill');
+                    if (fill) {
+                        fill.style.width = '100%';
+                    }
+                    prevLine.classList.add('completed');
+                }
+            } else {
+                // Для незавершенных уровней
+                if (index > 0) {
+                    const prevCircleLevel = milestoneLevels[index - 1];
+                    
+                    // Если текущий уровень находится между предыдущим и текущим кружком
+                    if (currentLevel > prevCircleLevel && currentLevel < circleLevel) {
+                        // Показываем текущий уровень в этом кружке
+                        circle.textContent = currentLevel;
+                        circle.classList.add('active');
+                        
+                        // Рассчитываем прогресс для линии
+                        const progressInRange = currentLevel - prevCircleLevel;
+                        const totalRange = circleLevel - prevCircleLevel;
+                        const percentage = (progressInRange / totalRange) * 100;
+                        
+                        // Частично заполняем предыдущую линию
+                        const prevLine = levelLines[index - 1];
+                        const fill = prevLine.querySelector('.level-line-fill');
+                        if (fill) {
+                            fill.style.width = `${percentage}%`;
+                        }
+                        prevLine.classList.add('partial');
+                    } else {
+                        // Если прогресса нет, показываем изначальный уровень
+                        circle.textContent = circleLevel;
+                    }
+                } else {
+                    // Для первого кружка (уровень 1)
+                    circle.textContent = circleLevel;
+                }
+            }
+        });
+        
+        // Особый случай: если уровень выше 100, отмечаем все как завершенные
+        if (currentLevel >= 100) {
+            levelCircles.forEach(circle => {
+                circle.classList.add('completed');
+                // В последнем кружке показываем текущий уровень
+                if (circle.dataset.level === "100") {
+                    circle.textContent = currentLevel;
+                    circle.classList.add('active');
+                } else {
+                    // В предыдущих кружках показываем изначальные уровни
+                    circle.textContent = circle.dataset.level;
+                }
+            });
+            levelLines.forEach(line => {
+                const fill = line.querySelector('.level-line-fill');
+                if (fill) {
+                    fill.style.width = '100%';
+                }
+                line.classList.add('completed');
+            });
+        }
     }
 
     updateLevelCards() {
         const levelCards = document.querySelectorAll('.level-card');
         
+        // Определяем milestone уровни
+        const milestoneLevels = [1, 25, 50, 75, 100];
+        
         levelCards.forEach((card, index) => {
-            const levelNumber = index + 1;
+            const milestoneLevel = milestoneLevels[index];
             const status = card.querySelector('.level-status');
             
             card.classList.remove('active', 'locked', 'completed');
             
-            if (levelNumber < this.gameState.level) {
+            if (milestoneLevel < this.gameState.level) {
                 card.classList.add('completed');
                 if (status) {
                     status.textContent = 'Пройден';
                     status.classList.add('completed');
                 }
-            } else if (levelNumber === this.gameState.level) {
+            } else if (milestoneLevel === this.gameState.level) {
                 card.classList.add('active');
                 
-                const currentLevelScore = this.getRequiredScoreForLevel(this.gameState.level);
-                const nextLevelScore = this.getRequiredScoreForLevel(this.gameState.level + 1);
-                const progress = Math.max(0, this.gameState.totalEarnedScore - currentLevelScore);
-                const totalNeeded = nextLevelScore - currentLevelScore;
-                
                 if (status) {
-                    if (totalNeeded > 0) {
-                        const percentage = Math.min(100, (progress / totalNeeded) * 100);
-                        status.textContent = `${Math.floor(percentage)}%`;
+                    if (milestoneLevel < 100) {
+                        const nextMilestone = milestoneLevels[index + 1];
+                        const currentLevelScore = this.getRequiredScoreForLevel(this.gameState.level);
+                        const nextLevelScore = this.getRequiredScoreForLevel(nextMilestone);
+                        const progress = Math.max(0, this.gameState.totalEarnedScore - currentLevelScore);
+                        const totalNeeded = nextLevelScore - currentLevelScore;
+                        
+                        if (totalNeeded > 0) {
+                            const percentage = Math.min(100, (progress / totalNeeded) * 100);
+                            status.textContent = `${Math.floor(percentage)}%`;
+                        }
                     } else {
                         status.textContent = 'Макс уровень';
                     }
@@ -442,11 +565,17 @@ class DarkPawsClicker {
                 }
             } else {
                 card.classList.add('locked');
-                const requiredScore = this.getRequiredScoreForLevel(levelNumber);
+                const requiredScore = this.getRequiredScoreForLevel(milestoneLevel);
                 if (status) {
-                    status.textContent = `${requiredScore} очков`;
+                    status.textContent = `${this.formatNumber(requiredScore)} очков`;
                     status.classList.remove('completed');
                 }
+            }
+            
+            // Обновляем номера уровней в карточках
+            const levelNumber = card.querySelector('.level-number');
+            if (levelNumber) {
+                levelNumber.textContent = `Уровень ${milestoneLevel}`;
             }
         });
     }
@@ -460,15 +589,10 @@ class DarkPawsClicker {
     updateDeckStats() {
         const deckPower = document.querySelector('.power-value');
         const deckStats = document.querySelectorAll('.stat-value');
-        const comboCount = document.querySelector('.combo-count span');
         const deckSize = document.querySelector('.deck-size span');
         
         if (deckPower) {
-            deckPower.textContent = this.calculateDeckPower();
-        }
-        
-        if (comboCount) {
-            comboCount.textContent = `${this.gameState.activeDeck.length}/4`;
+            deckPower.textContent = this.formatNumberRounded(this.calculateDeckPower());
         }
         
         if (deckSize) {
@@ -481,7 +605,7 @@ class DarkPawsClicker {
         
         if (deckStats.length >= 3) {
             deckStats[0].textContent = `${clickBonus}%`;
-            deckStats[1].textContent = `${autoBonus}`;
+            deckStats[1].textContent = `${this.formatNumberRounded(autoBonus)}`;
             deckStats[2].textContent = `${critBonus}%`;
         }
     }
@@ -640,7 +764,7 @@ class DarkPawsClicker {
                 rarity: 'rare',
                 icon: '🚀',
                 stats: { autoClick: 5 },
-                description: 'Добавляет 5 авто-кликов в секунду',
+                description: 'Добавляет 5 авто-клика в секунду',
                 unlocked: this.gameState.level >= 2
             },
             {
@@ -735,7 +859,7 @@ class DarkPawsClicker {
         const cardId = card.dataset.cardId;
         console.log(`Карта ${cardId} заблокирована`);
         
-        if (this.tg && this.tg.showPopup) {
+        if (this.isTelegram && this.tg.showPopup) {
             this.tg.showPopup({
                 title: '🔒 Карта заблокирована',
                 message: 'Эта карта будет доступна на более высоких уровнях',
@@ -747,7 +871,7 @@ class DarkPawsClicker {
     }
 
     showCardNotification(message, cardData) {
-        if (this.tg && this.tg.showPopup) {
+        if (this.isTelegram && this.tg.showPopup) {
             this.tg.showPopup({
                 title: `🎴 ${cardData.name}`,
                 message: `${message}\n\n${cardData.description}`,
@@ -764,6 +888,14 @@ class DarkPawsClicker {
         if (profileModal) {
             profileModal.classList.add('active');
             document.body.style.overflow = 'hidden';
+            
+            // Показать кнопку "Назад" в Telegram
+            if (this.isTelegram) {
+                this.tg.BackButton.show();
+                this.tg.BackButton.onClick(() => {
+                    this.closeProfile();
+                });
+            }
         }
     }
 
@@ -772,6 +904,11 @@ class DarkPawsClicker {
         if (profileModal) {
             profileModal.classList.remove('active');
             document.body.style.overflow = 'auto';
+            
+            // Скрыть кнопку "Назад" в Telegram
+            if (this.isTelegram) {
+                this.tg.BackButton.hide();
+            }
         }
     }
 
@@ -806,14 +943,14 @@ class DarkPawsClicker {
         const joinDate = document.getElementById('profile-join-date');
 
         if (totalClicks) {
-            totalClicks.textContent = this.gameState.stats.totalClicks.toLocaleString();
+            totalClicks.textContent = this.formatNumber(this.gameState.stats.totalClicks);
         }
         if (playTime) {
             const hours = Math.floor(this.gameState.stats.playTime / 3600000);
             playTime.textContent = `${hours}ч`;
         }
         if (totalScore) {
-            totalScore.textContent = this.gameState.totalEarnedScore.toLocaleString();
+            totalScore.textContent = this.formatNumber(this.gameState.totalEarnedScore);
         }
         if (joinDate) {
             const joinDateObj = new Date(this.gameState.stats.joinDate);
@@ -870,9 +1007,9 @@ class DarkPawsClicker {
     }
 
     shareProfile() {
-        const shareText = `Мой профиль в Dark Paws Clicker!\nУровень: ${this.gameState.level}\nОчки: ${this.gameState.score}\nПрисоединяйся!`;
+        const shareText = `Мой профиль в Dark Paws Clicker!\nУровень: ${this.gameState.level}\nОчки: ${this.formatNumber(this.gameState.score)}\nПрисоединяйся!`;
         
-        if (this.tg && this.tg.showPopup) {
+        if (this.isTelegram && this.tg.showPopup) {
             this.tg.showPopup({
                 title: 'Поделиться профилем',
                 message: shareText,
@@ -889,27 +1026,6 @@ class DarkPawsClicker {
             });
         } else {
             alert(shareText);
-        }
-    }
-
-    inviteFriends() {
-        const shareText = `Присоединяйся к Dark Paws Clicker! 🎮\nИграй и прокачивай свою лапу!\n\nСсылка: ${window.location.href}?ref=${this.user.id}`;
-        
-        if (this.tg && this.tg.showPopup) {
-            this.tg.showPopup({
-                title: 'Пригласить друга',
-                message: 'Поделитесь ссылкой с друзьями!',
-                buttons: [{ type: 'ok' }]
-            });
-        } else if (navigator.share) {
-            navigator.share({
-                title: 'Dark Paws Clicker',
-                text: shareText,
-                url: window.location.href + `?ref=${this.user.id}`
-            });
-        } else {
-            navigator.clipboard.writeText(window.location.href + `?ref=${this.user.id}`);
-            alert('Ссылка скопирована в буфер обмена! Отправь её другу: ' + shareText);
         }
     }
 
@@ -950,6 +1066,8 @@ class DarkPawsClicker {
         if (this.gameState.stats.totalClicks % 10 === 0) {
             this.saveGameState();
         }
+        
+        this.checkAchievements();
     }
 
     applyChaosEffect() {
@@ -986,7 +1104,7 @@ class DarkPawsClicker {
     showAchievementNotification(achievementName) {
         console.log(`🎉 Достижение разблокировано: ${achievementName}`);
         
-        if (this.tg && this.tg.showPopup) {
+        if (this.isTelegram && this.tg.showPopup) {
             this.tg.showPopup({
                 title: '🎉 Новое достижение!',
                 message: `Вы получили достижение: "${achievementName}"`,
@@ -1056,12 +1174,15 @@ class DarkPawsClicker {
         let leveledUp = false;
         const maxLevel = this.getMaxLevel();
         
-        while (this.gameState.level < maxLevel && 
-               this.gameState.totalEarnedScore >= this.getRequiredScoreForLevel(this.gameState.level + 1)) {
-            this.gameState.level++;
-            leveledUp = true;
-            
-            if (this.gameState.level >= maxLevel) break;
+        // Проверяем повышение уровня
+        while (this.gameState.level < maxLevel) {
+            const requiredScore = this.getRequiredScoreForLevel(this.gameState.level + 1);
+            if (this.gameState.totalEarnedScore >= requiredScore) {
+                this.gameState.level++;
+                leveledUp = true;
+            } else {
+                break;
+            }
         }
         
         this.updateUI();
@@ -1081,7 +1202,19 @@ class DarkPawsClicker {
 
     getRequiredScoreForLevel(level) {
         if (level <= 1) return 0;
-        return Math.pow(level - 1, 2) * 100;
+        
+        // Нелинейная прогрессия для больших уровней
+        if (level <= 10) {
+            return Math.pow(level - 1, 2) * 100;
+        } else if (level <= 25) {
+            return this.getRequiredScoreForLevel(10) + (level - 10) * 5000;
+        } else if (level <= 50) {
+            return this.getRequiredScoreForLevel(25) + (level - 25) * 10000;
+        } else if (level <= 75) {
+            return this.getRequiredScoreForLevel(50) + (level - 50) * 25000;
+        } else {
+            return this.getRequiredScoreForLevel(75) + (level - 75) * 50000;
+        }
     }
 
     showLevelUp() {
@@ -1096,6 +1229,8 @@ class DarkPawsClicker {
             levelText.textContent = `Уровень ${this.gameState.level}`;
         }
         
+        console.log(`🎉 Уровень повышен до ${this.gameState.level}!`);
+        
         this.saveGameState();
     }
 
@@ -1105,7 +1240,7 @@ class DarkPawsClicker {
         
         const critText = document.createElement('div');
         critText.className = 'critical-hit';
-        critText.textContent = `CRIT! +${points}`;
+        critText.textContent = `CRIT! +${this.formatNumberRounded(points)}`;
         
         container.appendChild(critText);
         
@@ -1158,7 +1293,7 @@ class DarkPawsClicker {
         
         console.log(`🔼 Улучшение куплено: ${upgradeNames[upgradeType]}`);
         
-        if (this.tg && this.tg.showPopup) {
+        if (this.isTelegram && this.tg.showPopup) {
             this.tg.showPopup({
                 title: '✅ Улучшение куплено!',
                 message: `Вы улучшили: ${upgradeNames[upgradeType]}`,
@@ -1170,16 +1305,17 @@ class DarkPawsClicker {
     }
 
     showInsufficientFundsNotification(cost) {
-        console.log(`❌ Недостаточно очков. Нужно: ${cost}`);
+        const formattedCost = this.formatNumberPrecise(cost);
+        console.log(`❌ Недостаточно очков. Нужно: ${formattedCost}`);
         
-        if (this.tg && this.tg.showPopup) {
+        if (this.isTelegram && this.tg.showPopup) {
             this.tg.showPopup({
                 title: '❌ Недостаточно очков',
-                message: `Для покупки нужно: ${cost} очков`,
+                message: `Для покупки нужно: ${formattedCost} очков`,
                 buttons: [{ type: 'ok' }]
             });
         } else {
-            alert(`❌ Недостаточно очков. Нужно: ${cost}`);
+            alert(`❌ Недостаточно очков. Нужно: ${formattedCost}`);
         }
     }
 
@@ -1203,7 +1339,7 @@ class DarkPawsClicker {
         const levelBadge = document.querySelector('.level-badge');
         const levelText = document.querySelector('.level-text');
         
-        if (scoreElement) scoreElement.textContent = Math.floor(this.gameState.score).toLocaleString();
+        if (scoreElement) scoreElement.textContent = this.formatNumber(this.gameState.score);
         if (levelBadge) levelBadge.textContent = this.gameState.level;
         if (levelText) levelText.textContent = `Уровень ${this.gameState.level}`;
         
@@ -1211,6 +1347,11 @@ class DarkPawsClicker {
         this.updateUpgradeButtons();
         this.updateUserInfo();
         this.updateEarnedScoreDisplay();
+        
+        // Обновляем вкладку уровней если она активна
+        if (this.currentTab === 'levels-tab') {
+            this.updateLevelsTab();
+        }
     }
 
     updateHeaderProgressBar() {
@@ -1233,6 +1374,7 @@ class DarkPawsClicker {
         
         if (progressFillHeader) {
             progressFillHeader.style.width = `${percentage}%`;
+            console.log(`Прогресс уровня: ${percentage}% (${progress}/${totalNeeded})`);
         }
     }
 
@@ -1244,9 +1386,9 @@ class DarkPawsClicker {
             earnedScoreElement.id = 'earned-score-display';
             earnedScoreElement.className = 'earned-score-display';
             
-            const progressBar = document.querySelector('.header-progress');
-            if (progressBar) {
-                progressBar.appendChild(earnedScoreElement);
+            const headerProgress = document.querySelector('.header-progress');
+            if (headerProgress) {
+                headerProgress.appendChild(earnedScoreElement);
             }
         }
         
@@ -1256,7 +1398,7 @@ class DarkPawsClicker {
         const totalNeeded = nextLevelScore - currentLevelScore;
         
         if (totalNeeded > 0) {
-            earnedScoreElement.textContent = `${Math.floor(progress).toLocaleString()} / ${totalNeeded.toLocaleString()} очков до уровня ${this.gameState.level + 1}`;
+            earnedScoreElement.textContent = `${this.formatNumber(progress)} / ${this.formatNumber(totalNeeded)} очков до уровня ${this.gameState.level + 1}`;
         } else {
             earnedScoreElement.textContent = 'Максимальный уровень достигнут!';
         }
@@ -1279,21 +1421,21 @@ class DarkPawsClicker {
                     level = this.gameState.upgrades.clickPower;
                     cost = 10 * Math.pow(2, level - 1);
                     levelSpan.textContent = level;
-                    button.textContent = cost;
+                    button.textContent = this.formatNumberPrecise(cost);
                     break;
                     
                 case 'auto-click':
                     level = this.gameState.upgrades.autoClick;
                     cost = level === 0 ? 50 : 50 * Math.pow(2, level);
                     levelSpan.textContent = level;
-                    button.textContent = cost;
+                    button.textContent = this.formatNumberPrecise(cost);
                     break;
                     
                 case 'critical-chance':
                     level = this.gameState.upgrades.criticalChance;
                     cost = 25 * Math.pow(2, level - 1);
                     levelSpan.textContent = level;
-                    button.textContent = cost;
+                    button.textContent = this.formatNumberPrecise(cost);
                     break;
             }
             
@@ -1315,6 +1457,7 @@ class DarkPawsClicker {
                 lastSave: Date.now()
             };
             localStorage.setItem('darkPawsClicker_save', JSON.stringify(saveData));
+            console.log('Game state saved');
         } catch (error) {
             console.error('Local storage save error:', error);
         }
@@ -1326,6 +1469,7 @@ class DarkPawsClicker {
             if (saved) {
                 const saveData = JSON.parse(saved);
                 
+                // Миграция старых сохранений
                 if (!saveData.totalEarnedScore) {
                     saveData.totalEarnedScore = saveData.score || 0;
                 }
@@ -1349,6 +1493,7 @@ class DarkPawsClicker {
                     this.gameState = { ...this.gameState, ...saveData };
                     this.applyCardEffects();
                     console.log('Game state loaded from localStorage');
+                    console.log(`Уровень: ${this.gameState.level}, Очки: ${this.gameState.score}, Всего заработано: ${this.gameState.totalEarnedScore}`);
                 }
             }
         } catch (error) {
@@ -1357,10 +1502,19 @@ class DarkPawsClicker {
     }
 }
 
+// Инициализация приложения
 document.addEventListener('DOMContentLoaded', () => {
     window.clickerGame = new DarkPawsClicker();
 });
 
+// Обработка видимости страницы
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden && window.clickerGame) {
+        window.clickerGame.saveGameState();
+    }
+});
+
+// Обработка закрытия страницы
 window.addEventListener('beforeunload', () => {
     if (window.clickerGame) {
         window.clickerGame.saveGameState();
