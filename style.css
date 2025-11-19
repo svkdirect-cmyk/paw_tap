@@ -23,21 +23,56 @@
     --gradient-gold: linear-gradient(135deg, #ffd700, #ff6b00);
     --gradient-success: linear-gradient(135deg, #2ecc71, #27ae60);
     --gradient-mythic: linear-gradient(135deg, #ff00ff, #00ffff, #ffff00);
+    
+    /* ФИКСИРОВАННЫЕ темные значения для Telegram */
+    --tg-theme-bg-color: #0a0a0a;
+    --tg-theme-text-color: #e0e0e0;
+    --tg-theme-hint-color: #888;
+    --tg-theme-link-color: #8b5cf6;
+    --tg-theme-button-color: #8b5cf6;
+    --tg-theme-button-text-color: #ffffff;
+    --tg-theme-secondary-bg-color: #1a1a1a;
 }
 
 body {
     font-family: 'Inter', sans-serif;
-    background: var(--bg-primary);
-    color: var(--text-primary);
+    background: var(--tg-theme-bg-color, var(--bg-primary));
+    color: var(--tg-theme-text-color, var(--text-primary));
     overflow-x: hidden;
     line-height: 1.6;
     -webkit-touch-callout: none;
     -webkit-text-size-adjust: none;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    /* Разрешаем скролл, но запрещаем масштабирование */
+    touch-action: pan-y;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+html {
+    /* Запрет масштабирования, но разрешение скролла */
+    touch-action: pan-y;
+    -ms-touch-action: pan-y;
+    height: 100%;
+    overflow: hidden;
+}
+
+#app {
+    /* Запрет выделения текста и масштабирования */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Шапка */
 .header {
-    background: var(--bg-secondary);
+    background: var(--tg-theme-secondary-bg-color, var(--bg-secondary));
     border-radius: 16px;
     margin: 15px;
     margin-bottom: 20px;
@@ -136,6 +171,8 @@ body {
     text-align: center;
     margin-top: 8px;
     font-weight: 500;
+    font-feature-settings: "tnum";
+    padding: 0 10px;
 }
 
 .coin-balance {
@@ -170,6 +207,7 @@ body {
     font-weight: 700;
     color: var(--text-primary);
     line-height: 1;
+    font-feature-settings: "tnum";
 }
 
 /* Прогресс бар под шапкой */
@@ -205,7 +243,7 @@ body {
     }
 }
 
-/* Кнопка-лапка */
+/* Кнопка-лапка - оптимизированная для Telegram Mini Apps */
 .paw-button {
     width: 240px;
     height: 240px;
@@ -215,7 +253,7 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.15s ease;
     position: relative;
     overflow: hidden;
     box-shadow: 
@@ -224,6 +262,10 @@ body {
         inset 0 2px 20px rgba(255, 255, 255, 0.1);
     -webkit-tap-highlight-color: transparent;
     animation: paw-pulse 3s ease-in-out infinite;
+    touch-action: manipulation;
+    border: none;
+    outline: none;
+    -webkit-appearance: none;
 }
 
 @keyframes paw-pulse {
@@ -250,12 +292,13 @@ body {
         0 0 0 8px rgba(139, 92, 246, 0.4),
         inset 0 2px 15px rgba(255, 255, 255, 0.2);
     animation: none;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
 .paw-icon {
     font-size: 90px;
     color: white;
-    transition: all 0.3s ease;
+    transition: all 0.15s ease;
     text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
@@ -263,6 +306,7 @@ body {
 .paw-button:active .paw-icon {
     transform: scale(0.8) rotate(10deg);
     color: var(--text-accent);
+    transition: transform 0.1s ease;
 }
 
 .paw-glow {
@@ -274,7 +318,7 @@ body {
     background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
     transform: translate(-50%, -50%);
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.15s ease;
 }
 
 .paw-button:active .paw-glow {
@@ -374,7 +418,7 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    background: var(--bg-secondary);
+    background: var(--tg-theme-secondary-bg-color, var(--bg-secondary));
     padding: 15px;
     border-radius: 16px;
     transition: all 0.3s ease;
@@ -423,9 +467,13 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    min-width: 70px;
+    min-width: 80px;
     -webkit-tap-highlight-color: transparent;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    border: none;
+    font-family: inherit;
+    font-feature-settings: "tnum";
+    touch-action: manipulation;
 }
 
 .upgrade-btn:active:not(:disabled) {
@@ -450,39 +498,16 @@ body {
     min-height: calc(100vh - 80px);
     padding-bottom: 80px;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .tab-content.active {
     display: block;
 }
 
-/* Шапка вкладок */
+/* Убираем стили для шапки вкладок */
 .tab-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 25px 15px;
-    margin-bottom: 25px;
-}
-
-.tab-header h2 {
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-.tab-stats {
-    display: flex;
-    gap: 15px;
-}
-
-.tab-stats > div {
-    background: var(--bg-secondary);
-    padding: 10px 15px;
-    border-radius: 12px;
-    font-size: 12px;
-    color: var(--text-secondary);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    display: none;
 }
 
 /* Нижняя панель вкладок */
@@ -491,11 +516,12 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    background: var(--bg-secondary);
+    background: var(--tg-theme-secondary-bg-color, var(--bg-secondary));
     display: flex;
     padding: 12px 0;
     z-index: 1000;
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
 }
 
 .tab-item {
@@ -509,6 +535,7 @@ body {
     transition: all 0.3s ease;
     opacity: 0.6;
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 
 .tab-item.active {
@@ -534,305 +561,20 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* Стили для вкладки друзей */
-.friends-content {
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-    padding: 0 15px;
-}
-
-.friends-actions {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 20px;
-}
-
-.friends-actions .btn-primary,
-.friends-actions .btn-secondary {
-    flex: 1;
-    justify-content: center;
-}
-
-.friends-list-section h4 {
-    font-size: 16px;
-    margin-bottom: 15px;
-    color: var(--text-primary);
-}
-
-.friends-list {
-    background: var(--bg-secondary);
-    border-radius: 16px;
-    min-height: 200px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.friend-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 15px;
-    transition: all 0.3s ease;
-}
-
-.friend-item:active {
-    background: var(--bg-tertiary);
-    transform: scale(0.98);
-}
-
-.friend-avatar {
-    width: 45px;
-    height: 45px;
-    border-radius: 12px;
-    background: var(--bg-tertiary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.friend-info {
-    flex: 1;
-}
-
-.friend-name {
-    font-weight: 600;
-    font-size: 15px;
-    margin-bottom: 4px;
-}
-
-.friend-stats {
-    font-size: 12px;
-    color: var(--text-secondary);
-}
-
-.friend-score {
-    font-weight: 600;
-    color: var(--text-accent);
-}
-
-.empty-state {
-    text-align: center;
-    padding: 40px 20px;
-}
-
-.empty-icon {
-    font-size: 48px;
-    margin-bottom: 16px;
-    opacity: 0.7;
-}
-
-.empty-state h3 {
-    font-size: 18px;
-    margin-bottom: 8px;
-    color: var(--text-primary);
-}
-
-.empty-state p {
-    color: var(--text-secondary);
-    margin-bottom: 20px;
-    font-size: 14px;
-}
-
-.btn-primary {
-    background: var(--gradient-primary);
-    color: white;
-    padding: 14px 24px;
-    border-radius: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    -webkit-tap-highlight-color: transparent;
-    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
-}
-
-.btn-primary:active {
-    transform: translateY(2px) scale(0.98);
-    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
-}
-
-.btn-secondary {
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    padding: 14px 24px;
-    border-radius: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    -webkit-tap-highlight-color: transparent;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.btn-secondary:active {
-    background: var(--bg-tertiary);
-    transform: translateY(2px) scale(0.98);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.friends-bonuses h4 {
-    font-size: 16px;
-    margin-bottom: 15px;
-    color: var(--text-primary);
-}
-
-.bonus-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.bonus-card {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 15px;
-    background: var(--bg-secondary);
-    border-radius: 16px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.bonus-card:active {
-    transform: scale(0.98);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.bonus-icon {
-    font-size: 24px;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg-tertiary);
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.bonus-info {
-    flex: 1;
-}
-
-.bonus-name {
-    font-weight: 600;
-    font-size: 15px;
-    margin-bottom: 4px;
-}
-
-.bonus-desc {
-    font-size: 12px;
-    color: var(--text-secondary);
-}
-
-.bonus-status {
-    font-size: 11px;
-    padding: 6px 10px;
-    border-radius: 8px;
-    background: var(--bg-tertiary);
-    color: var(--text-secondary);
-    font-weight: 600;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
-
-.bonus-status.active {
-    background: var(--gradient-success);
-    color: white;
-    box-shadow: 0 2px 10px rgba(46, 204, 113, 0.4);
-}
-
-.leaderboard-section h4 {
-    font-size: 16px;
-    margin-bottom: 15px;
-    color: var(--text-primary);
-}
-
-.leaderboard {
-    background: var(--bg-secondary);
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.leaderboard-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 0;
-    transition: all 0.3s ease;
-}
-
-.leaderboard-item:active {
-    transform: scale(0.98);
-}
-
-.leaderboard-rank {
-    font-weight: 700;
-    color: var(--text-accent);
-    min-width: 35px;
-    font-size: 14px;
-}
-
-.leaderboard-user {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.leaderboard-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: var(--bg-tertiary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.leaderboard-name {
-    font-weight: 600;
-    font-size: 15px;
-}
-
-.leaderboard-score {
-    font-weight: 700;
-    color: var(--text-accent);
-    font-size: 14px;
-}
-
-.loading {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--text-secondary);
-    font-style: italic;
-}
-
 /* Стили для вкладки уровней */
 .levels-content {
     display: flex;
     flex-direction: column;
-    gap: 25px;
-    padding: 0 15px;
+    gap: 20px;
+    padding: 15px;
 }
 
 .levels-progress {
-    background: var(--bg-secondary);
+    background: var(--tg-theme-secondary-bg-color, var(--bg-secondary));
     padding: 20px;
     border-radius: 16px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    margin-top: 10px;
 }
 
 .level-indicator {
@@ -857,11 +599,20 @@ body {
     transition: all 0.3s ease;
 }
 
+.level-circle.completed {
+    background: var(--gradient-primary);
+    color: white;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+    background-size: 200% 100%;
+    animation: progress-shine 2s ease-in-out infinite;
+}
+
 .level-circle.active {
-    background: var(--gradient-gold);
-    color: var(--bg-primary);
-    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+    background: var(--gradient-primary);
+    color: white;
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.6);
     transform: scale(1.1);
+    z-index: 3;
 }
 
 .level-line {
@@ -871,6 +622,31 @@ body {
     position: relative;
     top: -1px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.level-line.completed {
+    background: var(--gradient-primary);
+    background-size: 200% 100%;
+    animation: progress-shine 2s ease-in-out infinite;
+}
+
+.level-line.partial {
+    background: var(--bg-tertiary);
+}
+
+.level-line-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: var(--gradient-primary);
+    background-size: 200% 100%;
+    animation: progress-shine 2s ease-in-out infinite;
+    transition: width 0.5s ease;
+    width: 0%;
 }
 
 .levels-grid {
@@ -880,7 +656,7 @@ body {
 }
 
 .level-card {
-    background: var(--bg-secondary);
+    background: var(--tg-theme-secondary-bg-color, var(--bg-secondary));
     padding: 18px;
     border-radius: 16px;
     transition: all 0.3s ease;
@@ -921,6 +697,7 @@ body {
     color: var(--text-secondary);
     font-weight: 600;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-feature-settings: "tnum";
 }
 
 .level-status.completed {
@@ -955,6 +732,7 @@ body {
     font-weight: 600;
     font-size: 14px;
     margin-bottom: 4px;
+    color: var(--text-primary);
 }
 
 .reward-desc {
@@ -966,15 +744,16 @@ body {
 .combo-content {
     display: flex;
     flex-direction: column;
-    gap: 25px;
-    padding: 0 15px;
+    gap: 20px;
+    padding: 15px;
 }
 
 .combo-deck {
-    background: var(--bg-secondary);
+    background: var(--tg-theme-secondary-bg-color, var(--bg-secondary));
     padding: 20px;
     border-radius: 16px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    margin-top: 10px;
 }
 
 .deck-info {
@@ -993,6 +772,7 @@ body {
     color: var(--text-accent);
     line-height: 1;
     text-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+    font-feature-settings: "tnum";
 }
 
 .power-label {
@@ -1025,6 +805,7 @@ body {
     font-size: 18px;
     font-weight: 600;
     color: var(--text-primary);
+    font-feature-settings: "tnum";
 }
 
 .stat-label {
@@ -1034,9 +815,7 @@ body {
 }
 
 .combo-collection h4 {
-    font-size: 16px;
-    margin-bottom: 15px;
-    color: var(--text-primary);
+    display: none; /* Скрываем заголовок коллекции карт */
 }
 
 .cards-grid {
@@ -1051,6 +830,7 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     min-height: 140px;
+    touch-action: manipulation;
 }
 
 .combo-card:active {
@@ -1060,6 +840,7 @@ body {
 
 .combo-card.locked {
     opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .combo-card.active .card-frame {
@@ -1070,7 +851,7 @@ body {
 .card-frame {
     width: 100%;
     height: 100%;
-    background: var(--bg-secondary);
+    background: var(--tg-theme-secondary-bg-color, var(--bg-secondary));
     border-radius: 16px;
     padding: 15px;
     position: relative;
@@ -1153,6 +934,7 @@ body {
     font-size: 13px;
     font-weight: 600;
     margin-bottom: 8px;
+    color: var(--text-primary);
 }
 
 .card-stats {
@@ -1174,10 +956,11 @@ body {
 }
 
 .combo-info {
-    background: var(--bg-secondary);
+    background: var(--tg-theme-secondary-bg-color, var(--bg-secondary));
     padding: 18px;
     border-radius: 16px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
 }
 
 .combo-info h4 {
@@ -1217,22 +1000,28 @@ body {
     height: 100%;
     background: rgba(0, 0, 0, 0.9);
     z-index: 2000;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .modal.active {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 .modal-content {
-    background: var(--bg-primary);
+    background: var(--tg-theme-bg-color, var(--bg-primary));
     border-radius: 20px;
     max-width: 90%;
     max-height: 90%;
     overflow: hidden;
     animation: modalSlideIn 0.3s ease-out;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    margin: auto;
 }
 
 @keyframes modalSlideIn {
@@ -1251,7 +1040,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 20px;
-    background: var(--bg-secondary);
+    background: var(--tg-theme-secondary-bg-color, var(--bg-secondary));
 }
 
 .modal-header h2 {
@@ -1271,6 +1060,9 @@ body {
     transition: all 0.3s ease;
     -webkit-tap-highlight-color: transparent;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    border: none;
+    font-family: inherit;
+    touch-action: manipulation;
 }
 
 .modal-close:active {
@@ -1344,7 +1136,7 @@ body {
 }
 
 .profile-stats {
-    background: var(--bg-secondary);
+    background: var(--tg-theme-secondary-bg-color, var(--bg-secondary));
     border-radius: 16px;
     padding: 20px;
     margin-bottom: 20px;
@@ -1393,6 +1185,7 @@ body {
     font-weight: 700;
     color: var(--text-primary);
     margin-bottom: 2px;
+    font-feature-settings: "tnum";
 }
 
 .stat-label {
@@ -1421,7 +1214,7 @@ body {
     align-items: center;
     gap: 12px;
     padding: 15px;
-    background: var(--bg-secondary);
+    background: var(--tg-theme-secondary-bg-color, var(--bg-secondary));
     border-radius: 16px;
     opacity: 0.5;
     transition: all 0.3s ease;
@@ -1492,7 +1285,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 15px;
-    background: var(--bg-secondary);
+    background: var(--tg-theme-secondary-bg-color, var(--bg-secondary));
     border-radius: 16px;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -1515,9 +1308,31 @@ body {
 
 .modal-actions {
     padding: 20px;
-    background: var(--bg-secondary);
+    background: var(--tg-theme-secondary-bg-color, var(--bg-secondary));
     display: flex;
     justify-content: center;
+}
+
+.btn-secondary {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+    touch-action: manipulation;
+}
+
+.btn-secondary:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.6);
 }
 
 /* Анимация всплывающего текста для критических ударов */
@@ -1546,6 +1361,7 @@ body {
         0 0 20px rgba(212, 175, 55, 0.8),
         0 0 40px rgba(212, 175, 55, 0.6);
     animation: floatUp 2s ease-out forwards;
+    font-feature-settings: "tnum";
 }
 
 /* Улучшенная анимация пульсации для уровня */
@@ -1581,23 +1397,6 @@ body {
     
     .tab-content {
         padding-bottom: 70px;
-    }
-    
-    .tab-header {
-        flex-direction: column;
-        gap: 10px;
-        align-items: flex-start;
-        margin: 15px;
-        margin-bottom: 20px;
-    }
-    
-    .tab-stats {
-        width: 100%;
-        justify-content: space-between;
-    }
-    
-    .friends-actions {
-        flex-direction: column;
     }
     
     .cards-grid {
@@ -1701,7 +1500,6 @@ body {
         gap: 10px;
     }
     
-    .friends-content,
     .levels-content,
     .combo-content {
         padding: 0 10px;
@@ -1726,6 +1524,16 @@ body {
     .card-stats {
         font-size: 9px;
     }
+    
+    .upgrade-btn {
+        min-width: 70px;
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+    
+    .power-value {
+        font-size: 32px;
+    }
 }
 
 @media (max-width: 360px) {
@@ -1746,6 +1554,16 @@ body {
     .card-name {
         font-size: 11px;
         margin-bottom: 6px;
+    }
+    
+    .upgrade-btn {
+        min-width: 65px;
+        font-size: 11px;
+        padding: 6px 10px;
+    }
+    
+    .power-value {
+        font-size: 28px;
     }
 }
 
@@ -1773,4 +1591,62 @@ button, .clickable, .tab-item, .paw-button {
 #cards-grid-container.cards-grid {
     display: grid !important;
     grid-template-columns: repeat(2, 1fr) !important;
+}
+
+/* Telegram Mini Apps специфичные стили */
+.tg-theme-aware {
+    background: var(--tg-theme-bg-color, var(--bg-primary));
+    color: var(--tg-theme-text-color, var(--text-primary));
+}
+
+.tg-background {
+    background: var(--tg-theme-secondary-bg-color, var(--bg-secondary));
+}
+
+.tg-button {
+    background: var(--tg-theme-button-color, var(--gradient-primary));
+    color: var(--tg-theme-button-text-color, white);
+}
+
+/* Дополнительные стили для улучшения читаемости чисел */
+.number-compact {
+    font-feature-settings: "tnum";
+    letter-spacing: -0.5px;
+}
+
+/* Стили для плавных переходов */
+.smooth-transition {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Улучшенная доступность для кнопок */
+button:focus-visible {
+    outline: 2px solid var(--text-accent);
+    outline-offset: 2px;
+}
+
+/* Оптимизация производительности анимаций */
+.particle, .critical-hit, .paw-glow {
+    will-change: transform, opacity;
+}
+
+/* Поддержка reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Запрет масштабирования для всех интерактивных элементов */
+button, .paw-button, .tab-item, .upgrade-card, .combo-card, .level-card {
+    touch-action: manipulation;
+    -webkit-user-drag: none;
+}
+
+/* Восстановление скролла */
+.tab-content, .profile-content, .modal {
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
 }
